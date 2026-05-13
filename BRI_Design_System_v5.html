@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>BRI Design System v5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F0F4F8;--card:#FFFFFF;--brd:#E2ECF4;--brd2:#CBD8E8;
+  --t1:#0D1F35;--t2:#435770;--t3:#8FA5BE;
+  --bri:#00529C;--org:#F37021;
+  --fi:'Inter',system-ui,sans-serif;
+  --r:14px;--rs:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--fi);background:var(--bg);color:var(--t1);font-size:14px;
+  -webkit-font-smoothing:antialiased;font-feature-settings:"cv02","cv03","cv04","cv11";}
+.wrap{max-width:1060px;margin:0 auto;padding:1.5rem 1.5rem 5rem;}
+
+/* ─── TOP BAR ─── */
+.bar{position:sticky;top:0;z-index:200;background:var(--card);
+  border-bottom:1.5px solid var(--brd);padding:0 1.5rem;
+  display:flex;align-items:stretch;}
+.bar-brand{display:flex;align-items:center;gap:8px;
+  padding:10px 16px 10px 0;border-right:1px solid var(--brd);margin-right:8px;}
+.bar-logo{width:22px;height:22px;background:#00529C;border-radius:5px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.bar-title{font-weight:700;font-size:13px;color:var(--t1);}
+.bar-ver{font-size:10px;color:var(--t3);background:var(--bg);
+  padding:2px 7px;border-radius:10px;border:1px solid var(--brd);}
+.bar-tabs{display:flex;align-items:stretch;}
+.tab{font-size:12px;font-weight:500;color:var(--t2);padding:0 12px;cursor:pointer;
+  border-bottom:2.5px solid transparent;display:flex;align-items:center;
+  transition:color .15s,border-color .15s;text-decoration:none;white-space:nowrap;}
+.tab:hover{color:var(--t1);}
+.tab.on{color:var(--bri);border-bottom-color:var(--bri);font-weight:600;}
+.bar-right{display:flex;align-items:center;gap:6px;
+  padding:8px 0 8px 12px;margin-left:auto;border-left:1px solid var(--brd);}
+.mbtn{border:1px solid var(--brd2);border-radius:20px;padding:4px 13px;
+  font-size:11px;font-weight:600;cursor:pointer;background:var(--card);
+  color:var(--t2);transition:all .18s;font-family:var(--fi);}
+.mbtn.on{background:var(--bri);color:#fff;border-color:var(--bri);}
+.mbtn.ono{background:var(--org);color:#fff;border-color:var(--org);}
+
+/* ─── NOTIF ─── */
+.notif{background:var(--card);border:1px solid var(--brd);border-radius:10px;
+  padding:9px 14px;margin-bottom:1.5rem;font-size:11px;color:var(--t2);
+  display:flex;align-items:center;gap:8px;min-height:36px;transition:all .3s;}
+.ndot{width:7px;height:7px;border-radius:50%;background:var(--bri);flex-shrink:0;}
+
+/* ─── PAGES ─── */
+.pg-sec{display:none;}.pg-sec.on{display:block;}
+.sec{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--t3);
+  text-transform:uppercase;margin:2.2rem 0 .6rem;}
+.sec-d{font-size:12px;color:var(--t2);margin-bottom:.9rem;line-height:1.7;}
+.div{height:1px;background:var(--brd);margin:2rem 0;}
+.ibox{background:#EBF4FF;border:1px solid #A8CAEC;border-radius:9px;
+  padding:9px 14px;font-size:11.5px;color:#002B5E;line-height:1.75;margin-bottom:1rem;}
+.wbox{background:#FFFBEB;border:1px solid #FDE68A;border-radius:9px;
+  padding:9px 14px;font-size:11.5px;color:#78350F;line-height:1.75;margin-bottom:1rem;}
+
+/* ─── PAGE HEADER ─── */
+.hdr{border-radius:20px;padding:1.8rem 2.4rem;margin-bottom:1.8rem;
+  background:linear-gradient(140deg,#001B38 0%,#003270 40%,#00529C 100%);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;}
+.hdr h1{font-size:1.65rem;font-weight:800;color:#fff;letter-spacing:-.4px;}
+.hdr p{font-size:.73rem;color:rgba(255,255,255,.5);margin-top:4px;}
+.htags{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap;}
+.htag{font-size:9.5px;font-weight:600;padding:3px 9px;border-radius:20px;
+  background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);}
+.htag.o{background:rgba(243,112,33,.25);color:#FFB870;}
+
+/* ─── COLOR SCALES ─── */
+.pc-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.6rem;}
+.pc{border-radius:var(--r);overflow:hidden;border:1px solid var(--brd);background:var(--card);}
+.ps{height:146px;display:flex;flex-direction:column;justify-content:flex-end;
+  padding:1.2rem;position:relative;}
+.pbadge{position:absolute;top:11px;right:11px;border-radius:20px;padding:3px 10px;
+  font-size:9.5px;font-weight:700;background:rgba(255,255,255,.18);color:rgba(255,255,255,.85);}
+.ps h2{font-size:1.1rem;color:#fff;font-weight:700;}
+.ps-s{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px;}
+.pi{padding:1.1rem;}
+.hx{font-size:1.25rem;font-weight:700;cursor:pointer;margin-bottom:9px;
+  color:var(--t1);letter-spacing:-.3px;}
+.hx:hover{color:var(--bri);}
+.tags{display:flex;flex-wrap:wrap;gap:5px;}
+.tag{background:var(--bg);border-radius:5px;padding:4px 9px;font-size:.67rem;
+  cursor:pointer;color:var(--t2);border:1px solid var(--brd);transition:background .15s;}
+.tag:hover{background:#EBF4FF;color:var(--bri);border-color:#A8CAEC;}
+
+.scl{display:flex;gap:3px;margin-bottom:.3rem;}
+.sw{flex:1;border-radius:6px;cursor:pointer;border:1px solid transparent;
+  display:flex;flex-direction:column;justify-content:flex-end;padding:5px;
+  transition:transform .12s;}
+.sw:hover{transform:scale(1.09);z-index:2;position:relative;
+  box-shadow:0 3px 12px rgba(0,0,0,.2);}
+.sw.base{outline:3px solid;outline-offset:2px;}
+.sw-lg{height:68px;}.sw-md{height:56px;}.sw-sm{height:42px;}
+.sl{font-size:9px;font-weight:700;}
+.sh{font-size:8px;margin-top:1px;}
+.slbl{display:flex;gap:3px;margin-bottom:1.4rem;}
+.slbl span{flex:1;text-align:center;font-size:8px;color:var(--t3);}
+.nw{flex:1;height:42px;border-radius:6px;cursor:pointer;
+  border:1px solid transparent;transition:transform .12s;}
+.nw:hover{transform:scale(1.09);}
+
+/* ─── SEMANTIC ─── */
+.sgg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.4rem;}
+.scc{border-radius:10px;overflow:hidden;border:1px solid var(--brd);background:var(--card);}
+.sss{height:50px;}.sii{padding:8px 10px;}
+.sn{font-size:11px;font-weight:600;color:var(--t1);}
+.sv{font-size:9.5px;color:var(--t2);cursor:pointer;}
+.sv:hover{color:var(--bri);}
+
+/* ─── BADGES ─── */
+.bdg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.4rem;}
+.bdg-card{background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:10px;}
+.bdg-pill{display:inline-flex;align-items:center;gap:5px;border-radius:20px;
+  padding:4px 11px;font-size:11px;font-weight:600;margin-bottom:7px;}
+.bdg-dot{width:6px;height:6px;border-radius:50%;}
+.bdg-vals{font-size:9px;color:var(--t3);line-height:2.1;}
+.bdg-vals span{cursor:pointer;}.bdg-vals span:hover{color:var(--bri);}
+
+/* ─── DATA VIZ ─── */
+.dv-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:.8rem;}
+.dvs{border-radius:9px;cursor:pointer;padding:10px 8px;transition:transform .12s;
+  display:flex;flex-direction:column;gap:2px;height:76px;justify-content:flex-end;}
+.dvs:hover{transform:scale(1.05);}
+.dv-grp{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--t3);
+  text-transform:uppercase;margin:.9rem 0 .4rem;}
+
+/* ─── GRADIENTS ─── */
+.gg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.4rem;}
+.gs{height:84px;border-radius:var(--r);cursor:pointer;display:flex;align-items:flex-end;
+  padding:11px 13px;transition:transform .12s;}
+.gs:hover{transform:scale(1.02);}
+.gn{font-size:12px;color:#fff;font-weight:700;}
+.gc{font-size:8.5px;color:rgba(255,255,255,.55);margin-top:2px;}
+
+/* ─── A11Y ─── */
+.a11y-row{display:flex;gap:7px;margin-bottom:7px;}
+.a11y-chip{flex:1;border-radius:9px;padding:10px 14px;
+  display:flex;align-items:center;justify-content:space-between;}
+.wcag{font-size:9.5px;padding:3px 10px;border-radius:20px;font-weight:700;
+  background:rgba(0,0,0,.12);}
+
+/* ─── TYPOGRAPHY ─── */
+.fbox{background:var(--card);border:1px solid var(--brd);
+  border-radius:var(--r);margin-bottom:1.4rem;overflow:hidden;}
+.fhdr{padding:1rem 1.4rem;border-bottom:1px solid var(--brd);
+  display:flex;align-items:center;justify-content:space-between;}
+.fbody{padding:1.4rem;}
+.frow{display:flex;gap:1rem;align-items:baseline;
+  padding-bottom:.9rem;margin-bottom:.9rem;border-bottom:1px solid var(--brd);}
+.frow:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0;}
+.wlbl{font-size:9px;color:var(--t3);min-width:78px;flex-shrink:0;}
+.fbadge{background:var(--bg);border:1px solid var(--brd);border-radius:20px;
+  font-size:9px;font-weight:600;padding:2px 9px;color:var(--t2);}
+
+.type-tbl{width:100%;border-collapse:collapse;margin-bottom:1.4rem;}
+.type-tbl th{background:var(--bg);padding:8px 12px;text-align:left;
+  font-size:9px;font-weight:700;color:var(--t3);letter-spacing:1.5px;
+  text-transform:uppercase;border-bottom:1px solid var(--brd);}
+.type-tbl td{padding:10px 12px;border-bottom:1px solid var(--brd);
+  background:var(--card);vertical-align:middle;}
+.type-tbl tr:last-child td{border-bottom:none;}
+.tok{font-size:9.5px;color:var(--t3);background:var(--bg);
+  padding:2px 7px;border-radius:4px;cursor:pointer;}
+.tok:hover{color:var(--bri);}
+
+/* ─── SPACING ─── */
+.sp-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.4rem;}
+.sp-item{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;}
+.sp-block{background:#EBF4FF;border:1px solid #A8CAEC;border-radius:3px;}
+.sp-lbl{font-size:9px;color:var(--t2);text-align:center;font-weight:600;}
+.sp-tok{font-size:8px;color:var(--t3);}
+
+/* ─── RADIUS ─── */
+.rad-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:1.4rem;}
+.rad-item{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;}
+.rad-box{width:52px;height:52px;background:#00529C;opacity:.8;}
+.rad-lbl{font-size:9px;color:var(--t2);text-align:center;font-weight:600;}
+.rad-val{font-size:8px;color:var(--t3);}
+
+/* ─── SHADOWS ─── */
+.shad-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.4rem;}
+.shad-card{background:var(--card);border-radius:var(--r);padding:1rem;
+  display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;}
+.shad-inner{width:100%;height:38px;background:var(--card);border-radius:8px;
+  border:1px solid var(--brd);}
+.shad-lbl{font-size:11px;font-weight:600;color:var(--t1);}
+.shad-desc{font-size:10px;color:var(--t2);text-align:center;line-height:1.5;}
+
+/* ─── STATES ─── */
+.state-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:1.4rem;}
+.state-card{border-radius:10px;padding:.85rem;text-align:center;
+  border:1px solid var(--brd);background:var(--card);}
+.state-demo{border-radius:8px;padding:7px 12px;font-size:12px;font-weight:600;
+  margin-bottom:7px;display:inline-block;}
+.state-nm{font-size:10px;font-weight:700;color:var(--t1);}
+.state-val{font-size:9px;color:var(--t3);margin-top:2px;}
+
+/* ─── OPACITY ─── */
+.op-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.4rem;}
+.op-item{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;}
+.op-block{width:50px;height:38px;border-radius:6px;background:#00529C;
+  border:1px solid var(--brd);}
+.op-lbl{font-size:9px;color:var(--t2);font-weight:600;}
+
+/* ─── Z-INDEX ─── */
+.z-stack{display:flex;flex-direction:column;gap:4px;margin-bottom:1.4rem;}
+.z-row{display:flex;align-items:center;gap:10px;padding:8px 12px;
+  border-radius:8px;background:var(--card);border:1px solid var(--brd);cursor:pointer;}
+.z-val{font-size:13px;font-weight:700;color:var(--bri);min-width:48px;}
+.z-nm{font-size:12px;font-weight:600;color:var(--t1);}
+.z-bar{height:7px;background:var(--bri);border-radius:4px;opacity:.2;}
+.z-desc{font-size:11px;color:var(--t2);margin-left:auto;text-align:right;}
+
+/* ─── TRANSITIONS ─── */
+.trans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.4rem;}
+.tc{background:var(--card);border:1px solid var(--brd);border-radius:10px;
+  padding:11px;cursor:pointer;overflow:hidden;}
+.tc-demo{height:7px;background:var(--bri);border-radius:4px;margin-bottom:9px;
+  width:28%;transition-property:width;}
+.tc:hover .tc-demo{width:100%;}
+.tc-nm{font-size:11px;font-weight:700;color:var(--t1);}
+.tc-css{font-size:9.5px;color:var(--t3);margin-top:3px;}
+.tc-use{font-size:10px;color:var(--t2);margin-top:5px;line-height:1.5;}
+
+/* ─── BREAKPOINTS ─── */
+.bp-grid{display:flex;flex-direction:column;gap:5px;margin-bottom:1.4rem;}
+.bp-row{display:flex;align-items:center;gap:10px;padding:8px 12px;
+  background:var(--card);border:1px solid var(--brd);border-radius:8px;cursor:pointer;}
+.bp-bar-w{flex:1;background:var(--bg);border-radius:4px;height:9px;overflow:hidden;}
+.bp-bar{height:100%;background:var(--bri);border-radius:4px;opacity:.55;}
+.bp-nm{font-size:12px;font-weight:700;color:var(--bri);min-width:36px;}
+.bp-px{font-size:11px;color:var(--t1);min-width:90px;}
+.bp-col{font-size:10px;color:var(--t2);min-width:100px;}
+.bp-use{font-size:11px;color:var(--t2);margin-left:auto;}
+
+/* ─── COMPONENTS ─── */
+.cdemo{background:var(--bg);border-radius:var(--r);padding:1.3rem;
+  margin-bottom:.5rem;border:1px solid var(--brd);}
+.nav-lnk{font-size:12px;color:rgba(255,255,255,.6);font-weight:500;
+  padding:5px 10px;border-radius:6px;cursor:pointer;white-space:nowrap;}
+.nav-lnk.on{color:#fff;background:rgba(255,255,255,.17);font-weight:600;}
+.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;}
+.kpi-card{background:var(--card);border:1px solid var(--brd);border-radius:12px;padding:1rem;}
+.kpi-lbl{font-size:11px;color:var(--t2);margin-bottom:4px;}
+.kpi-val{font-size:22px;font-weight:700;color:var(--t1);line-height:1.1;
+  font-variant-numeric:tabular-nums;}
+.kpi-sub{font-size:10.5px;font-weight:600;margin-top:5px;}
+.kpi-prog{height:4px;background:var(--bg);border-radius:2px;margin-top:8px;}
+.kpi-fill{height:100%;border-radius:2px;}
+.tbl-demo{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:.5rem;}
+.tbl-demo thead th{background:var(--bg);padding:9px 12px;text-align:left;
+  font-size:9.5px;font-weight:700;color:var(--t3);letter-spacing:1px;
+  text-transform:uppercase;border-bottom:1.5px solid var(--brd);}
+.tbl-demo tbody td{padding:9px 12px;border-bottom:1px solid var(--brd);
+  color:var(--t1);vertical-align:middle;}
+.tbl-demo tbody tr:last-child td{border-bottom:none;}
+.tbl-demo tbody tr:hover td{background:var(--bg);}
+.num{text-align:right;font-variant-numeric:tabular-nums;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:.8rem;}
+.b-prim{background:var(--bri);color:#fff;border:none;border-radius:8px;
+  padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;
+  font-family:var(--fi);transition:background .18s;}
+.b-prim:hover{background:#003F7A;}
+.b-sec{background:transparent;color:var(--bri);border:1.5px solid var(--bri);
+  border-radius:8px;padding:7px 18px;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:var(--fi);}
+.b-ghost{background:transparent;color:var(--t2);border:1.5px solid var(--brd);
+  border-radius:8px;padding:7px 18px;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:var(--fi);}
+.b-danger{background:#DC2626;color:#fff;border:none;border-radius:8px;
+  padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fi);}
+.b-orange{background:#F37021;color:#fff;border:none;border-radius:8px;
+  padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fi);}
+.b-sm{padding:5px 12px!important;font-size:11px!important;}
+.b-lg{padding:11px 24px!important;font-size:15px!important;}
+.b-dis{opacity:.4;cursor:not-allowed!important;}
+.inp{width:100%;border:1.5px solid var(--brd);border-radius:8px;
+  padding:9px 12px;font-size:13px;font-family:var(--fi);color:var(--t1);
+  background:var(--card);outline:none;margin-bottom:8px;transition:border-color .15s;}
+.inp:focus{border-color:var(--bri);box-shadow:0 0 0 3px rgba(0,82,156,.1);}
+.inp-lbl{font-size:11px;font-weight:600;color:var(--t1);display:block;margin-bottom:4px;}
+
+/* ─── DARK MODE ─── */
+.dp{background:#091322;border-radius:var(--r);padding:1.4rem;
+  border:1px solid #162D4E;margin-bottom:1.4rem;}
+.dp .sec{color:#2D4D6E;margin-top:0;}
+.dm-surf{border-radius:8px;cursor:pointer;min-height:60px;padding:8px;
+  border:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;
+  justify-content:flex-end;gap:2px;transition:transform .12s;}
+.dm-surf:hover{transform:scale(1.05);}
+.dm-sw{flex:1;height:50px;border-radius:6px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;
+  justify-content:flex-end;padding:5px;transition:transform .12s;}
+.dm-sw:hover{transform:scale(1.09);z-index:2;position:relative;}
+
+/* ─── CSS BLOCK ─── */
+.cssb{background:#091322;border-radius:var(--r);padding:1.3rem;
+  border:1px solid #162D4E;font-size:10.5px;color:#7A9CBE;
+  line-height:1.9;margin-bottom:1.4rem;overflow-x:auto;white-space:pre;}
+.cpb{background:rgba(14,30,56,.8);border:1px solid #274E80;color:#7AAED8;
+  border-radius:6px;padding:4px 12px;font-size:10px;cursor:pointer;font-family:var(--fi);}
+.cpb:hover{background:#152B4E;color:#EAF2FC;}
+
+/* ─── USAGE ─── */
+.ug{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.4rem;}
+.uc{background:var(--card);border-radius:var(--rs);padding:.9rem;border:1px solid var(--brd);}
+.ut{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.ud{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.ut span{font-size:12px;font-weight:700;color:var(--t1);}
+.ul{font-size:10.5px;color:var(--t2);line-height:2.1;}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="bar">
+  <div class="bar-brand">
+    <div class="bar-logo"><svg width="13" height="13" viewBox="0 0 192 192"><path d="M28.217 0C12.623 0 0 12.622 0 28.229v135.35c0 15.608 12.623 28.244 28.217 28.244H163.58c15.593 0 28.243-12.636 28.243-28.243V28.229C191.823 12.622 179.173 0 163.58 0Zm0 22.002h18.352v.095a22.3 22.3 0 0 1 15.395 5.558c.343.304.688.648 1.005.965 8.635 8.622 8.516 21.652-.238 31.766L33.828 92.143c-1.94 2.126-1.94 5.387 0 7.5l28.705 31.53.277.329c8.833 9.625 8.913 22.933.159 31.661-.317.343-.662.65-1.005.953-4.238 3.776-9.691 5.742-15.395 5.584v.095H28.217a6.215 6.215 0 0 1-6.222-6.22V28.22a6.213 6.213 0 0 1 6.222-6.217zm57.276.006h20.282v.095a22.32 22.32 0 0 1 15.409 5.56c.343.304.686.646 1.003.963 8.635 8.622 8.516 21.655-.238 31.768L93.377 92.466a5.605 5.605 0 0 0 .077 7.526l65.27 69.807h-73.23c9.836-16.623 7.618-38-6.668-53.409v-.004L60.18 95.908l18.435-20.28.394-.411c14.062-15.898 16.188-36.823 6.483-53.209Zm59.206.004h18.88a6.22 6.22 0 0 1 6.222 6.217v120.84l-50.083-53.526 18.102-19.911.382-.41c14.062-15.896 16.215-36.824 6.497-53.21" fill="white"/></svg></div>
+    <span class="bar-title">BRI Design System</span>
+    <span class="bar-ver">v5.0</span>
+  </div>
+  <div class="bar-tabs">
+    <a class="tab on" onclick="showPg('colors',this)">Colors</a>
+    <a class="tab" onclick="showPg('typo',this)">Typography</a>
+    <a class="tab" onclick="showPg('tokens',this)">Spacing &amp; Tokens</a>
+    <a class="tab" onclick="showPg('comp',this)">Components</a>
+    <a class="tab" onclick="showPg('dark',this)">Dark Mode</a>
+    <a class="tab" onclick="showPg('css',this)">CSS Variables</a>
+  </div>
+  <div class="bar-right">
+    <button class="mbtn on" id="btn-lm" onclick="setMode('light')">☀ Light</button>
+    <button class="mbtn" id="btn-dm" onclick="setMode('dark')">☾ Dark</button>
+  </div>
+</div>
+<div class="wrap">
+<div class="notif" id="notif"><span class="ndot"></span><span id="ntxt">Klik swatch atau tag untuk menyalin nilai ke clipboard</span></div>
+<div class="hdr">
+  <div>
+    <h1>BRI Design System</h1>
+    <p>PT Bank Rakyat Indonesia — Color, Typography, Components &amp; Design Tokens</p>
+    <div class="htags">
+      <span class="htag">v5.0 · 2026</span>
+      <span class="htag o">9 Color Scales</span>
+      <span class="htag">12-Series DV Palette</span>
+      <span class="htag">Inter Only</span>
+      <span class="htag">Light + Dark</span>
+      <span class="htag">Full Design Tokens</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;">
+    <div style="display:flex;gap:5px;align-items:center;">
+      <span style="width:30px;height:30px;border-radius:50%;background:#F37021;display:inline-block;"></span>
+      <span style="width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.25);display:inline-block;"></span>
+      <span style="width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,.12);display:inline-block;"></span>
+    </div>
+    <span style="font-size:9px;color:rgba(255,255,255,.3);">Color + Typography + Tokens</span>
+  </div>
+</div>
+
+<!-- ====== PAGE: COLORS ====== -->
+<div id="pg-colors" class="pg-sec on">
+<div class="sec">Primary Colors — Brand Anchor</div>
+<div class="pc-grid">
+  <div class="pc">
+    <div class="ps" style="background:linear-gradient(145deg,#003270,#00529C);">
+      <span class="pbadge">★ PRIMARY</span><h2>BRI Blue</h2><span class="ps-s">Brand anchor · Navigation · CTA</span>
+    </div>
+    <div class="pi">
+      <div class="hx" onclick="cp('#00529C','BRI Blue')">#00529C ⎘</div>
+      <div class="tags">
+        <span class="tag" onclick="cp('rgb(0,82,156)','RGB')">RGB 0,82,156</span>
+        <span class="tag" onclick="cp('hsl(208,100%,31%)','HSL')">HSL 208° 100% 31%</span>
+        <span class="tag" onclick="cp('C:100 M:47 Y:0 K:39','CMYK')">C100 M47 Y0 K39</span>
+        <span class="tag" onclick="cp('Pantone 287 C','Pantone')">Pantone 287 C</span>
+        <span class="tag" onclick="cp('TC 3308','TC')">TC 3308</span>
+      </div>
+    </div>
+  </div>
+  <div class="pc">
+    <div class="ps" style="background:linear-gradient(145deg,#C05415,#F37021);">
+      <span class="pbadge">★ ACCENT</span><h2>BRI Orange</h2><span class="ps-s">Highlight · Alert · CTA sekunder</span>
+    </div>
+    <div class="pi">
+      <div class="hx" onclick="cp('#F37021','BRI Orange')">#F37021 ⎘</div>
+      <div class="tags">
+        <span class="tag" onclick="cp('rgb(243,112,33)','RGB')">RGB 243,112,33</span>
+        <span class="tag" onclick="cp('hsl(23,90%,54%)','HSL')">HSL 23° 90% 54%</span>
+        <span class="tag" onclick="cp('C:0 M:54 Y:86 K:5','CMYK')">C0 M54 Y86 K5</span>
+        <span class="tag" onclick="cp('Pantone 158 C','Pantone')">Pantone 158 C</span>
+        <span class="tag" onclick="cp('C:0 M:70 Y:100 K:0','CMYK-alt')">C0 M70 Y100 K0</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="scale-container"></div>
+<div class="div"></div>
+<div class="sec">Slate Scale — Cool Blue-Gray · UI Surfaces</div>
+<div class="sec-d">Blue-tinted gray (H=208°, S=14%) untuk surface, border, dan teks. Lebih harmonis daripada abu-abu netral.</div>
+<div class="scl" id="slate-row"></div>
+<div class="slbl"><span>50</span><span>100</span><span>200</span><span>300</span><span>400</span><span>500</span><span>600</span><span>700</span><span>800</span><span>900</span></div>
+<div style="display:flex;gap:3px;margin-bottom:1.4rem;">
+  <div style="flex:1;text-align:center;font-size:8px;color:var(--t3);">page-bg</div>
+  <div style="flex:1;text-align:center;font-size:8px;color:var(--t3);">card-alt</div>
+  <div style="flex:1;text-align:center;font-size:8px;color:var(--t3);">border</div>
+  <div style="flex:1;text-align:center;font-size:8px;color:var(--t3);">border+</div>
+  <div style="flex:1;text-align:center;font-size:8px;color:var(--t3);">muted</div>
+  <div style="flex:1;text-align:center;font-size:8px;color:var(--t3);">secondary</div>
+  <div style="flex:1;text-align:center;font-size:8px;color:var(--t3);">primary</div>
+  <div style="flex:1;text-align:center;font-size:8px;color:var(--t3);">sidebar</div>
+  <div style="flex:1;text-align:center;font-size:8px;color:var(--t3);">dm-card</div>
+  <div style="flex:1;text-align:center;font-size:8px;color:var(--t3);">dm-page</div>
+</div>
+<div class="div"></div>
+<div class="sec">Semantic Colors</div>
+<div class="sgg" id="sem-grid"></div>
+<div class="sec">Status Badge System — 8 Pasangan Siap Pakai</div>
+<div class="bdg-grid" id="badge-grid"></div>
+<div class="div"></div>
+<div class="sec">Data Visualization Palette — 12 Series</div>
+<div class="sec-d">Series 1–2 wajib BRI brand. Series 3–8 untuk chart standar. Series 9–12 untuk kasus lebih dari 8 kategori.</div>
+<div class="dv-grp">Series 1–6 · Core</div>
+<div class="dv-grid" id="dv-core"></div>
+<div class="dv-grp">Series 7–12 · Extended (untuk &gt;8 data series)</div>
+<div class="dv-grid" id="dv-ext"></div>
+<div class="cssb" id="dv-code"></div>
+<div class="div"></div>
+<div class="sec">Gradient Library</div>
+<div class="gg" id="grad-grid"></div>
+<div class="sec">Aksesibilitas — WCAG 2.1</div>
+<div id="a11y-sec"></div>
+</div>
+
+<!-- ====== PAGE: TYPOGRAPHY ====== -->
+<div id="pg-typo" class="pg-sec">
+<div class="sec">Font Stack — Inter Only</div>
+<div class="ibox"><strong>Satu font untuk semua:</strong> Inter digunakan untuk semua elemen UI — heading, body, label, button, nav, dan angka. Inter adalah pilihan terbaik untuk dashboard karena dirancang khusus untuk screen, memiliki optical sizing, dan sangat legible di ukuran kecil.<br><br>Untuk angka di tabel dan KPI: gunakan <code style="background:rgba(0,82,156,.1);padding:1px 6px;border-radius:3px;font-size:11px;">font-variant-numeric: tabular-nums</code> agar digit sejajar secara konsisten — tidak perlu font berbeda.</div>
+
+<div class="sec">Inter — Semua Elemen UI</div>
+<div class="fbox">
+  <div class="fhdr">
+    <div>
+      <div style="font-size:14px;font-weight:700;color:var(--t1);font-family:Inter;">Inter</div>
+      <div style="font-size:10px;color:var(--t2);">Google Fonts · Rasmus Andersson · Variable optical size 14..32pt · No install required</div>
+    </div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;">
+      <span class="fbadge">Heading</span><span class="fbadge">Body</span>
+      <span class="fbadge">Label</span><span class="fbadge">Button</span>
+      <span class="fbadge">Nav</span><span class="fbadge">Number</span>
+    </div>
+  </div>
+  <div class="fbody">
+    <div class="frow"><span class="wlbl">300 · Light</span><div><div style="font-family:Inter;font-weight:300;font-size:22px;color:var(--t1);">Dashboard Infrastruktur IT</div><div style="font-size:10px;color:var(--t3);margin-top:2px;">Caption sekunder, body text ringan</div></div></div>
+    <div class="frow"><span class="wlbl">400 · Regular</span><div><div style="font-family:Inter;font-weight:400;font-size:22px;color:var(--t1);">Laporan Realisasi Anggaran 2026</div><div style="font-size:10px;color:var(--t3);margin-top:2px;">Body text, deskripsi, konten tabel</div></div></div>
+    <div class="frow"><span class="wlbl">500 · Medium</span><div><div style="font-family:Inter;font-weight:500;font-size:22px;color:var(--t1);">PMO Infrastruktur IT Directorate</div><div style="font-size:10px;color:var(--t3);margin-top:2px;">Label, nav item, badge, subheading</div></div></div>
+    <div class="frow"><span class="wlbl">600 · SemiBold</span><div><div style="font-family:Inter;font-weight:600;font-size:22px;color:var(--t1);">Monitoring Pengadaan Q1 2026</div><div style="font-size:10px;color:var(--t3);margin-top:2px;">Card title, section heading, button</div></div></div>
+    <div class="frow"><span class="wlbl">700 · Bold</span><div><div style="font-family:Inter;font-weight:700;font-size:22px;color:var(--t1);">Total Budget CAPEX 2026</div><div style="font-size:10px;color:var(--t3);margin-top:2px;">Page title, widget header, chart title</div></div></div>
+    <div class="frow"><span class="wlbl">800 · ExtraBold</span><div><div style="font-family:Inter;font-weight:800;font-size:22px;color:var(--t1);">BRI IT Infrastructure Dashboard</div><div style="font-size:10px;color:var(--t3);margin-top:2px;">Hero text, login screen, brand statement</div></div></div>
+    <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--brd);">
+      <div style="font-size:9px;color:var(--t3);margin-bottom:8px;font-weight:700;letter-spacing:1px;">ANGKA — PERBANDINGAN RENDERING</div>
+      <div style="display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:9px;color:var(--t3);margin-bottom:4px;">Inter default</div>
+          <div style="font-family:Inter;font-size:13px;line-height:2.1;">1.000.000<br>987.654<br>12.345</div>
+        </div>
+        <div>
+          <div style="font-size:9px;color:var(--t3);margin-bottom:4px;">Inter + tabular-nums ✓ (untuk tabel)</div>
+          <div style="font-family:Inter;font-size:13px;line-height:2.1;font-variant-numeric:tabular-nums;">1.000.000<br>987.654<br>12.345</div>
+        </div>
+        <div>
+          <div style="font-size:9px;color:var(--t3);margin-bottom:4px;">Inter 600 untuk KPI value</div>
+          <div style="font-family:Inter;font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--t1);">Rp 24,5M</div>
+          <div style="font-family:Inter;font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;color:#00529C;">67.4%</div>
+        </div>
+        <div style="font-size:11px;color:var(--t2);max-width:180px;line-height:1.6;padding-top:20px;">Selalu tambahkan <code style="background:var(--bg);padding:1px 5px;border-radius:3px;">font-variant-numeric:tabular-nums</code> pada semua elemen yang menampilkan angka.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">Type Scale — Dashboard</div>
+<table class="type-tbl" id="type-tbl"></table>
+
+<div class="sec">Live Demo — Dashboard Card</div>
+<div style="background:var(--bg);border-radius:var(--r);padding:1.4rem;border:1px solid var(--brd);margin-bottom:1.4rem;">
+  <div style="background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--brd);">
+    <div style="background:linear-gradient(135deg,#001B38,#00529C);padding:.75rem 1.2rem;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:8px;"><svg width="17" height="17" viewBox="0 0 192 192"><path d="M28.217 0C12.623 0 0 12.622 0 28.229v135.35c0 15.608 12.623 28.244 28.217 28.244H163.58c15.593 0 28.243-12.636 28.243-28.243V28.229C191.823 12.622 179.173 0 163.58 0Zm0 22.002h18.352v.095a22.3 22.3 0 0 1 15.395 5.558c.343.304.688.648 1.005.965 8.635 8.622 8.516 21.652-.238 31.766L33.828 92.143c-1.94 2.126-1.94 5.387 0 7.5l28.705 31.53.277.329c8.833 9.625 8.913 22.933.159 31.661-.317.343-.662.65-1.005.953-4.238 3.776-9.691 5.742-15.395 5.584v.095H28.217a6.215 6.215 0 0 1-6.222-6.22V28.22a6.213 6.213 0 0 1 6.222-6.217zm57.276.006h20.282v.095a22.32 22.32 0 0 1 15.409 5.56c.343.304.686.646 1.003.963 8.635 8.622 8.516 21.655-.238 31.768L93.377 92.466a5.605 5.605 0 0 0 .077 7.526l65.27 69.807h-73.23c9.836-16.623 7.618-38-6.668-53.409v-.004L60.18 95.908l18.435-20.28.394-.411c14.062-15.898 16.188-36.823 6.483-53.209Zm59.206.004h18.88a6.22 6.22 0 0 1 6.222 6.217v120.84l-50.083-53.526 18.102-19.911.382-.41c14.062-15.896 16.215-36.824 6.497-53.21" fill="white"/></svg><span style="font-family:Inter;font-weight:700;font-size:13px;color:#fff;">Dashboard PMO Infrastruktur</span></div>
+      <span style="font-size:10px;color:rgba(255,255,255,.45);font-variant-numeric:tabular-nums;">Apr 2026</span>
+    </div>
+    <div style="padding:1.2rem;">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;">
+        <div style="background:#F0F4F8;border-radius:8px;padding:10px;"><div style="font-family:Inter;font-size:10px;color:#435770;margin-bottom:4px;">Total OPEX</div><div style="font-family:Inter;font-size:20px;font-weight:600;color:#0D1F35;font-variant-numeric:tabular-nums;">Rp 24,5M</div><div style="font-family:Inter;font-size:10px;font-weight:600;color:#059669;margin-top:3px;">↑ 67.4% Terserap</div></div>
+        <div style="background:#F0F4F8;border-radius:8px;padding:10px;"><div style="font-family:Inter;font-size:10px;color:#435770;margin-bottom:4px;">Sisa Anggaran</div><div style="font-family:Inter;font-size:20px;font-weight:600;color:#0D1F35;font-variant-numeric:tabular-nums;">Rp 8,0M</div><div style="font-family:Inter;font-size:10px;font-weight:600;color:#F37021;margin-top:3px;">→ 32.6% Tersisa</div></div>
+        <div style="background:#F0F4F8;border-radius:8px;padding:10px;"><div style="font-family:Inter;font-size:10px;color:#435770;margin-bottom:4px;">Item Pengadaan</div><div style="font-family:Inter;font-size:20px;font-weight:600;color:#0D1F35;font-variant-numeric:tabular-nums;">142</div><div style="font-family:Inter;font-size:10px;font-weight:600;color:#00529C;margin-top:3px;">→ 89 Selesai</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-family:Inter;font-size:11px;color:#435770;">Hardware &amp; Infrastructure</span><span style="font-family:Inter;font-size:11px;font-weight:500;color:#0D1F35;font-variant-numeric:tabular-nums;">72.3%</span></div><div style="height:6px;background:#E2ECF4;border-radius:3px;"><div style="height:100%;width:72.3%;background:#00529C;border-radius:3px;"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-family:Inter;font-size:11px;color:#435770;">Software &amp; Lisensi</span><span style="font-family:Inter;font-size:11px;font-weight:500;color:#0D1F35;font-variant-numeric:tabular-nums;">55.8%</span></div><div style="height:6px;background:#E2ECF4;border-radius:3px;"><div style="height:100%;width:55.8%;background:#F37021;border-radius:3px;"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-family:Inter;font-size:11px;color:#435770;">Maintenance &amp; Support</span><span style="font-family:Inter;font-size:11px;font-weight:500;color:#0D1F35;font-variant-numeric:tabular-nums;">88.1%</span></div><div style="height:6px;background:#E2ECF4;border-radius:3px;"><div style="height:100%;width:88.1%;background:#059669;border-radius:3px;"></div></div></div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:.7rem;font-size:9.5px;color:var(--t3);">Semua teks = Inter · Heading = 700 · Body = 400 · Numbers = 600 + tabular-nums</div>
+</div>
+</div>
+
+<!-- ====== PAGE: TOKENS ====== -->
+<div id="pg-tokens" class="pg-sec">
+<div class="sec">1 · Spacing Scale — 4px Base Grid</div>
+<div class="sec-d">Semua padding, margin, dan gap harus kelipatan 4px. Konsistensi ini memudahkan alignment dan membuat layout terasa "rapi" secara visual.</div>
+<div class="sp-row" id="spacing-row"></div>
+<div class="div"></div>
+
+<div class="sec">2 · Border Radius Tokens</div>
+<div class="sec-d">Dari none (tabel/divider) sampai full (pill badge, toggle button). Konsisten di seluruh komponen ketiga dashboard.</div>
+<div class="rad-row" id="radius-row"></div>
+<div class="div"></div>
+
+<div class="sec">3 · Shadow & Elevation — 4 Level</div>
+<div class="sec-d">Level 0 = flat (tabel, divider). Level 1 = card default. Level 2 = dropdown/popover. Level 3 = modal/drawer. Hover card untuk lihat efek.</div>
+<div class="shad-grid" id="shadow-grid"></div>
+<div class="div"></div>
+
+<div class="sec">4 · Component States — 5 State Wajib</div>
+<div class="sec-d">Setiap elemen interaktif (button, input, row tabel, link) harus punya 5 state ini. Ini yang membuat dashboard terasa responsif dan profesional.</div>
+<div class="state-grid" id="state-grid"></div>
+<div class="ibox">Dark mode states: default bg = <code style="background:rgba(0,0,0,.15);padding:1px 6px;border-radius:3px;">#1B3860</code>, hover = <code style="background:rgba(0,0,0,.15);padding:1px 6px;border-radius:3px;">#274E80</code>, focus ring = <code style="background:rgba(0,0,0,.15);padding:1px 6px;border-radius:3px;">0 0 0 3px rgba(75,150,230,.3)</code></div>
+<div class="div"></div>
+
+<div class="sec">5 · Opacity Scale</div>
+<div class="sec-d">Untuk overlay, disabled state, skeleton loader, hover background. Jangan gunakan nilai opacity ad-hoc — selalu ambil dari scale ini.</div>
+<div class="op-row" id="opacity-row"></div>
+<div class="div"></div>
+
+<div class="sec">6 · Z-index Scale — Layer Hierarchy</div>
+<div class="sec-d">Hierarki layer yang jelas agar modal, tooltip, dropdown, dan header tidak saling tabrakan antar komponen maupun antar dashboard.</div>
+<div class="z-stack" id="z-stack"></div>
+<div class="div"></div>
+
+<div class="sec">7 · Transition Tokens</div>
+<div class="sec-d">Durasi dan easing yang konsisten. Arahkan mouse ke setiap card untuk preview transisi masing-masing.</div>
+<div class="trans-grid" id="trans-grid"></div>
+<div class="div"></div>
+
+<div class="sec">8 · Breakpoints & Grid System</div>
+<div class="sec-d">6 breakpoint untuk layout responsif. Gunakan CSS Grid dengan <code style="background:var(--bg);padding:1px 6px;border-radius:3px;">auto-fit</code> untuk KPI cards.</div>
+<div class="bp-grid" id="bp-grid"></div>
+<div class="cssb">/* Responsive grid helpers */
+.grid-2   { display:grid; grid-template-columns:repeat(2,1fr); gap:var(--space-4); }
+.grid-3   { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-4); }
+.grid-4   { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-4); }
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:var(--space-4); }
+
+@media (max-width:768px)  { .grid-3,.grid-4 { grid-template-columns:repeat(2,1fr); } }
+@media (max-width:480px)  { .grid-2,.grid-3,.grid-4 { grid-template-columns:1fr; } }</div>
+</div>
+
+<!-- ====== PAGE: COMPONENTS ====== -->
+<div id="pg-comp" class="pg-sec">
+
+<div class="sec">Header Component — Standard (3 Dashboard)</div>
+<div class="sec-d">Template yang sama digunakan di Dashboard Pengadaan, RKA TI, dan CJE0. Dark mode toggle menggunakan localStorage agar preferensi tersimpan antar halaman.</div>
+<div class="cdemo">
+  <div style="background:linear-gradient(140deg,#001B38,#003270,#00529C);border-radius:12px;overflow:hidden;margin-bottom:.7rem;">
+    <div style="padding:0 1.2rem;height:54px;display:flex;align-items:center;gap:12px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        <div style="width:28px;height:28px;background:rgba(255,255,255,.15);border-radius:7px;display:flex;align-items:center;justify-content:center;"><svg width="17" height="17" viewBox="0 0 192 192"><path d="M28.217 0C12.623 0 0 12.622 0 28.229v135.35c0 15.608 12.623 28.244 28.217 28.244H163.58c15.593 0 28.243-12.636 28.243-28.243V28.229C191.823 12.622 179.173 0 163.58 0Zm0 22.002h18.352v.095a22.3 22.3 0 0 1 15.395 5.558c.343.304.688.648 1.005.965 8.635 8.622 8.516 21.652-.238 31.766L33.828 92.143c-1.94 2.126-1.94 5.387 0 7.5l28.705 31.53.277.329c8.833 9.625 8.913 22.933.159 31.661-.317.343-.662.65-1.005.953-4.238 3.776-9.691 5.742-15.395 5.584v.095H28.217a6.215 6.215 0 0 1-6.222-6.22V28.22a6.213 6.213 0 0 1 6.222-6.217zm57.276.006h20.282v.095a22.32 22.32 0 0 1 15.409 5.56c.343.304.686.646 1.003.963 8.635 8.622 8.516 21.655-.238 31.768L93.377 92.466a5.605 5.605 0 0 0 .077 7.526l65.27 69.807h-73.23c9.836-16.623 7.618-38-6.668-53.409v-.004L60.18 95.908l18.435-20.28.394-.411c14.062-15.898 16.188-36.823 6.483-53.209Zm59.206.004h18.88a6.22 6.22 0 0 1 6.222 6.217v120.84l-50.083-53.526 18.102-19.911.382-.41c14.062-15.896 16.215-36.824 6.497-53.21" fill="white"/></svg></div>
+        <div><div style="font-size:13px;font-weight:700;color:#fff;line-height:1.1;">PMO Infrastruktur</div><div style="font-size:9px;color:rgba(255,255,255,.4);">IT Directorate · BRI</div></div>
+      </div>
+      <div style="display:flex;gap:2px;margin-left:16px;">
+        <span class="nav-lnk on">Dashboard</span>
+        <span class="nav-lnk">Pengadaan</span>
+        <span class="nav-lnk">RKA TI</span>
+        <span class="nav-lnk">CJE0</span>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:10px;color:rgba(255,255,255,.3);font-variant-numeric:tabular-nums;" id="hdr-date"></span>
+        <div style="width:34px;height:19px;background:rgba(255,255,255,.15);border-radius:10px;
+          cursor:pointer;position:relative;display:flex;align-items:center;padding:0 3px;
+          transition:background .2s;" onclick="demoToggle(this)" id="hdr-tog">
+          <div style="width:13px;height:13px;border-radius:50%;background:#fff;
+            transition:transform .2s;flex-shrink:0;" id="hdr-thumb"></div>
+          <span style="position:absolute;right:5px;font-size:8px;color:rgba(255,255,255,.5);" id="hdr-icon">☀</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:10px;color:var(--t3);">Preview — Klik toggle untuk simulasi dark mode</div>
+</div>
+<div class="cssb">&lt;header id="appHeader" class="bri-header"&gt;
+  &lt;div class="header-brand"&gt;
+    &lt;div class="header-logo"&gt;
+      &lt;svg width="17" height="17" viewBox="0 0 192 192"&gt;
+        &lt;path d="M28.217 0..." fill="white"/&gt;
+      &lt;/svg&gt;
+    &lt;/div&gt;
+    &lt;div class="header-text"&gt;
+      &lt;div class="header-title"&gt;PMO Infrastruktur&lt;/div&gt;
+      &lt;div class="header-subtitle"&gt;IT Directorate · BRI&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;nav class="header-nav"&gt;
+    &lt;a href="dashboard.html" class="nav-item active"&gt;Dashboard&lt;/a&gt;
+    &lt;a href="pengadaan.html" class="nav-item"&gt;Pengadaan&lt;/a&gt;
+    &lt;a href="rka.html" class="nav-item"&gt;RKA TI&lt;/a&gt;
+    &lt;a href="cje0.html" class="nav-item"&gt;CJE0&lt;/a&gt;
+  &lt;/nav&gt;
+  &lt;div class="header-actions"&gt;
+    &lt;span class="header-date" id="currentDate"&gt;&lt;/span&gt;
+    &lt;button class="dark-toggle" id="darkToggle" onclick="toggleDark()"&gt;&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/header&gt;
+
+/* ── HEADER CSS ── */
+.bri-header {
+  background: linear-gradient(140deg,#001B38 0%,#003270 40%,#00529C 100%);
+  height: 56px; padding: 0 1.5rem;
+  display: flex; align-items: center; gap: 16px;
+  position: sticky; top: 0; z-index: var(--z-header);
+  box-shadow: var(--shadow-2);
+}
+.header-logo { width:28px; height:28px; background:rgba(255,255,255,.15);
+  border-radius:7px; display:flex; align-items:center; justify-content:center; }
+.header-title { font-size:13px; font-weight:700; color:#fff; line-height:1.1; }
+.header-subtitle { font-size:9px; color:rgba(255,255,255,.4); }
+.header-nav { display:flex; gap:2px; }
+.nav-item { font-size:12px; color:rgba(255,255,255,.6); font-weight:500;
+  padding:5px 10px; border-radius:6px; text-decoration:none;
+  transition: all var(--transition-fast); }
+.nav-item:hover { color:#fff; background:rgba(255,255,255,.12); }
+.nav-item.active { color:#fff; background:rgba(255,255,255,.17); font-weight:600; }
+.header-actions { margin-left:auto; display:flex; align-items:center; gap:10px; }
+.header-date { font-size:10px; color:rgba(255,255,255,.35);
+  font-variant-numeric: tabular-nums; }
+.dark-toggle { width:36px; height:20px; background:rgba(255,255,255,.15);
+  border:none; border-radius:10px; cursor:pointer; position:relative;
+  transition:background var(--transition-fast); }
+.dark-toggle::after { content:''; position:absolute; top:2px; left:2px;
+  width:16px; height:16px; background:#fff; border-radius:50%;
+  transition:transform var(--transition-fast); }
+.dark .dark-toggle { background:#F37021; }
+.dark .dark-toggle::after { transform:translateX(16px); }
+
+/* ── ANTI-FLASH SCRIPT — pasang SEBELUM &lt;body&gt; ── */
+&lt;script&gt;
+(function(){
+  if(localStorage.getItem('bri-theme')==='dark')
+    document.documentElement.classList.add('dark');
+})();
+function toggleDark(){
+  const d = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('bri-theme', d?'dark':'light');
+}
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('currentDate').textContent =
+    new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
+});
+&lt;/script&gt;</div>
+
+<div class="div"></div>
+
+<div class="sec">Footer Component — Standard</div>
+<div class="sec-d">Footer minimal konsisten di ketiga dashboard. Branding BRI, versi data, nama grup.</div>
+<div class="cdemo">
+  <div style="background:var(--card);border:1px solid var(--brd);border-radius:12px;overflow:hidden;">
+    <div style="padding:12px 1.2rem;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--brd);flex-wrap:wrap;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:22px;height:22px;background:#00529C;border-radius:5px;display:flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 192 192"><path d="M28.217 0C12.623 0 0 12.622 0 28.229v135.35c0 15.608 12.623 28.244 28.217 28.244H163.58c15.593 0 28.243-12.636 28.243-28.243V28.229C191.823 12.622 179.173 0 163.58 0Zm0 22.002h18.352v.095a22.3 22.3 0 0 1 15.395 5.558c.343.304.688.648 1.005.965 8.635 8.622 8.516 21.652-.238 31.766L33.828 92.143c-1.94 2.126-1.94 5.387 0 7.5l28.705 31.53.277.329c8.833 9.625 8.913 22.933.159 31.661-.317.343-.662.65-1.005.953-4.238 3.776-9.691 5.742-15.395 5.584v.095H28.217a6.215 6.215 0 0 1-6.222-6.22V28.22a6.213 6.213 0 0 1 6.222-6.217zm57.276.006h20.282v.095a22.32 22.32 0 0 1 15.409 5.56c.343.304.686.646 1.003.963 8.635 8.622 8.516 21.655-.238 31.768L93.377 92.466a5.605 5.605 0 0 0 .077 7.526l65.27 69.807h-73.23c9.836-16.623 7.618-38-6.668-53.409v-.004L60.18 95.908l18.435-20.28.394-.411c14.062-15.898 16.188-36.823 6.483-53.209Zm59.206.004h18.88a6.22 6.22 0 0 1 6.222 6.217v120.84l-50.083-53.526 18.102-19.911.382-.41c14.062-15.896 16.215-36.824 6.497-53.21" fill="white"/></svg></div>
+        <span style="font-size:12px;font-weight:600;color:var(--t1);">PMO Infrastruktur</span>
+        <span style="font-size:10px;color:var(--t3);">IT DC Infrastructure &amp; Operations Group · PT Bank Rakyat Indonesia</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:10px;color:var(--t3);font-variant-numeric:tabular-nums;" id="footer-date"></span>
+        <span style="font-size:10px;background:var(--bg);border:1px solid var(--brd);border-radius:5px;padding:2px 8px;color:var(--t2);">v2.0.0</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="cssb">/* ── FOOTER CSS ── */
+.bri-footer {
+  background: var(--lm-card); border-top: 1px solid var(--lm-border);
+  padding: 12px 1.5rem; display:flex; align-items:center;
+  justify-content:space-between; flex-wrap:wrap; gap:8px;
+  margin-top: auto; /* push to bottom — beri body display:flex;flex-direction:column */
+}
+.footer-logo { width:22px; height:22px; background:var(--bri-blue);
+  border-radius:5px; display:flex; align-items:center; justify-content:center; }
+.footer-name { font-size:12px; font-weight:600; color:var(--lm-text-1); }
+.footer-desc { font-size:10px; color:var(--lm-text-3); }
+.footer-updated { font-size:10px; color:var(--lm-text-3);
+  font-variant-numeric:tabular-nums; }
+.footer-version { font-size:10px; background:var(--lm-bg);
+  border:1px solid var(--lm-border); border-radius:5px; padding:2px 8px; }
+
+/* Dark footer */
+.dark .bri-footer { background:var(--dm-card); border-color:var(--dm-border); }
+.dark .footer-name { color:var(--dm-text-1); }
+.dark .footer-desc, .dark .footer-updated { color:var(--dm-text-3); }
+.dark .footer-version { background:var(--dm-bg); border-color:var(--dm-border); color:var(--dm-text-2); }</div>
+
+<div class="div"></div>
+
+<div class="sec">KPI Card — 3 Variant</div>
+<div class="card-grid">
+  <div class="kpi-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <div class="kpi-lbl">Total Anggaran OPEX</div>
+      <div style="width:28px;height:28px;background:#EBF4FF;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;">💰</div>
+    </div>
+    <div class="kpi-val">Rp 24,5M</div>
+    <div class="kpi-sub" style="color:#059669;">↑ 67.4% Terserap</div>
+    <div class="kpi-prog"><div class="kpi-fill" style="width:67.4%;background:#00529C;"></div></div>
+  </div>
+  <div class="kpi-card" style="border-left:3px solid #F37021;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <div class="kpi-lbl">Budget Tersisa</div>
+      <div style="font-size:10px;font-weight:600;background:#FFF5ED;color:#C05415;padding:3px 8px;border-radius:20px;font-variant-numeric:tabular-nums;">32.6%</div>
+    </div>
+    <div class="kpi-val" style="color:#F37021;">Rp 8,0M</div>
+    <div class="kpi-sub" style="color:#F37021;">→ 3 bulan tersisa</div>
+    <div class="kpi-prog"><div class="kpi-fill" style="width:32.6%;background:#F37021;"></div></div>
+  </div>
+  <div class="kpi-card" style="background:linear-gradient(135deg,#003270,#00529C);border:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <div class="kpi-lbl" style="color:rgba(255,255,255,.6);">Item Selesai</div>
+      <div style="font-size:10px;font-weight:600;background:rgba(255,255,255,.15);color:#fff;padding:3px 8px;border-radius:20px;font-variant-numeric:tabular-nums;">89/142</div>
+    </div>
+    <div class="kpi-val" style="color:#fff;font-variant-numeric:tabular-nums;">62.7%</div>
+    <div class="kpi-sub" style="color:rgba(255,255,255,.6);">→ 53 masih berjalan</div>
+    <div class="kpi-prog" style="background:rgba(255,255,255,.15);"><div class="kpi-fill" style="width:62.7%;background:#F37021;"></div></div>
+  </div>
+</div>
+
+<div class="div"></div>
+
+<div class="sec">Table Style</div>
+<div class="sec-d">Angka wajib gunakan <code style="background:var(--bg);padding:1px 6px;border-radius:3px;">font-variant-numeric:tabular-nums</code> agar kolom sejajar.</div>
+<div style="background:var(--card);border:1px solid var(--brd);border-radius:var(--r);overflow:hidden;margin-bottom:.5rem;">
+  <table class="tbl-demo">
+    <thead><tr><th>#</th><th>Nama Kegiatan</th><th>Vendor</th><th class="num">Anggaran</th><th class="num">Realisasi</th><th style="text-align:center;">Status</th></tr></thead>
+    <tbody>
+      <tr><td style="font-size:11px;color:var(--t3);font-variant-numeric:tabular-nums;">001</td><td>Pengadaan Server Rack</td><td style="color:var(--t2);">PT ABC</td><td class="num">Rp 4.500.000</td><td class="num" style="color:#059669;">Rp 4.320.000</td><td style="text-align:center;"><span style="background:#ECFDF6;color:#065E45;font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px;">Selesai</span></td></tr>
+      <tr><td style="font-size:11px;color:var(--t3);font-variant-numeric:tabular-nums;">002</td><td>Lisensi Software SAP</td><td style="color:var(--t2);">PT XYZ</td><td class="num">Rp 8.200.000</td><td class="num" style="color:#F37021;">Rp 5.500.000</td><td style="text-align:center;"><span style="background:#FFF5ED;color:#9A3412;font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px;">Proses</span></td></tr>
+      <tr><td style="font-size:11px;color:var(--t3);font-variant-numeric:tabular-nums;">003</td><td>Maintenance UPS</td><td style="color:var(--t2);">PT DEF</td><td class="num">Rp 1.800.000</td><td class="num" style="color:#DC2626;">Rp 1.950.000</td><td style="text-align:center;"><span style="background:#FFF1F1;color:#9B0D0D;font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px;">Terlambat</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="div"></div>
+
+<div class="sec">Button Variants & States</div>
+<div class="btn-row">
+  <button class="b-prim">Primary</button>
+  <button class="b-prim" style="display:inline-flex;align-items:center;gap:6px;">⬇ Download</button>
+  <button class="b-sec">Secondary</button>
+  <button class="b-ghost">Ghost</button>
+  <button class="b-orange">Orange CTA</button>
+  <button class="b-danger">Hapus</button>
+</div>
+<div class="btn-row">
+  <button class="b-prim b-sm">Small</button>
+  <button class="b-prim">Default</button>
+  <button class="b-prim b-lg">Large</button>
+  <button class="b-prim b-dis" disabled>Disabled</button>
+</div>
+
+<div class="div"></div>
+<div class="sec">Form Elements</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.4rem;">
+  <div>
+    <label class="inp-lbl">Filter Periode</label>
+    <input class="inp" type="text" placeholder="Jan 2026 – Mar 2026">
+    <label class="inp-lbl">Kategori</label>
+    <select class="inp"><option>Semua Kategori</option><option>OPEX</option><option>CAPEX</option><option>Satelit</option></select>
+  </div>
+  <div>
+    <label class="inp-lbl">Cari Kegiatan</label>
+    <input class="inp" type="search" placeholder="Nama kegiatan, vendor...">
+    <div style="font-size:10px;color:var(--t3);margin-top:4px;">Focus: border-color: var(--bri-blue) · shadow: 0 0 0 3px rgba(0,82,156,.1)</div>
+  </div>
+</div>
+</div>
+
+<!-- ====== PAGE: DARK MODE ====== -->
+<div id="pg-dark" class="pg-sec">
+<div class="sec">Dark Mode System</div>
+<div class="wbox"><strong>Prinsip BRI Dark Mode:</strong> Surface menggunakan BRI Navy (H=215°, S=50–58%) sebagai basis, bukan hitam generik. Ini mempertahankan karakter biru BRI di mode gelap tanpa harus menggunakan biru penuh.</div>
+
+<div class="dp">
+  <div class="sec">Surfaces (Dark)</div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:1rem;" id="dm-surfaces"></div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem;">
+    <div style="background:#0D1E38;border-radius:9px;padding:12px;border:1px solid rgba(255,255,255,.05);">
+      <div style="font-size:9px;color:#2D4D6E;margin-bottom:8px;font-weight:700;letter-spacing:1px;">BORDERS</div>
+      <div id="dm-borders"></div>
+    </div>
+    <div style="background:#0D1E38;border-radius:9px;padding:12px;border:1px solid rgba(255,255,255,.05);">
+      <div style="font-size:9px;color:#2D4D6E;margin-bottom:8px;font-weight:700;letter-spacing:1px;">TEXT</div>
+      <div id="dm-text"></div>
+    </div>
+  </div>
+
+  <div class="sec">Color Scales — Dark Variants (stop 300)</div>
+  <div style="display:flex;gap:3px;margin-bottom:.4rem;" id="dm-scale-row"></div>
+  <div style="display:flex;gap:3px;margin-bottom:1rem;" id="dm-scale-lbl"></div>
+
+  <div class="sec">Data Viz Dark — 12 Series (stop 300, lebih terang)</div>
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-bottom:1rem;" id="dv-dark-grid"></div>
+
+  <div class="sec">Live Preview — Header Dark Mode</div>
+  <div style="background:linear-gradient(140deg,#001225,#002B52);border-radius:10px;overflow:hidden;margin-bottom:.5rem;">
+    <div style="padding:0 1.2rem;height:52px;display:flex;align-items:center;gap:12px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:26px;height:26px;background:rgba(255,255,255,.1);border-radius:6px;display:flex;align-items:center;justify-content:center;"><svg width="15" height="15" viewBox="0 0 192 192"><path d="M28.217 0C12.623 0 0 12.622 0 28.229v135.35c0 15.608 12.623 28.244 28.217 28.244H163.58c15.593 0 28.243-12.636 28.243-28.243V28.229C191.823 12.622 179.173 0 163.58 0Zm0 22.002h18.352v.095a22.3 22.3 0 0 1 15.395 5.558c.343.304.688.648 1.005.965 8.635 8.622 8.516 21.652-.238 31.766L33.828 92.143c-1.94 2.126-1.94 5.387 0 7.5l28.705 31.53.277.329c8.833 9.625 8.913 22.933.159 31.661-.317.343-.662.65-1.005.953-4.238 3.776-9.691 5.742-15.395 5.584v.095H28.217a6.215 6.215 0 0 1-6.222-6.22V28.22a6.213 6.213 0 0 1 6.222-6.217zm57.276.006h20.282v.095a22.32 22.32 0 0 1 15.409 5.56c.343.304.686.646 1.003.963 8.635 8.622 8.516 21.655-.238 31.768L93.377 92.466a5.605 5.605 0 0 0 .077 7.526l65.27 69.807h-73.23c9.836-16.623 7.618-38-6.668-53.409v-.004L60.18 95.908l18.435-20.28.394-.411c14.062-15.898 16.188-36.823 6.483-53.209Zm59.206.004h18.88a6.22 6.22 0 0 1 6.222 6.217v120.84l-50.083-53.526 18.102-19.911.382-.41c14.062-15.896 16.215-36.824 6.497-53.21" fill="rgba(255,255,255,0.6)"/></svg></div>
+        <div><div style="font-size:13px;font-weight:700;color:#EAF2FC;line-height:1.1;">PMO Infrastruktur</div><div style="font-size:9px;color:rgba(255,255,255,.25);">IT Directorate · BRI</div></div>
+      </div>
+      <div style="display:flex;gap:2px;margin-left:16px;">
+        <span style="font-size:12px;color:#EAF2FC;font-weight:600;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.12);">Dashboard</span>
+        <span style="font-size:12px;color:rgba(255,255,255,.4);padding:4px 10px;">Pengadaan</span>
+        <span style="font-size:12px;color:rgba(255,255,255,.4);padding:4px 10px;">RKA TI</span>
+        <span style="font-size:12px;color:rgba(255,255,255,.4);padding:4px 10px;">CJE0</span>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:10px;color:rgba(255,255,255,.25);font-variant-numeric:tabular-nums;">06 Apr 2026</span>
+        <div style="width:36px;height:20px;background:#F37021;border-radius:10px;position:relative;cursor:pointer;">
+          <div style="position:absolute;top:2px;right:2px;width:16px;height:16px;background:#fff;border-radius:50%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">Live Preview — Footer Dark Mode</div>
+  <div style="background:#091322;border-radius:10px;border:1px solid #162D4E;">
+    <div style="padding:12px 1.2rem;display:flex;align-items:center;justify-content:space-between;border-top:1px solid #162D4E;flex-wrap:wrap;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:20px;height:20px;background:#152B4E;border-radius:5px;display:flex;align-items:center;justify-content:center;border:1px solid #274E80;"><svg width="12" height="12" viewBox="0 0 192 192"><path d="M28.217 0C12.623 0 0 12.622 0 28.229v135.35c0 15.608 12.623 28.244 28.217 28.244H163.58c15.593 0 28.243-12.636 28.243-28.243V28.229C191.823 12.622 179.173 0 163.58 0Zm0 22.002h18.352v.095a22.3 22.3 0 0 1 15.395 5.558c.343.304.688.648 1.005.965 8.635 8.622 8.516 21.652-.238 31.766L33.828 92.143c-1.94 2.126-1.94 5.387 0 7.5l28.705 31.53.277.329c8.833 9.625 8.913 22.933.159 31.661-.317.343-.662.65-1.005.953-4.238 3.776-9.691 5.742-15.395 5.584v.095H28.217a6.215 6.215 0 0 1-6.222-6.22V28.22a6.213 6.213 0 0 1 6.222-6.217zm57.276.006h20.282v.095a22.32 22.32 0 0 1 15.409 5.56c.343.304.686.646 1.003.963 8.635 8.622 8.516 21.655-.238 31.768L93.377 92.466a5.605 5.605 0 0 0 .077 7.526l65.27 69.807h-73.23c9.836-16.623 7.618-38-6.668-53.409v-.004L60.18 95.908l18.435-20.28.394-.411c14.062-15.898 16.188-36.823 6.483-53.209Zm59.206.004h18.88a6.22 6.22 0 0 1 6.222 6.217v120.84l-50.083-53.526 18.102-19.911.382-.41c14.062-15.896 16.215-36.824 6.497-53.21" fill="#4A7AB5"/></svg></div>
+        <span style="font-size:12px;font-weight:600;color:#EAF2FC;">PMO Infrastruktur</span>
+        <span style="font-size:10px;color:#2D4D6E;">IT DC Infrastructure &amp; Operations Group · PT Bank Rakyat Indonesia</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:10px;color:#2D4D6E;font-variant-numeric:tabular-nums;">06 Apr 2026</span>
+        <span style="font-size:10px;background:#0D1E38;border:1px solid #1B3860;border-radius:5px;padding:2px 8px;color:#4A6880;">v2.0.0</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ====== PAGE: CSS VARIABLES ====== -->
+<div id="pg-css" class="pg-sec">
+<div class="sec">CSS Design Tokens — Complete</div>
+<div class="sec-d">Paste ke file CSS utama. Mencakup tipografi, warna, spacing, radius, shadow, opacity, z-index, transisi, dan data viz 12 series.</div>
+<button class="cpb" onclick="copyCSS()" style="margin-bottom:8px;">⎘ Salin Semua CSS Tokens</button>
+<div class="cssb" id="css-out"></div>
+</div>
+</div><!-- /wrap -->
+
+<script>
+// ─── COLOR DATA ───
+const SC = [
+  {k:'blue',   n:'Blue',    s:['#EBF4FF','#D5E8FF','#A8CCF5','#78ADE8','#4A8ED8','#2470BE','#00529C','#003F7A','#002C57','#001A34'],a:'#F37021'},
+  {k:'orange', n:'Orange',  s:['#FFF5ED','#FFE7D4','#FFCDA3','#FFB16E','#FF9340','#F87C27','#F37021','#BF5118','#8E380E','#672607'],a:'#00529C'},
+  {k:'emerald',n:'Emerald', s:['#ECFDF6','#D0FAE8','#A2F3CD','#6AE7AD','#34D497','#10BA7E','#059669','#047758','#065D46','#054D3B'],a:'#F37021'},
+  {k:'teal',   n:'Teal',    s:['#F0FDFB','#CAFAF5','#97F2EC','#5DE4DF','#28CFCA','#0DBAB4','#0A9688','#097970','#0A5F5B','#083F3D'],a:'#F37021'},
+  {k:'indigo', n:'Indigo',  s:['#EEF2FF','#E0E7FF','#C7D2FE','#A5B4FC','#7F87FA','#636AEF','#4F46E5','#4338CA','#3630A3','#2E2A82'],a:'#F37021'},
+  {k:'amber',  n:'Amber',   s:['#FFFBEB','#FEF3C7','#FDE58A','#FDD153','#FBB824','#F5A009','#D97706','#B35B05','#8C4204','#6A3003'],a:'#00529C'},
+  {k:'red',    n:'Red',     s:['#FFF1F1','#FFE3E3','#FFCACA','#FFA3A3','#FF6B6B','#F43E3E','#DC2626','#B01010','#8D0D0D','#6E0A0A'],a:'#F37021'},
+  {k:'rose',   n:'Rose',    s:['#FFF0F6','#FFE3EE','#FFCADF','#FF9DC5','#FF68A4','#F4407F','#E11D63','#BE185D','#9C174D','#81163F'],a:'#F37021'},
+  {k:'cyan',   n:'Cyan',    s:['#ECFEFF','#CFFAFE','#A5F3FC','#67E8F9','#22D3EE','#06B6D4','#0891B2','#0E7490','#155E75','#164E63'],a:'#F37021'},
+  {k:'violet', n:'Violet',  s:['#F5F3FF','#EDE9FE','#DDD6FE','#C4B5FD','#A78BFA','#8B5CF6','#7C3AED','#6D28D9','#5B21B6','#4C1D95'],a:'#F37021'},
+  {k:'lime',   n:'Lime',    s:['#F7FEE7','#ECFCCB','#D9F99D','#BEF264','#A3E635','#84CC16','#65A30D','#4D7C0F','#3F6212','#365314'],a:'#F37021'},
+  {k:'fuchsia',n:'Fuchsia', s:['#FDF4FF','#FAE8FF','#F0ABFC','#E879F9','#D946EF','#C026D3','#A21CAF','#86198F','#701A75','#5B0F61'],a:'#F37021'},
+];
+const SLATE=['#F0F4F8','#E4EAF2','#D0D9E5','#B0C0D4','#8FA5BE','#6B86A1','#4D6880','#334E68','#1E3450','#0D1F35'];
+const STOP=['50','100','200','300','400','500','600','700','800','900'];
+const DV_KEYS=['blue','orange','teal','indigo','amber','red','rose','emerald','cyan','violet','lime','fuchsia'];
+const DV_NAMES=['BRI Blue','BRI Orange','Teal','Indigo','Amber','Red','Rose','Emerald','Cyan','Violet','Lime','Fuchsia'];
+
+// ─── COPY ───
+function cp(val,lbl){
+  try{navigator.clipboard.writeText(val);}catch(e){
+    const t=document.createElement('textarea');t.value=val;
+    document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);}
+  const el=document.getElementById('notif');
+  document.getElementById('ntxt').textContent='Disalin: '+(lbl?lbl+' — ':'')+val;
+  el.style.borderColor='#00529C';el.style.background='#EBF4FF';
+  setTimeout(()=>{el.style.borderColor='var(--brd)';el.style.background='var(--card)';},2200);
+}
+function copyCSS(){cp(document.getElementById('css-out').textContent,'All CSS Tokens');}
+
+// ─── PAGE NAV ───
+function showPg(id,el){
+  document.querySelectorAll('.pg-sec').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  el.classList.add('on');
+}
+
+// ─── MODE ───
+function setMode(m){
+  const r=document.documentElement,d=m==='dark';
+  r.style.setProperty('--bg',   d?'#060D1A':'#F0F4F8');
+  r.style.setProperty('--card', d?'#0D1E38':'#FFFFFF');
+  r.style.setProperty('--brd',  d?'#1B3860':'#E2ECF4');
+  r.style.setProperty('--brd2', d?'#274E80':'#CBD8E8');
+  r.style.setProperty('--t1',   d?'#EAF2FC':'#0D1F35');
+  r.style.setProperty('--t2',   d?'#7AAED8':'#435770');
+  r.style.setProperty('--t3',   d?'#4A6880':'#8FA5BE');
+  document.body.style.background=d?'#060D1A':'#F0F4F8';
+  document.getElementById('btn-lm').className=d?'mbtn':'mbtn on';
+  document.getElementById('btn-dm').className=d?'mbtn ono':'mbtn';
+}
+
+let _hdrDark=false;
+function demoToggle(el){
+  _hdrDark=!_hdrDark;
+  const thumb=document.getElementById('hdr-thumb');
+  const icon=document.getElementById('hdr-icon');
+  el.style.background=_hdrDark?'#F37021':'rgba(255,255,255,.15)';
+  thumb.style.transform=_hdrDark?'translateX(15px)':'';
+  icon.textContent=_hdrDark?'☾':'☀';
+}
+
+// ─── RENDER SCALES ───
+function renderScales(){
+  const c=document.getElementById('scale-container');let h='';
+  SC.slice(0,8).forEach(sc=>{
+    h+=`<div class="sec" style="margin-top:1.8rem;">${sc.n} Scale</div><div class="scl">`;
+    sc.s.forEach((hex,i)=>{
+      const base=i===6,dark=i>=5;
+      const tc=dark?'#fff':(i>3?'rgba(0,0,0,.65)':'rgba(0,0,0,.45)');
+      const ol=base?`outline:3px solid ${sc.a};outline-offset:2px;`:'';
+      h+=`<div class="sw sw-md" onclick="cp('${hex}','${sc.n}-${STOP[i]}')" style="background:${hex};${ol}">
+        <span class="sl" style="color:${tc};">${STOP[i]}${base?'★':''}</span>
+        <span class="sh" style="color:${tc};opacity:.75;">${hex}</span>
+      </div>`;
+    });
+    h+=`</div><div class="slbl">${STOP.map(s=>`<span>${s}</span>`).join('')}</div>`;
+  });
+  c.innerHTML=h;
+}
+
+function renderSlate(){
+  document.getElementById('slate-row').innerHTML=
+    SLATE.map((h,i)=>`<div class="nw" onclick="cp('${h}','Slate-${STOP[i]}')" style="background:${h};border-color:${i<3?'var(--brd)':'transparent'};"></div>`).join('');
+}
+
+// ─── SEMANTIC ───
+function renderSem(){
+  const d=[{n:'Info / Brand',k:'blue',i:6},{n:'Sukses',k:'emerald',i:6},{n:'Peringatan',k:'amber',i:6},{n:'Error',k:'red',i:6}];
+  document.getElementById('sem-grid').innerHTML=d.map(x=>{
+    const h=SC.find(s=>s.k===x.k).s[x.i];
+    return `<div class="scc"><div class="sss" style="background:${h};"></div>
+    <div class="sii"><div class="sn">${x.n}</div><div class="sv" onclick="cp('${h}','${x.n}')">${h} ⎘</div></div></div>`;
+  }).join('');
+}
+
+// ─── BADGES ───
+function renderBadges(){
+  const bs=[
+    {l:'Selesai',k:'emerald'},{l:'Error',k:'red'},{l:'Proses',k:'amber'},{l:'Menunggu',k:'blue'},
+    {l:'Urgen',k:'orange'},{l:'Premium',k:'indigo'},{l:'Aktif',k:'teal'},{l:'Netral',k:null}
+  ];
+  document.getElementById('badge-grid').innerHTML=bs.map(b=>{
+    const sc=b.k?SC.find(x=>x.k===b.k):null;
+    const bg=sc?sc.s[0]:'#F0F4F8',tx=sc?sc.s[8]:'#334E68',dot=sc?sc.s[6]:'#8FA5BE',brd=sc?sc.s[2]:'#D0D9E5';
+    return `<div class="bdg-card">
+      <div class="bdg-pill" style="background:${bg};color:${tx};"><span class="bdg-dot" style="background:${dot};"></span>${b.l}</div>
+      <div class="bdg-vals">bg: <span onclick="cp('${bg}','${b.l}-bg')">${bg}</span><br>text: <span onclick="cp('${tx}','${b.l}-text')">${tx}</span><br>border: <span onclick="cp('${brd}','${b.l}-brd')">${brd}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ─── DV PALETTE 12 ───
+function renderDV(){
+  const core=DV_KEYS.slice(0,6),ext=DV_KEYS.slice(6);
+  ['dv-core','dv-ext'].forEach((id,gi)=>{
+    const keys=gi===0?core:ext;
+    document.getElementById(id).innerHTML=keys.map((k,i)=>{
+      const idx=gi===0?i:i+6;
+      const hex=SC.find(x=>x.k===k).s[6];
+      return `<div class="dvs" onclick="cp('${hex}','DV-${idx+1}')" style="background:${hex};">
+        <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,.85);">${idx+1}</span>
+        <span style="font-size:10px;color:rgba(255,255,255,.7);">${DV_NAMES[idx]}</span>
+        <span style="font-size:8px;color:rgba(255,255,255,.45);">${hex}</span>
+      </div>`;
+    }).join('');
+  });
+  const light=DV_KEYS.map(k=>SC.find(x=>x.k===k).s[6]);
+  const dark=DV_KEYS.map(k=>SC.find(x=>x.k===k).s[3]);
+  document.getElementById('dv-code').textContent=
+`// Chart.js — BRI Design System v5 (12 Series)
+const BRI_CHART = {
+  light: [${light.map(h=>"'"+h+"'").join(',')}],
+  dark:  [${dark.map(h=>"'"+h+"'").join(',')}],
+};
+// Gunakan series 1-8 untuk chart normal
+// Series 9-12 untuk kasus >8 kategori data`;
+  // DV dark
+  document.getElementById('dv-dark-grid').innerHTML=DV_KEYS.map((k,i)=>{
+    const hex=SC.find(x=>x.k===k).s[3];
+    const dk=['blue','teal','indigo','emerald','red'].includes(k);
+    return `<div class="dm-sw" onclick="cp('${hex}','DM-DV-${i+1}')" style="background:${hex};">
+      <span style="font-size:8.5px;font-weight:700;color:${dk?'rgba(255,255,255,.8)':'rgba(0,0,0,.7)'};">${i+1}·${DV_NAMES[i].split(' ').pop()}</span>
+      <span style="font-size:7.5px;color:${dk?'rgba(255,255,255,.45)':'rgba(0,0,0,.4)'};">${hex}</span>
+    </div>`;
+  }).join('');
+}
+
+// ─── GRADIENTS ───
+function renderGrads(){
+  const g=[
+    {n:'Blue Deep',    css:'linear-gradient(140deg,#001B38,#003270,#00529C)',d:'Blue 900→700→600 · Sidebar, header'},
+    {n:'Orange Warm',  css:'linear-gradient(135deg,#F37021,#BF5118)',        d:'Orange 600→700 · CTA, promo'},
+    {n:'Brand Fusion', css:'linear-gradient(135deg,#003270,#00529C,#F37021)',d:'Blue 700→600 → Orange 600 · Hero'},
+    {n:'BRI Night',    css:'linear-gradient(180deg,#001A34,#00529C)',         d:'Blue 900→600 · Dark card'},
+    {n:'Emerald Cool', css:'linear-gradient(135deg,#0A9688,#059669)',         d:'Teal → Emerald · Success'},
+    {n:'Indigo Teal',  css:'linear-gradient(135deg,#4F46E5,#0A9688)',         d:'Indigo → Teal · Premium'},
+  ];
+  document.getElementById('grad-grid').innerHTML=g.map(x=>
+    `<div class="gs" onclick="cp('${x.css}','${x.n}')" style="background:${x.css};">
+    <div><div class="gn">${x.n}</div><div class="gc">${x.d}</div></div></div>`).join('');
+}
+
+// ─── A11Y ───
+function renderA11Y(){
+  const ps=[
+    {bg:'#00529C',tx:'#fff',l:'White on Blue 600',  w:'6.8:1',pass:true},
+    {bg:'#003F7A',tx:'#fff',l:'White on Blue 700',  w:'10.4:1',pass:true},
+    {bg:'#F37021',tx:'#fff',l:'White on Orange 600',w:'3.0:1',pass:'AA*'},
+    {bg:'#BF5118',tx:'#fff',l:'White on Orange 700',w:'5.0:1',pass:true},
+    {bg:'#EBF4FF',tx:'#00529C',l:'Blue-600 on Blue-50',w:'6.2:1',pass:true},
+    {bg:'#FFF5ED',tx:'#8E380E',l:'Orange-800 on Orange-50',w:'7.1:1',pass:true},
+    {bg:'#ECFDF6',tx:'#065D46',l:'Green-800 on Green-50',w:'9.4:1',pass:true},
+    {bg:'#FFF1F1',tx:'#8D0D0D',l:'Red-800 on Red-50',w:'10.1:1',pass:true},
+  ];
+  let h='';
+  for(let i=0;i<ps.length;i+=2){
+    h+='<div class="a11y-row">';
+    [ps[i],ps[i+1]].forEach(p=>{
+      const lt=p.bg.startsWith('#F')||p.bg.startsWith('#E');
+      const badge=p.pass===true?`AA ✓ ${p.w}`:`AA* ${p.w}`;
+      h+=`<div class="a11y-chip" style="background:${p.bg};${lt?'border:1px solid var(--brd);':''}">
+        <span style="font-size:12px;font-weight:600;color:${p.tx};">${p.l}</span>
+        <span class="wcag" style="color:${p.tx};">${badge}</span>
+      </div>`;
+    });
+    h+='</div>';
+  }
+  h+=`<div style="font-size:10.5px;color:var(--t2);padding:8px 12px;background:var(--card);border-radius:8px;border:1px solid var(--brd);margin-top:8px;">AA* = lolos WCAG AA untuk teks besar (≥18pt regular / ≥14pt bold). Teks kecil di atas Orange 600: gunakan dark text #672607 atau pakai Orange 700.</div>`;
+  document.getElementById('a11y-sec').innerHTML=h;
+}
+
+// ─── TYPE SCALE ───
+function renderTypeScale(){
+  const ts=[
+    {tok:'--text-xs',  px:11,lh:'1.5',wt:400,use:'Caption, timestamp, tooltip'},
+    {tok:'--text-sm',  px:12,lh:'1.5',wt:500,use:'Label, badge, tabel header'},
+    {tok:'--text-base',px:13,lh:'1.6',wt:400,use:'Body text, deskripsi, tabel isi'},
+    {tok:'--text-md',  px:14,lh:'1.5',wt:500,use:'Body emphasis, subheading'},
+    {tok:'--text-lg',  px:16,lh:'1.5',wt:600,use:'Card title, section heading'},
+    {tok:'--text-xl',  px:18,lh:'1.4',wt:700,use:'Widget header, modal title'},
+    {tok:'--text-2xl', px:22,lh:'1.3',wt:700,use:'Page title, KPI label'},
+    {tok:'--text-3xl', px:28,lh:'1.2',wt:600,use:'KPI value besar (tabular-nums)'},
+    {tok:'--text-4xl', px:36,lh:'1.1',wt:700,use:'Dashboard hero metric'},
+  ];
+  document.getElementById('type-tbl').innerHTML=
+    `<thead><tr><th>Token</th><th>Size</th><th>L-Height</th><th>Weight</th><th>Contoh</th><th>Digunakan untuk</th></tr></thead><tbody>`+
+    ts.map(t=>`<tr>
+      <td><span class="tok" onclick="cp('${t.px}px','${t.tok}')">${t.tok}</span></td>
+      <td style="font-size:11px;color:var(--t2);">${t.px}px</td>
+      <td style="font-size:11px;color:var(--t2);">${t.lh}</td>
+      <td style="font-size:11px;color:var(--t2);">${t.wt}</td>
+      <td style="font-size:${Math.min(t.px,18)}px;font-weight:${t.wt};color:var(--t1);">${t.use.split(',')[0]}</td>
+      <td style="font-size:11px;color:var(--t2);">${t.use}</td>
+    </tr>`).join('')+'</tbody>';
+}
+
+// ─── SPACING ───
+function renderSpacing(){
+  const sp=[{n:'space-1',v:'4px',px:4},{n:'space-2',v:'8px',px:8},{n:'space-3',v:'12px',px:12},
+    {n:'space-4',v:'16px',px:16},{n:'space-5',v:'20px',px:20},{n:'space-6',v:'24px',px:24},
+    {n:'space-8',v:'32px',px:32},{n:'space-10',v:'40px',px:40},{n:'space-12',v:'48px',px:48},
+    {n:'space-16',v:'64px',px:64},{n:'space-20',v:'80px',px:80},{n:'space-24',v:'96px',px:96}];
+  document.getElementById('spacing-row').innerHTML=sp.map(s=>
+    `<div class="sp-item" onclick="cp('${s.v}','--${s.n}')">
+      <div class="sp-block" style="width:${Math.min(s.px,96)}px;height:${Math.min(s.px,96)}px;"></div>
+      <span class="sp-lbl">${s.v}</span>
+      <span class="sp-tok">--${s.n}</span>
+    </div>`).join('');
+}
+
+// ─── RADIUS ───
+function renderRadius(){
+  const rs=[
+    {n:'radius-none',v:'0px',  l:'none', u:'Tabel, divider'},
+    {n:'radius-xs',  v:'4px',  l:'xs',   u:'Badge kecil, input'},
+    {n:'radius-sm',  v:'6px',  l:'sm',   u:'Button, tag'},
+    {n:'radius-md',  v:'8px',  l:'md',   u:'Card kecil, tooltip'},
+    {n:'radius-lg',  v:'12px', l:'lg',   u:'Card utama, modal'},
+    {n:'radius-xl',  v:'16px', l:'xl',   u:'Card hero, panel'},
+    {n:'radius-2xl', v:'20px', l:'2xl',  u:'Section, container'},
+    {n:'radius-full',v:'9999px',l:'full',u:'Pill, toggle, avatar'},
+  ];
+  document.getElementById('radius-row').innerHTML=rs.map(r=>
+    `<div class="rad-item" onclick="cp('${r.v}','--${r.n}')">
+      <div class="rad-box" style="border-radius:${r.v};"></div>
+      <span class="rad-lbl">${r.l}<br>${r.v}</span>
+      <span class="rad-val">${r.u}</span>
+    </div>`).join('');
+}
+
+// ─── SHADOWS ───
+function renderShadows(){
+  const sh=[
+    {n:'shadow-0',v:'none',           l:'Flat',   d:'Tabel row, divider, flat card'},
+    {n:'shadow-1',v:'0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05)',l:'Subtle',  d:'Card default, input'},
+    {n:'shadow-2',v:'0 4px 16px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.07)',l:'Medium',  d:'Dropdown, popover, header sticky'},
+    {n:'shadow-3',v:'0 12px 40px rgba(0,0,0,.18),0 4px 12px rgba(0,0,0,.10)',l:'Strong',  d:'Modal, drawer, toast'},
+  ];
+  document.getElementById('shadow-grid').innerHTML=sh.map(s=>
+    `<div class="shad-card" style="box-shadow:${s.v};" onclick="cp('${s.v}','--${s.n}')">
+      <div class="shad-inner" style="box-shadow:${s.v};"></div>
+      <div class="shad-lbl">${s.l}</div>
+      <div class="shad-desc">${s.d}</div>
+      <div style="font-size:8.5px;color:var(--t3);">--${s.n}</div>
+    </div>`).join('');
+}
+
+// ─── STATES ───
+function renderStates(){
+  const st=[
+    {n:'Default', bg:'#00529C',tx:'#fff',  bord:'',         desc:'#00529C'},
+    {n:'Hover',   bg:'#003F7A',tx:'#fff',  bord:'',         desc:'#003F7A (Blue-700)'},
+    {n:'Active',  bg:'#002C57',tx:'#fff',  bord:'',         desc:'#002C57 (Blue-800)'},
+    {n:'Focus',   bg:'#00529C',tx:'#fff',  bord:'0 0 0 4px rgba(0,82,156,.2)',desc:'+ ring 4px .2'},
+    {n:'Disabled',bg:'#00529C',tx:'#fff',  bord:'',         desc:'opacity: 0.4',dis:true},
+  ];
+  document.getElementById('state-grid').innerHTML=st.map((s,i)=>
+    `<div class="state-card">
+      <div class="state-demo" style="background:${s.bg};color:${s.tx};${s.bord?'box-shadow:'+s.bord:''}${s.dis?'opacity:.4':''};">${s.n}</div>
+      <div class="state-nm">${s.n}</div>
+      <div class="state-val">${s.desc}</div>
+    </div>`).join('');
+}
+
+// ─── OPACITY ───
+function renderOpacity(){
+  const ops=[
+    {v:.04,l:'4%', u:'Hover bg ringan'},{v:.08,l:'8%', u:'Active bg'},
+    {v:.16,l:'16%',u:'Selected bg'},{v:.24,l:'24%',u:'Disabled content'},
+    {v:.40,l:'40%',u:'Disabled element'},{v:.60,l:'60%',u:'Subtitle, muted'},
+    {v:.72,l:'72%',u:'Placeholder'},{v:.88,l:'88%',u:'Secondary text'},{v:1,l:'100%',u:'Full opacity'},
+  ];
+  document.getElementById('opacity-row').innerHTML=ops.map(o=>
+    `<div class="op-item" onclick="cp('${o.v}','opacity-${Math.round(o.v*100)}')">
+      <div class="op-block" style="opacity:${o.v};"></div>
+      <span class="op-lbl">${o.l}</span>
+      <span class="sp-tok">${o.u}</span>
+    </div>`).join('');
+}
+
+// ─── Z-INDEX ───
+function renderZIndex(){
+  const zs=[
+    {v:'0',  n:'z-base',    d:'Konten normal, kartu biasa'},
+    {v:'10', n:'z-raised',  d:'Card hover, sticky tabel column'},
+    {v:'20', n:'z-sticky',  d:'Sticky header tabel, frozen column'},
+    {v:'50', n:'z-float',   d:'Floating action button'},
+    {v:'100',n:'z-header',  d:'App header / topbar navigasi'},
+    {v:'200',n:'z-dropdown',d:'Dropdown menu, select, datepicker'},
+    {v:'300',n:'z-overlay', d:'Overlay backdrop (sebelum modal)'},
+    {v:'400',n:'z-modal',   d:'Modal dialog, drawer, side panel'},
+    {v:'500',n:'z-toast',   d:'Toast notification, snackbar'},
+    {v:'999',n:'z-tooltip', d:'Tooltip (selalu paling atas)'},
+  ];
+  document.getElementById('z-stack').innerHTML=zs.map(z=>
+    `<div class="z-row" onclick="cp('${z.v}','--${z.n}')">
+      <span class="z-val">${z.v}</span>
+      <div class="z-bar" style="width:${(parseInt(z.v)/999)*180+30}px;"></div>
+      <span class="z-nm">--${z.n}</span>
+      <span class="z-desc">${z.d}</span>
+    </div>`).join('');
+}
+
+// ─── TRANSITIONS ───
+function renderTransitions(){
+  const ts=[
+    {n:'Fast',  dur:'100ms',ease:'ease-out',         u:'Hover bg, color, opacity',tok:'transition-fast'},
+    {n:'Normal',dur:'180ms',ease:'ease-in-out',       u:'Button press, badge, border',tok:'transition-base'},
+    {n:'Slow',  dur:'280ms',ease:'ease-in-out',       u:'Panel open, card expand',tok:'transition-slow'},
+    {n:'Spring',dur:'320ms',ease:'cubic-bezier(.34,1.56,.64,1)',u:'Modal, bounce effects',tok:'transition-spring'},
+    {n:'Fade',  dur:'200ms',ease:'ease',              u:'Overlay, toast appear',tok:'transition-fade'},
+    {n:'Slide', dur:'240ms',ease:'ease-out',          u:'Sidebar, mobile menu',tok:'transition-slide'},
+  ];
+  document.getElementById('trans-grid').innerHTML=ts.map(t=>
+    `<div class="tc" onclick="cp('${t.dur} ${t.ease}','--${t.tok}')">
+      <div class="tc-demo" style="transition:width ${t.dur} ${t.ease};"></div>
+      <div class="tc-nm">${t.n}</div>
+      <div class="tc-css">${t.dur} · ${t.ease}</div>
+      <div class="tc-use">${t.u}</div>
+    </div>`).join('');
+}
+
+// ─── BREAKPOINTS ───
+function renderBreakpoints(){
+  const bp=[
+    {n:'xs',px:'< 480px', c:'1 col',   g:'16px',p:'16px',u:'Mobile portrait'},
+    {n:'sm',px:'≥ 480px', c:'1–2 col', g:'16px',p:'16px',u:'Mobile landscape'},
+    {n:'md',px:'≥ 768px', c:'2–3 col', g:'20px',p:'24px',u:'Tablet'},
+    {n:'lg',px:'≥ 1024px',c:'3–4 col', g:'24px',p:'32px',u:'Desktop kecil'},
+    {n:'xl',px:'≥ 1280px',c:'4 col',   g:'24px',p:'40px',u:'Desktop standar'},
+    {n:'2xl',px:'≥ 1440px',c:'4–6 col',g:'32px',p:'48px',u:'Wide screen'},
+  ];
+  document.getElementById('bp-grid').innerHTML=bp.map((b,i)=>
+    `<div class="bp-row" onclick="cp(b.px,'${b.n}')">
+      <span class="bp-nm">${b.n}</span>
+      <span class="bp-px">${b.px}</span>
+      <div class="bp-bar-w"><div class="bp-bar" style="width:${(i+1)/6*100}%;"></div></div>
+      <span class="bp-col">${b.c} · gap ${b.g}</span>
+      <span class="bp-use">${b.u}</span>
+    </div>`).join('');
+}
+
+// ─── DARK MODE SURFACES ───
+function renderDarkMode(){
+  const surfs=[
+    {n:'Deepest', h:'#060D1A',s:'hsl(215,52%,6%)'},
+    {n:'Page BG', h:'#091525',s:'hsl(215,50%,9%)'},
+    {n:'Card',    h:'#0D1E38',s:'hsl(215,58%,14%)'},
+    {n:'Card Alt',h:'#152B4E',s:'hsl(215,58%,19%)'},
+    {n:'Elevated',h:'#1B3860',s:'hsl(215,53%,24%)'},
+  ];
+  document.getElementById('dm-surfaces').innerHTML=surfs.map(s=>
+    `<div class="dm-surf" onclick="cp('${s.h}','DM-${s.n}')" style="background:${s.h};">
+      <span style="font-size:10px;font-weight:600;color:${s.h==='#060D1A'?'#1B3860':'#2D4D6E'};">${s.n}</span>
+      <span style="font-size:8.5px;color:${s.h==='#060D1A'?'#1B3860':'#2A4A6E'};">${s.h}</span>
+      <span style="font-size:7.5px;color:#1B3860;">${s.s}</span>
+    </div>`).join('');
+  const borders=[{h:'#1B3860',l:'Subtle'},{h:'#274E80',l:'Default'},{h:'#3A6AA8',l:'Strong'}];
+  document.getElementById('dm-borders').innerHTML=borders.map(b=>
+    `<div onclick="cp('${b.h}','DM-border-${b.l}')" style="cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:7px;">
+      <div style="width:44px;height:1px;background:${b.h};"></div>
+      <span style="font-size:8.5px;color:#4A6880;">${b.h} · ${b.l}</span>
+    </div>`).join('');
+  const texts=[{h:'#EAF2FC',l:'Primary'},{h:'#7AAED8',l:'Secondary'},{h:'#4A6880',l:'Muted'}];
+  document.getElementById('dm-text').innerHTML=texts.map(t=>
+    `<div onclick="cp('${t.h}','DM-text-${t.l}')" style="cursor:pointer;margin-bottom:6px;">
+      <span style="font-size:13px;font-weight:500;color:${t.h};">${t.l} Text</span>
+      <span style="font-size:8px;color:#2D4D6E;margin-left:6px;">${t.h}</span>
+    </div>`).join('');
+  const row=document.getElementById('dm-scale-row');
+  const lbl=document.getElementById('dm-scale-lbl');
+  row.innerHTML=SC.slice(0,8).map(sc=>{
+    const hex=sc.s[3];
+    const dk=['blue','teal','indigo','emerald','red'].includes(sc.k);
+    return `<div class="dm-sw" onclick="cp('${hex}','DM-${sc.n}-300')" style="background:${hex};">
+      <span style="font-size:9px;font-weight:700;color:${dk?'rgba(255,255,255,.8)':'rgba(0,0,0,.7)'};">${sc.n}</span>
+      <span style="font-size:8px;color:${dk?'rgba(255,255,255,.45)':'rgba(0,0,0,.4)'};">${hex}</span>
+    </div>`;
+  }).join('');
+  lbl.innerHTML=SC.slice(0,8).map(sc=>`<span style="flex:1;text-align:center;font-size:8px;color:#2D4D6E;">${sc.n}</span>`).join('');
+}
+
+// ─── CSS TOKENS ───
+function buildCSS(){
+  const b=SC.find(x=>x.k==='blue').s, o=SC.find(x=>x.k==='orange').s;
+  const g=SC.find(x=>x.k==='emerald').s, a=SC.find(x=>x.k==='amber').s;
+  const r=SC.find(x=>x.k==='red').s, sl=SLATE;
+  const dvl=DV_KEYS.map(k=>SC.find(x=>x.k===k).s[6]);
+  const dvd=DV_KEYS.map(k=>SC.find(x=>x.k===k).s[3]);
+  return `@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
+
+:root {
+  /* ── TYPOGRAPHY (Inter only) ── */
+  --font-ui:     'Inter', system-ui, sans-serif;
+  --font-feature: "cv02","cv03","cv04","cv11";
+
+  /* ── TYPE SCALE ── */
+  --text-xs:   11px;  --text-sm:  12px;  --text-base: 13px;
+  --text-md:   14px;  --text-lg:  16px;  --text-xl:   18px;
+  --text-2xl:  22px;  --text-3xl: 28px;  --text-4xl:  36px;
+
+  /* ── BRAND ── */
+  --bri-blue:         ${b[6]};
+  --bri-blue-light:   ${b[1]};
+  --bri-blue-dark:    ${b[7]};
+  --bri-orange:       ${o[6]};
+  --bri-orange-light: ${o[1]};
+  --bri-orange-dark:  ${o[7]};
+
+  /* ── SEMANTIC ── */
+  --success:       ${g[6]};  --success-bg: ${g[0]};  --success-text: ${g[8]};
+  --warning:       ${a[6]};  --warning-bg: ${a[0]};  --warning-text: ${a[8]};
+  --error:         ${r[6]};  --error-bg:   ${r[0]};  --error-text:   ${r[8]};
+  --info:          ${b[6]};  --info-bg:    ${b[0]};  --info-text:    ${b[8]};
+
+  /* ── LIGHT SURFACES (Slate) ── */
+  --lm-bg:        ${sl[0]};
+  --lm-card:      #FFFFFF;
+  --lm-card-alt:  ${sl[1]};
+  --lm-border:    ${sl[2]};
+  --lm-border-2:  ${sl[3]};
+  --lm-text-1:    ${sl[9]};
+  --lm-text-2:    ${sl[6]};
+  --lm-text-3:    ${sl[4]};
+
+  /* ── DARK SURFACES (BRI Navy) ── */
+  --dm-deepest:   #060D1A;
+  --dm-bg:        #091525;
+  --dm-card:      #0D1E38;
+  --dm-card-alt:  #152B4E;
+  --dm-elevated:  #1B3860;
+  --dm-border:    #1B3860;
+  --dm-border-2:  #274E80;
+  --dm-text-1:    #EAF2FC;
+  --dm-text-2:    #7AAED8;
+  --dm-text-3:    #4A6880;
+
+  /* ── SPACING (4px base) ── */
+  --space-1:  4px;   --space-2:  8px;   --space-3:  12px;
+  --space-4:  16px;  --space-5:  20px;  --space-6:  24px;
+  --space-8:  32px;  --space-10: 40px;  --space-12: 48px;
+  --space-16: 64px;  --space-20: 80px;  --space-24: 96px;
+
+  /* ── BORDER RADIUS ── */
+  --radius-none: 0;       --radius-xs:  4px;
+  --radius-sm:   6px;     --radius-md:  8px;
+  --radius-lg:   12px;    --radius-xl:  16px;
+  --radius-2xl:  20px;    --radius-full: 9999px;
+
+  /* ── SHADOWS ── */
+  --shadow-0: none;
+  --shadow-1: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+  --shadow-2: 0 4px 16px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.07);
+  --shadow-3: 0 12px 40px rgba(0,0,0,.18), 0 4px 12px rgba(0,0,0,.10);
+
+  /* ── OPACITY ── */
+  --op-4: .04;  --op-8: .08;   --op-16: .16;
+  --op-24: .24; --op-40: .40;  --op-60: .60;
+  --op-72: .72; --op-88: .88;
+
+  /* ── Z-INDEX ── */
+  --z-base:     0;   --z-raised:   10;  --z-sticky:   20;
+  --z-float:    50;  --z-header:   100; --z-dropdown: 200;
+  --z-overlay:  300; --z-modal:    400; --z-toast:    500;
+  --z-tooltip:  999;
+
+  /* ── TRANSITIONS ── */
+  --transition-fast:   100ms ease-out;
+  --transition-base:   180ms ease-in-out;
+  --transition-slow:   280ms ease-in-out;
+  --transition-spring: 320ms cubic-bezier(.34,1.56,.64,1);
+  --transition-fade:   200ms ease;
+  --transition-slide:  240ms ease-out;
+
+  /* ── DATA VIZ LIGHT (12 series) ── */
+  --dv-1:${dvl[0]};  --dv-2:${dvl[1]};  --dv-3:${dvl[2]};  --dv-4:${dvl[3]};
+  --dv-5:${dvl[4]};  --dv-6:${dvl[5]};  --dv-7:${dvl[6]};  --dv-8:${dvl[7]};
+  --dv-9:${dvl[8]};  --dv-10:${dvl[9]}; --dv-11:${dvl[10]}; --dv-12:${dvl[11]};
+}
+
+/* ── DARK MODE ── */
+.dark, [data-theme="dark"] {
+  --dv-1:${dvd[0]};  --dv-2:${dvd[1]};  --dv-3:${dvd[2]};  --dv-4:${dvd[3]};
+  --dv-5:${dvd[4]};  --dv-6:${dvd[5]};  --dv-7:${dvd[6]};  --dv-8:${dvd[7]};
+  --dv-9:${dvd[8]};  --dv-10:${dvd[9]}; --dv-11:${dvd[10]}; --dv-12:${dvd[11]};
+}
+
+/* ── BASE ── */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  font-family: var(--font-ui);
+  font-feature-settings: var(--font-feature);
+  -webkit-font-smoothing: antialiased;
+  background: var(--lm-bg);
+  color: var(--lm-text-1);
+}
+.dark body { background: var(--dm-bg); color: var(--dm-text-1); }
+
+/* ── ANGKA & KPI ── */
+/* Selalu tambahkan font-variant-numeric untuk semua angka */
+.tabular, td.num, .kpi-value, .kpi-val, .header-date {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── ANTI-FLASH DARK MODE ── */
+/*
+Pasang di <head> SEBELUM load CSS, untuk hindari flash:
+<script>
+  (function(){ if(localStorage.getItem('bri-theme')==='dark')
+    document.documentElement.classList.add('dark'); })();
+<\/script>
+*/`;
+}
+
+// ─── INIT ───
+window.addEventListener('DOMContentLoaded',()=>{
+  renderScales(); renderSlate(); renderSem(); renderBadges();
+  renderDV(); renderGrads(); renderA11Y(); renderTypeScale();
+  renderSpacing(); renderRadius(); renderShadows(); renderStates();
+  renderOpacity(); renderZIndex(); renderTransitions(); renderBreakpoints();
+  renderDarkMode();
+  document.getElementById('css-out').textContent=buildCSS();
+  const now=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
+  const hd=document.getElementById('hdr-date'); if(hd) hd.textContent=now;
+  const fd=document.getElementById('footer-date'); if(fd) fd.textContent='Data per '+now;
+});
+</script>
+</body>
+</html>

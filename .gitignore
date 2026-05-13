@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*$py.class
+*.so
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Output (generated dashboards)
+output/dashboard_CS_*.html
+output/dashboard_latest.html
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node (from earlier experiments)
+node_modules/
+package.json
+package-lock.json
+
+# Temp
+_*.js
+_*.py
