@@ -80,139 +80,54 @@ class ProcessWorker(QThread):
 
     def _render_dashboard(self, context: dict) -> Path:
         """
-        Inject parsed data into the existing dashboard.html.
-        Strategy: Read dashboard.html, replace the file-upload/parsing section
-        with pre-loaded data, so it renders immediately without user interaction.
+        Inject parsed data into dashboard.html via the __autoRender hook.
+        dashboard.html already has __autoRender built-in — we just inject the data.
+        Same approach as generate_dashboard.py.
         """
-        import json
-
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-        # Read the base dashboard HTML
         base_html_path = Path(__file__).parent / "dashboard.html"
         if not base_html_path.exists():
-            raise FileNotFoundError(f"Base dashboard.html not found at {base_html_path}")
+            raise FileNotFoundError(f"dashboard.html not found: {base_html_path}")
 
         html = base_html_path.read_text(encoding="utf-8")
 
-        # Build the injection script that auto-loads data
         projects_json = context["json_projects"]
-        totals_json = context["json_totals"]
         cutoff = context["cutoff_month"]
         source = context.get("source_file", "")
         period = context.get("period_label", "")
 
         inject_script = f"""
 <script>
-// === AUTO-INJECTED BY app.py — data pre-loaded, skip file upload ===
-(function() {{
-  var _injectedData = {{
+(function() {{{{
+  window.__INJECTED_DATA__ = {{{{
     projects: {projects_json},
     cutoff_month: {cutoff},
     source_file: "{source}",
     period_label: "{period}"
-  }};
-  window.__INJECTED_DATA__ = _injectedData;
-}})();
+  }}}};
+}}}})();
 </script>
-"""
-
-        # Also inject an auto-start script that triggers processing after page load
-        auto_start = """
 <script>
-// Auto-start: if injected data exists, skip upload and render directly
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {{{{
   if (!window.__INJECTED_DATA__) return;
-  var data = window.__INJECTED_DATA__;
-
-  // Simulate what processBtn click does, but with pre-parsed data
-  // We need to wait for the IIFE to set up state
-  setTimeout(function() {
-    // Access the state object via a hook we'll add
-    if (window.__autoRender) window.__autoRender(data);
-  }, 100);
-});
+  setTimeout(function() {{{{
+    if (window.__autoRender) window.__autoRender(window.__INJECTED_DATA__);
+  }}}}, 100);
+}}}});
 </script>
 """
+        html = html.replace("</body>", inject_script + "</body>")
 
-        # Insert injection before closing </body>
-        html = html.replace("</body>", inject_script + auto_start + "</body>")
-
-        # Add the __autoRender hook inside the main IIFE
-        # Insert just before the closing })(); of the IIFE
-        hook_code = """
-
-// === AUTO-RENDER HOOK (injected by app.py) ===
-window.__autoRender = function(data) {
-  // Parse projects same way as processBtn handler
-  state.rows = data.projects.map(function(p, idx) {
-    // Convert Python dict format to match JS expected format
-    p.rowIdx = idx;
-    p.real = p.real || [0,0,0,0,0,0,0,0,0,0,0,0];
-    p.prog = p.prog || [0,0,0,0,0,0,0,0,0,0,0,0];
-    p.progKum = p.prog_kum || [0,0,0,0,0,0,0,0,0,0,0,0];
-    p.realisasi = p.real_total || 0;
-    p.prognosaTotal = p.prog_total || 0;
-    p.alokasiUpdate = p.alokasi_update || 0;
-    p.nominalSwitching = p.nominal_switching || 0;
-    p.kebutuhan1Thn = p.kebutuhan_1thn || 0;
-    p.kebutuhan1ThnRev = p.kebutuhan_1thn_rev || 0;
-    p.tpcAwal = p.tpc_awal || 0;
-    p.tpcRevisi = p.tpc_revisi || 0;
-    p.nominalMinAlokasi = p.nominal_min_alokasi || 0;
-    p.selisihAlokasi = p.selisih_alokasi || 0;
-    p.nominalSpk = p.nominal_spk || 0;
-    p.idRka2026 = p.id_rka_ti || '';
-    p.parentChild = p.parent_child || '';
-    p.namaGL = p.nama_gl || '';
-    p.assetClass = p.asset_class || '';
-    p.idAsset = p.id_asset || '';
-    p.idRka2025 = p.id_rka_2025 || '';
-    p.kodeNomor = p.kode_nomor || '';
-    p.nameAwal = p.name_awal || '';
-    p.nameRev = p.name_rev || '';
-    p.keteranganRevisi = p.keterangan_revisi || '';
-    p.updateProgress = p.update_progress || '';
-    p.notaDinas = p.nota_dinas || '';
-    p.namaAplikasi = p.nama_aplikasi || '';
-    p.grpAplikasi = p.grp_aplikasi || '';
-    p.fungsiTim = p.fungsi_tim || '';
-    p.siRbb = p.si_rbb || '';
-    p.programKerja = p.program_kerja || '';
-    p.nomorSpk = p.nomor_spk || '';
-    p.namaSpk = p.nama_spk || '';
-    p.spkMulai = p.spk_mulai || '';
-    p.spkSelesai = p.spk_selesai || '';
-    p.statusRaw = p.status_raw || '';
-    p.switchingLog = (p.switching_log || []);
-    p.changeType = p.change_type || 'Tidak berubah';
-    p.serapanPct = p.serapan_pct || 0;
-    // Getter-like computed
-    Object.defineProperty(p, 'serapanPct', {
-      get: function() { return this.alokasiUpdate > 0 ? (this.realisasi / this.alokasiUpdate * 100) : 0; },
-      configurable: true
-    });
-    return p;
-  });
-  state.cutoffMonth = data.cutoff_month;
-  renderDashboard();
-};
-
-"""
-        # Insert hook before the IIFE closing
-        html = html.replace("})(); // IIFE end", hook_code + "})(); // IIFE end")
-
-        # Hide the landing page by default when data is injected
+        # Show dashboard immediately (skip landing)
         html = html.replace(
             '<main class="landing" id="landing">',
             '<main class="landing hidden" id="landing">'
         )
-        # Show topbar by default
         html = html.replace(
-            '<header class="topbar" id="topbar" style="display:none;">',
+            '<header class="topbar" id="topbar" style="display:none">',
             '<header class="topbar" id="topbar">'
         )
-        # Show dashboard by default
         html = html.replace(
             '<main class="main hidden" id="dashboard">',
             '<main class="main" id="dashboard">'
@@ -223,12 +138,10 @@ window.__autoRender = function(data) {
         output_path = OUTPUT_DIR / filename
         output_path.write_text(html, encoding="utf-8")
 
-        # Create latest alias
         latest = OUTPUT_DIR / "dashboard_latest.html"
         latest.write_text(html, encoding="utf-8")
 
         return output_path
-
 
 # ---------------------------------------------------------------------------
 # Main Window

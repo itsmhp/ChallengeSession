@@ -2,16 +2,22 @@
 
 **Dashboard Analisis Revisi Anggaran RKA TI 2026 — PMO Infrastruktur, IT Directorate BRI**
 
-Status: aktif diperbarui (sinkron per 2026-05-13)
+Status: aktif diperbarui (sinkron per 2026-05-18)
+
+---
 
 ## Deskripsi
 
 Aplikasi desktop yang memproses file Excel "Challenge Session" (window revisi pengadaan RKA TI) dan menghasilkan dashboard HTML interaktif untuk analisis:
+
 - **Switching flow** antar proyek (bertambah/berkurang alokasi)
-- **Status pengadaan** seluruh proyek INF Group
-- **Realisasi vs Prognosa** bulanan dan kumulatif
-- **Proyeksi multi-tahun** (CJE0) berdasarkan estimasi termin pembayaran
+- **Delta TPC** — perubahan Total Project Cost awal vs revisi
+- **Delta Kebutuhan** — selisih Alokasi Update ISG (col AB) vs Kebutuhan 1 Thn Revisi INF (col AF)
+- **Perubahan scope/nama** proyek
+- **Selisih vs minimum alokasi ISG**
 - **Proyek baru (unplanned)**, yang dibatalkan, dan yang ditunda
+
+---
 
 ## Cara Install
 
@@ -19,78 +25,132 @@ Aplikasi desktop yang memproses file Excel "Challenge Session" (window revisi pe
 pip install -r requirements.txt
 ```
 
-Dependensi utama:
-- openpyxl
-- jinja2
-- PySide6
+Dependensi:
+- `openpyxl` — baca Excel lokal (DLP-safe, tidak upload ke browser)
+- `PySide6` — desktop GUI
+
+---
 
 ## Cara Menjalankan
 
-```bash
-python app.py
+### Opsi 1 — GUI (double-click)
+
+```
+run.bat
 ```
 
-1. Klik tombol **Pilih File** dan pilih file Challenge Session Excel (.xlsx)
+1. Klik **Pilih File** → pilih file `Challenge Session.xlsx`
 2. Klik **Process & Generate Dashboard**
 3. Dashboard otomatis terbuka di browser
 
-Alternatif (tanpa GUI):
+### Opsi 2 — CLI
 
 ```bash
 python generate_dashboard.py "Challenge Session.xlsx"
 ```
 
+---
+
 ## Output
 
-File HTML dashboard interaktif di folder `output/`, dengan format nama: `dashboard_CS_YYYYMMDD_HHMMSS.html`
+File HTML di folder `output/`:
+- `dashboard_CS_YYYYMMDD_HHMMSS.html` — timestamped
+- `dashboard_latest.html` — alias file terbaru
 
-Alias file terbaru:
-- `output/dashboard_latest.html`
+---
 
-Dashboard meliputi:
-- **Overview**: KPI utama (alokasi revisi, realisasi YTD, switching flow, sisa, prognosa), chart realisasi vs prognosa, distribusi status, breakdown per DEPT
-- **Perubahan**: Highlight revisi — proyek bertambah/berkurang alokasi, unplanned baru, batal/ditunda
-- **Pengadaan**: Tabel lengkap sortable & filterable dengan detail per proyek
-- **RKA TI**: Realisasi vs prognosa bulanan, Sankey switching flow, heatmap DEPT × bulan, top proyek
-- **CJE0**: Proyeksi cashout multi-tahun (2026–2030+) dari estimasi termin pembayaran
+## Fitur Dashboard
+
+Dashboard terdiri dari **1 halaman** dengan 2 bagian:
+
+### Bagian Atas — KPI Cards (8 card, klik untuk detail)
+
+| Card | Isi |
+|---|---|
+| Switching In | Proyek yang bertambah alokasi |
+| Switching Out | Proyek yang berkurang alokasi |
+| Delta TPC | Perubahan Total Project Cost (awal vs revisi) |
+| Delta Kebutuhan vs Alokasi ISG | Selisih col AF (INF) vs col AB (ISG) |
+| Perubahan Scope/Nama | Proyek yang nama/scope-nya diubah |
+| Selisih vs Min ISG | Gap antara yang diminta INF vs minimum ISG |
+| Unplanned Baru | Proyek baru dari Nota Dinas |
+| Batal / Ditunda | Proyek yang dibatalkan atau ditunda |
+
+**Klik card** → modal berisi daftar proyek terkait → **klik proyek** → drawer detail lengkap
+
+### Bagian Bawah — Tabel Semua Proyek
+
+- Search multi-field (nama, ID RKA, vendor, nota dinas)
+- Filter: Status, DEPT, Planned/Unplanned, Jenis Perubahan
+- Sort semua kolom
+- Badge delta: `SW` `TPC` `Scope` `Baru`
+- Kolom: ID RKA · Nama Proyek · DEPT · Status · Alokasi Revisi · Realisasi · Switching · Δ TPC · Δ Kebutuhan
+- Klik baris → drawer detail
+
+### Drawer Detail Proyek
+
+- Delta boxes: TPC, Kebutuhan, Scope, Selisih ISG (highlight warna)
+- Riwayat switching (bertambah/berkurang dari proyek mana)
+- Keterangan revisi & catatan update progress
+- Tombol "← Kembali ke daftar" jika dibuka dari card modal
+
+---
 
 ## Struktur Folder
 
 ```
 Challenge Session/
-├── app.py                          # Entry point — PySide6 GUI
-├── generate_dashboard.py           # Generator dashboard via CLI
+├── app.py                      # Entry point — PySide6 GUI
+├── generate_dashboard.py       # CLI alternative
+├── run.bat                     # Double-click untuk jalankan GUI
 ├── core/
 │   ├── __init__.py
-│   ├── parser_challenge.py         # Parser Challenge Session Excel → records
-│   └── builder.py                  # Aggregasi & context builder untuk Jinja2
+│   ├── parser_challenge.py     # Parser Excel → project records
+│   └── builder.py              # Aggregasi + context builder
 ├── output/
-│   ├── dashboard_template.html     # Jinja2 template dashboard
-│   └── dashboard_CS_*.html         # Generated output files (gitignored)
-├── BRI_Design_System_v5.html       # Reference: BRI Design System spec
-├── MASTER_CONTEXT.md               # Master context untuk AI & developer
+│   ├── dashboard_template.html # (placeholder, tidak dipakai)
+│   └── dashboard_CS_*.html     # Generated outputs (gitignored)
+├── dashboard.html              # Base dashboard template
+├── BRI_Design_System_v5.html   # Reference design system
+├── MASTER_CONTEXT.md           # Master context untuk AI & developer
 ├── requirements.txt
 ├── .gitignore
 └── README.md
 ```
 
-## Tech Stack
+---
 
-- Python 3.11+ (openpyxl, jinja2)
-- PySide6 (desktop GUI)
-- HTML + Vanilla JS (ECharts 5.5.x)
-- BRI Design System v5
+## Kolom Excel yang Digunakan
+
+| Kolom Excel | Index (0-based) | Nama | Keterangan |
+|---|---|---|---|
+| U | 20 | ID RKA TI 2026 | Primary identifier |
+| V/W/X | 21/22/23 | Nama Proyek | Awal / Rev / Akhir |
+| Y | 24 | Total Project Cost (Awal) | Baseline TPC |
+| Z | 25 | Kebutuhan 1 Tahun (Awal) | Baseline kebutuhan |
+| AA | 26 | Nominal Switching | +/- switching |
+| **AB** | **27** | **Alokasi Update** | **ISG allocation (for delta)** |
+| AE | 30 | TPC Revisi | Revised TPC |
+| **AF** | **31** | **Kebutuhan 1 Thn Revisi** | **INF request (for delta)** |
+| AH | 33 | Selisih | Gap vs minimum ISG |
+| AL–AW | 37–48 | Realisasi Jan–Des | Monthly realization |
+| BV–CG | 73–84 | Prognosa Jan–Des | Monthly forecast |
+
+**Delta Kebutuhan = col AF − col AB** (Kebutuhan INF − Alokasi ISG)
+
+---
 
 ## Keamanan & DLP
 
-- File Excel dibaca **lokal** oleh Python — tidak pernah di-upload ke browser atau server
-- Dashboard output adalah file HTML statis offline — tidak ada koneksi internet saat dibuka
+- File Excel dibaca **lokal** oleh Python — tidak pernah di-upload ke browser
+- Dashboard output = file HTML statis offline — tidak ada koneksi internet saat dibuka
 - Tidak ada data yang dikirim ke luar mesin pengguna
 
-## Catatan Penting
+---
 
-- File input: `Challenge Session.xlsx` (format window revisi pengadaan dari ISG)
-- Sheet yang diproses: sheet pertama (biasanya "Sheet3")
-- Struktur kolom fixed — sesuai template Challenge Session ISG
-- Kolom alokasi utama: `Kebutuhan 1 Tahun Revisi` (col 31) sebagai angka final pasca-Challenge Session
-- Kolom switching: `Nominal Switching` (col 26) — positif = bertambah, negatif = berkurang
+## Tech Stack
+
+- Python 3.11+ (openpyxl)
+- PySide6 (desktop GUI)
+- HTML + Vanilla JS (ECharts 5.5.x via CDN)
+- BRI Design System v5
