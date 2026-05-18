@@ -1511,29 +1511,39 @@ function renderChanges() {
   const totalOut = Math.abs(berkurang.reduce((s,p) => s + p.nominalSwitching, 0));
   const netChange = totalIn - totalOut;
 
+  // Delta analysis
+  const tpcChanged = rows.filter(p => p.hasTpcChange);
+  const kebChanged = rows.filter(p => p.hasKebChange);
+  const nameChanged = rows.filter(p => p.hasNameChange);
+  const withSelisih = rows.filter(p => p.hasSelisih && p.selisihAlokasi !== 0);
+  const totalTpcDelta = tpcChanged.reduce((s,p) => s + (p.tpcDelta || 0), 0);
+  const totalKebDelta = kebChanged.reduce((s,p) => s + (p.kebDelta || 0), 0);
+  const totalSelisih = withSelisih.reduce((s,p) => s + p.selisihAlokasi, 0);
+
   const html = `
     <div class="section-head">
       <div>
-        <div class="section-title">Perubahan &amp; Switching Anggaran</div>
-        <div class="section-desc">Hasil Challenge Session — highlight revisi, proyek baru (unplanned), yang dibatalkan &amp; ditunda</div>
+        <div class="section-title">Perubahan &amp; Revisi Challenge Session</div>
+        <div class="section-desc">Highlight semua perubahan: switching anggaran, perubahan TPC, perubahan kebutuhan, perubahan scope/nama, dan selisih vs minimum ISG</div>
       </div>
     </div>
 
+    <!-- KPI Row 1: Switching -->
     <div class="kpi-grid">
       <div class="kpi-card success">
-        <div class="kpi-label">Switching In <span class="kpi-icon">↑</span></div>
+        <div class="kpi-label">Switching In ↑</div>
         <div class="kpi-value tnum">${fmtRp(totalIn, true)}</div>
         <div class="kpi-sub">${bertambah.length} proyek bertambah alokasi</div>
       </div>
       <div class="kpi-card danger">
-        <div class="kpi-label">Switching Out <span class="kpi-icon">↓</span></div>
+        <div class="kpi-label">Switching Out ↓</div>
         <div class="kpi-value tnum">${fmtRp(totalOut, true)}</div>
         <div class="kpi-sub">${berkurang.length} proyek berkurang alokasi</div>
       </div>
       <div class="kpi-card ${netChange >= 0 ? 'primary' : 'warning'}">
         <div class="kpi-label">Net Switching</div>
         <div class="kpi-value tnum">${netChange >= 0 ? '+' : ''}${fmtRp(netChange, true)}</div>
-        <div class="kpi-sub">Selisih switching in − out</div>
+        <div class="kpi-sub">Selisih switching in - out</div>
       </div>
       <div class="kpi-card accent">
         <div class="kpi-label">Unplanned (Baru)</div>
@@ -1541,62 +1551,144 @@ function renderChanges() {
         <div class="kpi-sub">Total ${fmtRp(unplanned.reduce((s,p)=>s+p.alokasiUpdate,0), true)}</div>
       </div>
       <div class="kpi-card danger">
-        <div class="kpi-label">Dibatalkan</div>
-        <div class="kpi-value tnum">${batal.length}</div>
-        <div class="kpi-sub">${ditunda.length} ditunda</div>
+        <div class="kpi-label">Dibatalkan / Ditunda</div>
+        <div class="kpi-value tnum">${batal.length + ditunda.length}</div>
+        <div class="kpi-sub">${batal.length} batal, ${ditunda.length} ditunda</div>
       </div>
     </div>
 
+    <!-- KPI Row 2: Delta Analysis -->
+    <div class="kpi-grid" style="margin-bottom:20px;">
+      <div class="kpi-card ${totalTpcDelta >= 0 ? 'success' : 'danger'}">
+        <div class="kpi-label">Delta TPC (Total Project Cost)</div>
+        <div class="kpi-value tnum">${totalTpcDelta >= 0 ? '+' : ''}${fmtRp(totalTpcDelta, true)}</div>
+        <div class="kpi-sub">${tpcChanged.length} proyek TPC berubah</div>
+      </div>
+      <div class="kpi-card ${totalKebDelta >= 0 ? 'success' : 'danger'}">
+        <div class="kpi-label">Delta Kebutuhan 1 Tahun</div>
+        <div class="kpi-value tnum">${totalKebDelta >= 0 ? '+' : ''}${fmtRp(totalKebDelta, true)}</div>
+        <div class="kpi-sub">${kebChanged.length} proyek kebutuhan berubah</div>
+      </div>
+      <div class="kpi-card primary">
+        <div class="kpi-label">Perubahan Nama/Scope</div>
+        <div class="kpi-value tnum">${nameChanged.length}</div>
+        <div class="kpi-sub">Proyek dengan redefinisi scope</div>
+      </div>
+      <div class="kpi-card ${totalSelisih >= 0 ? 'success' : 'warning'}">
+        <div class="kpi-label">Total Selisih vs Min ISG</div>
+        <div class="kpi-value tnum">${fmtRp(totalSelisih, true)}</div>
+        <div class="kpi-sub">${withSelisih.length} proyek ada gap vs minimum ISG</div>
+      </div>
+    </div>
+
+    <!-- Switching Lists -->
     <div class="grid grid-2" style="margin-bottom:12px;">
       <div class="panel">
         <div class="panel-head">
           <div>
-            <div class="panel-title">🔺 Bertambah Alokasi</div>
-            <div class="panel-desc">Top 15 proyek penerima switching (urut nominal)</div>
+            <div class="panel-title">🔺 Bertambah Alokasi (Switching In)</div>
+            <div class="panel-desc">Top 15 proyek penerima switching</div>
           </div>
           <span class="chip success">${bertambah.length} proyek</span>
         </div>
         <div class="change-list">
-          ${bertambah.slice(0, 15).map(p => changeRow(p, 'in')).join('') || '<div class="empty"><div class="empty-desc">Tidak ada proyek yang bertambah alokasi</div></div>'}
+          ${bertambah.slice(0, 15).map(p => changeRow(p, 'in')).join('') || '<div class="empty"><div class="empty-desc">Tidak ada</div></div>'}
         </div>
       </div>
       <div class="panel">
         <div class="panel-head">
           <div>
-            <div class="panel-title">🔻 Berkurang Alokasi</div>
-            <div class="panel-desc">Top 15 proyek donor switching (urut nominal absolut)</div>
+            <div class="panel-title">🔻 Berkurang Alokasi (Switching Out)</div>
+            <div class="panel-desc">Top 15 proyek donor switching</div>
           </div>
           <span class="chip danger">${berkurang.length} proyek</span>
         </div>
         <div class="change-list">
-          ${berkurang.slice(0, 15).map(p => changeRow(p, 'out')).join('') || '<div class="empty"><div class="empty-desc">Tidak ada proyek yang berkurang alokasi</div></div>'}
+          ${berkurang.slice(0, 15).map(p => changeRow(p, 'out')).join('') || '<div class="empty"><div class="empty-desc">Tidak ada</div></div>'}
         </div>
       </div>
     </div>
 
-    <div class="grid grid-2">
+    <!-- TPC & Kebutuhan Delta -->
+    <div class="grid grid-2" style="margin-bottom:12px;">
       <div class="panel">
         <div class="panel-head">
           <div>
-            <div class="panel-title">Unplanned / Proyek Baru</div>
-            <div class="panel-desc">Pengadaan unplanned hasil revisi dari Nota Dinas</div>
+            <div class="panel-title">📊 Perubahan TPC (Total Project Cost)</div>
+            <div class="panel-desc">Proyek yang TPC-nya berubah signifikan antara awal vs revisi</div>
           </div>
-          <span class="chip accent">${unplanned.length} proyek</span>
+          <span class="chip primary">${tpcChanged.length} proyek</span>
         </div>
         <div class="change-list">
-          ${unplanned.slice(0, 12).map(p => unplannedRow(p)).join('') || '<div class="empty"><div class="empty-desc">Tidak ada proyek unplanned</div></div>'}
+          ${tpcChanged.sort((a,b) => Math.abs(b.tpcDelta) - Math.abs(a.tpcDelta)).slice(0, 15).map(p => deltaRow(p, 'tpc')).join('') || '<div class="empty"><div class="empty-desc">Tidak ada perubahan TPC</div></div>'}
         </div>
       </div>
       <div class="panel">
         <div class="panel-head">
           <div>
-            <div class="panel-title">Batal &amp; Ditunda</div>
-            <div class="panel-desc">Proyek yang dibatalkan / ditunda setelah revisi</div>
+            <div class="panel-title">📊 Perubahan Kebutuhan 1 Tahun</div>
+            <div class="panel-desc">Selisih kebutuhan awal vs revisi (yang diminta INF)</div>
+          </div>
+          <span class="chip primary">${kebChanged.length} proyek</span>
+        </div>
+        <div class="change-list">
+          ${kebChanged.sort((a,b) => Math.abs(b.kebDelta) - Math.abs(a.kebDelta)).slice(0, 15).map(p => deltaRow(p, 'keb')).join('') || '<div class="empty"><div class="empty-desc">Tidak ada perubahan kebutuhan</div></div>'}
+        </div>
+      </div>
+    </div>
+
+    <!-- Name Changes & Selisih vs ISG -->
+    <div class="grid grid-2" style="margin-bottom:12px;">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">✏️ Perubahan Nama / Scope Proyek</div>
+            <div class="panel-desc">Proyek yang scope-nya diubah (nama awal ≠ nama akhir)</div>
+          </div>
+          <span class="chip accent">${nameChanged.length} proyek</span>
+        </div>
+        <div class="change-list">
+          ${nameChanged.slice(0, 15).map(p => nameChangeRow(p)).join('') || '<div class="empty"><div class="empty-desc">Tidak ada perubahan nama</div></div>'}
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">⚖️ Selisih vs Minimum Alokasi ISG</div>
+            <div class="panel-desc">Gap antara yang diminta INF (Keb Rev) vs minimum yang ditetapkan ISG</div>
+          </div>
+          <span class="chip warning">${withSelisih.length} proyek</span>
+        </div>
+        <div class="change-list">
+          ${withSelisih.sort((a,b) => Math.abs(b.selisihAlokasi) - Math.abs(a.selisihAlokasi)).slice(0, 15).map(p => selisihRow(p)).join('') || '<div class="empty"><div class="empty-desc">Tidak ada selisih</div></div>'}
+        </div>
+      </div>
+    </div>
+
+    <!-- Unplanned & Batal -->
+    <div class="grid grid-2">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">➕ Unplanned / Proyek Baru</div>
+            <div class="panel-desc">Pengadaan baru dari Nota Dinas (tidak ada di RKA awal)</div>
+          </div>
+          <span class="chip accent">${unplanned.length} proyek</span>
+        </div>
+        <div class="change-list">
+          ${unplanned.slice(0, 12).map(p => unplannedRow(p)).join('') || '<div class="empty"><div class="empty-desc">Tidak ada</div></div>'}
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">❌ Batal &amp; Ditunda</div>
+            <div class="panel-desc">Proyek yang dibatalkan / ditunda setelah Challenge Session</div>
           </div>
           <span class="chip danger">${batal.length + ditunda.length} proyek</span>
         </div>
         <div class="change-list">
-          ${[...batal, ...ditunda].slice(0, 12).map(p => batalRow(p)).join('') || '<div class="empty"><div class="empty-desc">Tidak ada proyek batal/ditunda</div></div>'}
+          ${[...batal, ...ditunda].slice(0, 12).map(p => batalRow(p)).join('') || '<div class="empty"><div class="empty-desc">Tidak ada</div></div>'}
         </div>
       </div>
     </div>
@@ -1617,6 +1709,11 @@ function renderChanges() {
       .change-item.out { border-left: 3px solid var(--danger); }
       .change-item.unplanned { border-left: 3px solid var(--bri-orange); }
       .change-item.batal { border-left: 3px solid var(--danger); opacity: 0.9; }
+      .change-item.delta-up { border-left: 3px solid var(--success); }
+      .change-item.delta-down { border-left: 3px solid var(--danger); }
+      .change-item.name-change { border-left: 3px solid var(--info); }
+      .change-item.selisih-neg { border-left: 3px solid var(--warning); }
+      .change-item.selisih-pos { border-left: 3px solid var(--success); }
       .change-name { font-size: 12px; font-weight: 600; line-height: 1.4; margin-bottom: 4px;
         display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
       .change-meta { font-size: 10.5px; color: var(--text-3); display: flex; gap: 8px; flex-wrap: wrap; }
@@ -1624,6 +1721,12 @@ function renderChanges() {
       .change-amt.in { color: var(--success); }
       .change-amt.out { color: var(--danger); }
       .change-amt.unplanned { color: var(--bri-orange); }
+      .delta-detail { font-size: 10px; color: var(--text-3); margin-top: 3px; font-variant-numeric: tabular-nums; }
+      .delta-detail .old { text-decoration: line-through; opacity: 0.7; }
+      .delta-detail .arrow { margin: 0 4px; }
+      .delta-detail .new { font-weight: 600; color: var(--text-2); }
+      .name-old { font-size: 10.5px; color: var(--text-3); text-decoration: line-through; margin-top: 3px; line-height: 1.3;
+        display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
     </style>
   `;
   document.getElementById('view-changes').innerHTML = html;
@@ -1632,7 +1735,7 @@ function renderChanges() {
   document.querySelectorAll('#view-changes .change-item').forEach(el => {
     el.addEventListener('click', () => {
       const idx = parseInt(el.dataset.idx, 10);
-      openDrawer(state.rows[idx]);
+      if (state.rows[idx]) openDrawer(state.rows[idx]);
     });
   });
 }
@@ -1681,6 +1784,70 @@ function batalRow(p) {
         </div>
       </div>
       <div class="change-amt" style="color:var(--text-3);">${fmtRp(p.alokasiUpdate || p.kebutuhan1Thn, true)}</div>
+    </div>`;
+}
+
+function deltaRow(p, type) {
+  const delta = type === 'tpc' ? (p.tpcDelta || 0) : (p.kebDelta || 0);
+  const oldVal = type === 'tpc' ? p.tpcAwal : p.kebutuhan1Thn;
+  const newVal = type === 'tpc' ? p.tpcRevisi : p.kebutuhan1ThnRev;
+  const cls = delta > 0 ? 'delta-up' : 'delta-down';
+  const sign = delta > 0 ? '+' : '';
+  return `
+    <div class="change-item ${cls}" data-idx="${state.rows.indexOf(p)}">
+      <div>
+        <div class="change-name">${escapeHtml(p.name)}</div>
+        <div class="change-meta">
+          <span>${escapeHtml(p.idRka2026 || '')}</span>
+          <span>·</span>
+          <span>${escapeHtml(p.dept || '-')}/${escapeHtml(p.tim || '-')}</span>
+        </div>
+        <div class="delta-detail">
+          <span class="old">${fmtRp(oldVal, true)}</span>
+          <span class="arrow">→</span>
+          <span class="new">${fmtRp(newVal, true)}</span>
+        </div>
+      </div>
+      <div class="change-amt ${delta > 0 ? 'in' : 'out'}">${sign}${fmtRp(delta, true)}</div>
+    </div>`;
+}
+
+function nameChangeRow(p) {
+  return `
+    <div class="change-item name-change" data-idx="${state.rows.indexOf(p)}">
+      <div>
+        <div class="change-name">${escapeHtml(p.name)}</div>
+        <div class="name-old">Sebelum: ${escapeHtml(p.nameAwal || '-')}</div>
+        <div class="change-meta">
+          <span>${escapeHtml(p.idRka2026 || '')}</span>
+          <span>·</span>
+          <span>${escapeHtml(p.dept || '-')}/${escapeHtml(p.tim || '-')}</span>
+        </div>
+      </div>
+      <div class="change-amt" style="color:var(--info);">${fmtRp(p.alokasiUpdate, true)}</div>
+    </div>`;
+}
+
+function selisihRow(p) {
+  const sel = p.selisihAlokasi || 0;
+  const cls = sel < 0 ? 'selisih-neg' : 'selisih-pos';
+  const sign = sel > 0 ? '+' : '';
+  return `
+    <div class="change-item ${cls}" data-idx="${state.rows.indexOf(p)}">
+      <div>
+        <div class="change-name">${escapeHtml(p.name)}</div>
+        <div class="change-meta">
+          <span>${escapeHtml(p.idRka2026 || '')}</span>
+          <span>·</span>
+          <span>${escapeHtml(p.dept || '-')}/${escapeHtml(p.tim || '-')}</span>
+        </div>
+        <div class="delta-detail">
+          <span>Keb Rev: ${fmtRp(p.kebutuhan1ThnRev, true)}</span>
+          <span class="arrow">vs Min:</span>
+          <span>${fmtRp(p.nominalMinAlokasi, true)}</span>
+        </div>
+      </div>
+      <div class="change-amt ${sel < 0 ? 'out' : 'in'}">${sign}${fmtRp(sel, true)}</div>
     </div>`;
 }
 

@@ -128,6 +128,15 @@ window.__autoRender = function(data) {
     p.switchingLog = (p.switching_log || []);
     p.changeType = p.change_type || 'Tidak berubah';
     p.serapanPct = p.serapan_pct || 0;
+    // Delta fields
+    p.tpcDelta = p.tpc_delta || 0;
+    p.kebDelta = p.keb_delta || 0;
+    p.hasTpcChange = p.has_tpc_change || false;
+    p.hasKebChange = p.has_keb_change || false;
+    p.hasNameChange = p.has_name_change || false;
+    p.hasSwitching = p.has_switching || false;
+    p.hasSelisih = p.has_selisih || false;
+    p.isNewUnplanned = p.is_new_unplanned || false;
     Object.defineProperty(p, 'serapanPct', {
       get: function() { return this.alokasiUpdate > 0 ? (this.realisasi / this.alokasiUpdate * 100) : 0; },
       configurable: true
