@@ -42,11 +42,6 @@ input,select{font-family:inherit}
   display:grid;place-items:center;font-weight:800;color:#fff;font-size:11px;flex-shrink:0}
 .tb-title{color:#fff;font-weight:700;font-size:13px}
 .tb-sub{color:rgba(255,255,255,.5);font-size:10px;margin-top:1px}
-.tb-nav{display:flex;gap:2px;margin-left:16px}
-.tab-btn{padding:6px 14px;font-size:12px;font-weight:500;color:rgba(255,255,255,.6);
-  border-radius:7px;transition:all var(--tf)}
-.tab-btn:hover{background:rgba(255,255,255,.1);color:#fff}
-.tab-btn.active{background:rgba(255,255,255,.18);color:#fff;font-weight:600}
 .tb-right{margin-left:auto;display:flex;align-items:center;gap:8px}
 .pill{font-size:10px;color:rgba(255,255,255,.65);padding:3px 10px;
   background:rgba(255,255,255,.08);border-radius:20px}
@@ -100,6 +95,28 @@ input,select{font-family:inherit}
 .kpi.blue{--ac:var(--blue)}.kpi.green{--ac:var(--green)}.kpi.red{--ac:var(--red)}
 .kpi.amber{--ac:var(--amber)}.kpi.orange{--ac:var(--orange)}.kpi.sky{--ac:var(--sky)}
 .kpi.purple{--ac:var(--purple)}
+/* clickable KPI */
+.kpi.clickable{cursor:pointer;transition:all var(--tf)}
+.kpi.clickable:hover{transform:translateY(-2px);box-shadow:var(--sh2);border-color:var(--ac,var(--blue))}
+/* ── CARD MODAL ── */
+.cmodal-ov{position:fixed;inset:0;background:rgba(10,20,40,.5);backdrop-filter:blur(4px);
+  opacity:0;pointer-events:none;transition:opacity var(--tf);z-index:300}
+.cmodal-ov.open{opacity:1;pointer-events:auto}
+.cmodal{position:fixed;top:50%;left:50%;transform:translate(-50%,-48%);
+  width:min(680px,96vw);max-height:80vh;background:var(--card);
+  border-radius:var(--r2);box-shadow:0 24px 60px rgba(0,0,0,.2);
+  display:flex;flex-direction:column;z-index:301;
+  opacity:0;pointer-events:none;transition:all var(--tf)}
+.cmodal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
+.cmh{padding:16px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cmh h3{font-size:14px;font-weight:700}
+.cmh .cmsub{font-size:10.5px;color:var(--t3);margin-top:2px}
+.cmb{flex:1;overflow-y:auto;padding:14px 20px;display:flex;flex-direction:column;gap:5px}
+.cm-close{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;
+  color:var(--t3);transition:all var(--tf);flex-shrink:0}
+.cm-close:hover{background:var(--bg);color:var(--t1)}
+.cm-close svg{width:14px;height:14px}
 /* ── PANELS ── */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
@@ -187,11 +204,11 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 .dbadge.neu{background:rgba(140,155,176,.1);color:var(--t3)}
 /* ── DRAWER ── */
 .ov{position:fixed;inset:0;background:rgba(10,20,40,.45);backdrop-filter:blur(4px);
-  opacity:0;pointer-events:none;transition:opacity var(--tf);z-index:200}
+  opacity:0;pointer-events:none;transition:opacity var(--tf);z-index:399}
 .ov.open{opacity:1;pointer-events:auto}
 .drawer{position:fixed;top:0;right:0;bottom:0;width:600px;max-width:100vw;
   background:var(--card);transform:translateX(100%);transition:transform var(--tf);
-  z-index:201;display:flex;flex-direction:column;box-shadow:-8px 0 40px rgba(0,0,0,.15)}
+  z-index:400;display:flex;flex-direction:column;box-shadow:-8px 0 40px rgba(0,0,0,.15)}
 .drawer.open{transform:translateX(0)}
 .dh{padding:18px 22px;border-bottom:1px solid var(--border);
   display:flex;align-items:start;justify-content:space-between;gap:14px}
@@ -247,10 +264,6 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
     <div class="tb-title">Challenge Session · RKA TI Revisi 2026</div>
     <div class="tb-sub">PMO Infrastruktur · IT Directorate BRI</div>
   </div>
-  <nav class="tb-nav" id="topNav">
-    <button class="tab-btn active" data-view="changes">Perubahan</button>
-    <button class="tab-btn" data-view="projects">Semua Proyek</button>
-  </nav>
   <div class="tb-right">
     <span class="pill tnum" id="metaCutoff"></span>
     <span class="pill tnum" id="metaRows"></span>
@@ -302,9 +315,22 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 
 <!-- DASHBOARD -->
 <main class="main hidden" id="dashboard">
-  <section class="view active" id="view-changes"></section>
-  <section class="view" id="view-projects"></section>
+  <section id="view-main"></section>
 </main>
+
+<!-- CARD MODAL -->
+<div class="cmodal-ov" id="cmodalOv"></div>
+<div class="cmodal" id="cmodal">
+  <div class="cmh">
+    <div><h3 id="cmTitle"></h3><div class="cmsub" id="cmSub"></div></div>
+    <button class="cm-close" id="cmClose">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <div class="cmb" id="cmBody"></div>
+</div>
 
 <!-- DRAWER -->
 <div class="ov" id="ov"></div>
@@ -491,9 +517,11 @@ function buildRow(r,ri){
   const progK= PROG_KUM.map(c=>num(g(c)));
   const rTot = num(g(COL.r_tot))||real.reduce((a,b)=>a+b,0);
   const pTot = num(g(COL.p_tot))||prog.reduce((a,b)=>a+b,0);
-  const alok = num(g(COL.keb_rev))||num(g(COL.alok));
+  // alokasi_update = col AB (idx 27), kebutuhan_1thn_rev = col AF (idx 31)
+  const alokUpdate = num(g(COL.alok));       // col AB — Alokasi Update (ISG)
+  const kebRev     = num(g(COL.keb_rev));    // col AF — Kebutuhan 1 Thn Revisi (INF)
+  const alok = kebRev || alokUpdate;         // primary display value
   const tpcA = num(g(COL.tpc_awal)), tpcR = num(g(COL.tpc_rev));
-  const kebA = num(g(COL.keb1)),     kebR = num(g(COL.keb_rev));
   const sw   = num(g(COL.sw));
   const sel  = num(g(COL.selisih));
   const nomMin = num(g(COL.nom_min));
@@ -506,7 +534,10 @@ function buildRow(r,ri){
   if(ks) swLog.push({ip:txt(g(COL.ip_sw)),desc:ks});
 
   const tpcDelta = (tpcA>0&&tpcR>0) ? tpcR-tpcA : 0;
-  const kebDelta = (kebA>0&&kebR>0) ? kebR-kebA : 0;
+  // kebDelta: Kebutuhan 1 Thn Revisi (INF, col AF) - Alokasi Update (ISG, col AB)
+  // Positif = INF minta lebih dari alokasi ISG | Negatif = alokasi ISG sudah cukup
+  // Show delta whenever either value is non-zero (not just when both are non-zero)
+  const kebDelta = (alokUpdate!==0||kebRev!==0) ? kebRev-alokUpdate : 0;
   const hasNameChange = !!(nameA&&name&&nameA!=='-'&&name!=='-'&&nameA!==name&&nameA.length>3);
 
   const p = {
@@ -520,7 +551,7 @@ function buildRow(r,ri){
     rutin:txt(g(COL.rutin)), baru:txt(g(COL.baru)),
     status, statusRaw,
     tpcA, tpcR, tpcDelta,
-    kebA, kebR, kebDelta,
+    alokUpdate, kebRev, kebDelta,  // alokUpdate=col AB, kebRev=col AF
     alok, sw, sel, nomMin,
     real, rTot, prog, pTot, progK,
     ketRev:txt(g(COL.ket_rev)), catatan:txt(g(COL.catatan)),
@@ -536,7 +567,7 @@ function buildRow(r,ri){
     hasNameChange,
     hasSw: sw!==0,
     hasSel: sel!==0,
-    isNew: plan.toLowerCase()==='unplanned'&&kebA===0,
+    isNew: plan.toLowerCase()==='unplanned'&&alokUpdate===0&&kebRev===0,
     get serapan(){ return this.alok>0?(this.rTot/this.alok*100):0; }
   };
   return p;
@@ -564,19 +595,8 @@ function detectCutoff(rows){
   return last<0?new Date().getMonth():last;
 }
 
-/* ── NAV ── */
-document.getElementById('topNav').addEventListener('click', e=>{
-  const btn=e.target.closest('.tab-btn'); if(!btn) return;
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));
-  switchView(btn.dataset.view);
-});
-function switchView(v){
-  S.view=v;
-  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
-  document.getElementById('view-'+v).classList.add('active');
-  renderView(v);
-}
-function renderView(v){ if(!S.rows.length) return; v==='changes'?renderChanges():renderProjects(); }
+/* ── NAV (removed — single view) ── */
+function renderView(){ if(!S.rows.length) return; renderMain(); }
 
 function renderDashboard(){
   document.getElementById('landing').classList.add('hidden');
@@ -584,7 +604,7 @@ function renderDashboard(){
   document.getElementById('dashboard').classList.remove('hidden');
   document.getElementById('metaRows').textContent=S.rows.length+' proyek';
   document.getElementById('metaCutoff').textContent='Cut-off: '+MONTHS_FULL[S.cutoff];
-  switchView(S.view);
+  renderMain();
 }
 
 /* ── CHART HELPERS ── */
@@ -611,8 +631,8 @@ function base(extra){
 }
 window.addEventListener('resize',()=>{ let t; clearTimeout(t); t=setTimeout(()=>Object.values(S.charts).forEach(c=>c&&c.resize()),150); });
 
-/* ── VIEW 1: PERUBAHAN ── */
-function renderChanges(){
+/* ── SINGLE VIEW: renderMain ── */
+function renderMain(){
   const rows=S.rows;
   const swIn   = rows.filter(p=>p.sw>0).sort((a,b)=>b.sw-a.sw);
   const swOut  = rows.filter(p=>p.sw<0).sort((a,b)=>a.sw-b.sw);
@@ -631,82 +651,107 @@ function renderChanges(){
   const totKebD= rows.reduce((s,p)=>s+(p.kebDelta||0),0);
   const totSel = selAll.reduce((s,p)=>s+p.sel,0);
 
-  const el=document.getElementById('view-changes');
+  // KPI card definitions — each has a dataset key for click handler
+  const cards = [
+    {key:'swIn',   cls:'green',  lbl:'Switching In',          val:fmtRp(totIn,true),   sub:swIn.length+' proyek bertambah alokasi',   items:swIn,   title:'Switching In — Bertambah Alokasi',   renderFn:p=>ciRow(p,'in',fmtRp(p.sw,true),'g','+')},
+    {key:'swOut',  cls:'red',    lbl:'Switching Out',          val:fmtRp(totOut,true),  sub:swOut.length+' proyek berkurang alokasi',  items:swOut,  title:'Switching Out — Berkurang Alokasi',  renderFn:p=>ciRow(p,'out',fmtRp(p.sw,true),'r','')},
+    {key:'tpc',    cls:totTpcD>=0?'green':'red', lbl:'Delta TPC', val:(totTpcD>=0?'+':'')+fmtRp(totTpcD,true), sub:(tpcUp.length+tpcDn.length)+' proyek TPC berubah', items:[...tpcUp,...tpcDn], title:'Perubahan Total Project Cost', renderFn:p=>ciDelta(p,p.tpcDelta>0?'tpc-up':'tpc-dn',p.tpcA,p.tpcR,p.tpcDelta,p.tpcDelta>0?'g':'r')},
+    {key:'keb',    cls:totKebD>=0?'green':'red', lbl:'Delta Kebutuhan vs Alokasi ISG', val:(totKebD>=0?'+':'')+fmtRp(totKebD,true), sub:(kebUp.length+kebDn.length)+' proyek ada selisih', items:[...kebUp,...kebDn], title:'Kebutuhan 1 Thn Revisi (INF) vs Alokasi Update (ISG)', renderFn:p=>ciDeltaKeb(p)},
+    {key:'scope',  cls:'sky',    lbl:'Perubahan Scope/Nama',   val:scope.length+' proyek', sub:'Nama proyek diubah',                  items:scope,  title:'Perubahan Scope / Nama Proyek',      renderFn:p=>ciScope(p)},
+    {key:'sel',    cls:'amber',  lbl:'Selisih vs Min ISG',     val:fmtRp(totSel,true),  sub:selAll.length+' proyek ada gap',          items:selAll, title:'Selisih vs Minimum Alokasi ISG',     renderFn:p=>ciSelisih(p)},
+    {key:'new',    cls:'orange', lbl:'Unplanned Baru',         val:newP.length+' proyek', sub:fmtRp(newP.reduce((s,p)=>s+p.alok,0),true), items:newP, title:'Unplanned / Proyek Baru',          renderFn:p=>ciRow(p,'new',fmtRp(p.alok,true),'o','')},
+    {key:'batal',  cls:'red',    lbl:'Batal / Ditunda',        val:batal.length+' proyek', sub:batal.filter(p=>p.status==='Batal').length+' batal, '+batal.filter(p=>p.status==='Ditunda').length+' ditunda', items:batal, title:'Batal & Ditunda', renderFn:p=>ciRow(p,'cancel',fmtRp(p.alok||p.kebA,true),'','',true)},
+  ];
+
+  // Store card data for click handlers
+  S.cardData = {};
+  cards.forEach(c=>{ S.cardData[c.key]=c; });
+
+  const el=document.getElementById('view-main');
   el.innerHTML=`
 <div style="margin-bottom:14px">
-  <div style="font-size:17px;font-weight:800;letter-spacing:-.01em">Perubahan &amp; Revisi Challenge Session</div>
-  <div style="font-size:11.5px;color:var(--t3);margin-top:3px">Highlight semua perubahan: switching, delta TPC, delta kebutuhan, perubahan scope, dan selisih vs minimum ISG</div>
+  <div style="font-size:17px;font-weight:800;letter-spacing:-.01em">Challenge Session · RKA TI Revisi 2026</div>
+  <div style="font-size:11.5px;color:var(--t3);margin-top:3px">Klik card untuk melihat detail item. Tabel di bawah dapat difilter dan diurutkan.</div>
 </div>
 
-<div class="kpi-grid">
-  ${kpi('Switching In','green',fmtRp(totIn,true),swIn.length+' proyek bertambah alokasi')}
-  ${kpi('Switching Out','red',fmtRp(totOut,true),swOut.length+' proyek berkurang alokasi')}
-  ${kpi('Delta TPC',totTpcD>=0?'green':'red',(totTpcD>=0?'+':'')+fmtRp(totTpcD,true),(tpcUp.length+tpcDn.length)+' proyek TPC berubah')}
-  ${kpi('Delta Kebutuhan 1 Thn',totKebD>=0?'green':'red',(totKebD>=0?'+':'')+fmtRp(totKebD,true),(kebUp.length+kebDn.length)+' proyek kebutuhan berubah')}
-  ${kpi('Perubahan Scope/Nama','sky',scope.length+' proyek','Nama proyek diubah')}
-  ${kpi('Selisih vs Min ISG','amber',fmtRp(totSel,true),selAll.length+' proyek ada gap')}
-  ${kpi('Unplanned Baru','orange',newP.length+' proyek',fmtRp(newP.reduce((s,p)=>s+p.alok,0),true))}
-  ${kpi('Batal / Ditunda','red',batal.length+' proyek',batal.filter(p=>p.status==='Batal').length+' batal, '+batal.filter(p=>p.status==='Ditunda').length+' ditunda')}
+<div class="kpi-grid" style="margin-bottom:20px">
+  ${cards.map(c=>`
+  <div class="kpi ${c.cls} clickable" data-card="${c.key}" title="Klik untuk detail">
+    <div class="kpi-lbl">${c.lbl}</div>
+    <div class="kpi-val tnum">${c.val}</div>
+    <div class="kpi-sub">${c.sub}</div>
+  </div>`).join('')}
 </div>
 
-<div class="grid2" style="margin-bottom:12px">
-  <div class="panel">
-    <div class="ph"><div><div class="pt">🔺 Switching In — Bertambah Alokasi</div><div class="pd">Proyek penerima switching (urut nominal)</div></div><span class="chip g">${swIn.length}</span></div>
-    <div class="clist">${swIn.slice(0,15).map(p=>ciRow(p,'in',fmtRp(p.sw,true),'g','+')).join('')||empty()}</div>
+<div style="font-size:13px;font-weight:700;margin-bottom:10px">Semua Proyek</div>
+<div class="twrap">
+  <div class="tbar">
+    <div class="sbox">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="pQ" placeholder="Cari nama, ID RKA, vendor…" value="${esc(S.filter.q)}">
+    </div>
+    <select class="fsel" id="pStatus">
+      <option value="all">Semua Status</option>
+      ${[...new Set(rows.map(p=>p.status))].sort().map(s=>`<option value="${esc(s)}" ${S.filter.status===s?'selected':''}>${esc(s)}</option>`).join('')}
+    </select>
+    <select class="fsel" id="pDept">
+      <option value="all">Semua DEPT</option>
+      ${[...new Set(rows.map(p=>p.dept).filter(Boolean))].sort().map(d=>`<option value="${esc(d)}" ${S.filter.dept===d?'selected':''}>${esc(d)}</option>`).join('')}
+    </select>
+    <select class="fsel" id="pPlanned">
+      <option value="all">Planned &amp; Unplanned</option>
+      <option value="Planned" ${S.filter.planned==='Planned'?'selected':''}>Planned</option>
+      <option value="Unplanned" ${S.filter.planned==='Unplanned'?'selected':''}>Unplanned</option>
+    </select>
+    <select class="fsel" id="pChange">
+      <option value="all">Semua Perubahan</option>
+      <option value="sw">Ada Switching</option>
+      <option value="tpc">TPC Berubah</option>
+      <option value="keb">Kebutuhan Berubah</option>
+      <option value="scope">Nama Berubah</option>
+      <option value="new">Unplanned Baru</option>
+      <option value="batal">Batal/Ditunda</option>
+    </select>
+    <button onclick="resetFilter()" style="padding:7px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:11.5px;color:var(--t2);background:var(--card)">Reset</button>
   </div>
-  <div class="panel">
-    <div class="ph"><div><div class="pt">🔻 Switching Out — Berkurang Alokasi</div><div class="pd">Proyek donor switching (urut nominal)</div></div><span class="chip r">${swOut.length}</span></div>
-    <div class="clist">${swOut.slice(0,15).map(p=>ciRow(p,'out',fmtRp(p.sw,true),'r','')).join('')||empty()}</div>
+  <div class="tscroll">
+    <table>
+      <thead><tr>
+        <th data-k="id">ID RKA</th>
+        <th data-k="name">Nama Proyek</th>
+        <th data-k="dept">DEPT</th>
+        <th>Status</th>
+        <th data-k="alok" style="text-align:right">Alokasi Revisi</th>
+        <th data-k="rTot" style="text-align:right">Realisasi</th>
+        <th data-k="sw" style="text-align:right">Switching</th>
+        <th data-k="tpcDelta" style="text-align:right">Δ TPC</th>
+        <th data-k="kebDelta" style="text-align:right">Δ Kebutuhan</th>
+      </tr></thead>
+      <tbody id="pTbody"></tbody>
+    </table>
   </div>
-</div>
-
-<div class="grid2" style="margin-bottom:12px">
-  <div class="panel">
-    <div class="ph"><div><div class="pt">📈 TPC Naik</div><div class="pd">Total Project Cost bertambah vs awal</div></div><span class="chip g">${tpcUp.length}</span></div>
-    <div class="clist">${tpcUp.slice(0,12).map(p=>ciDelta(p,'tpc-up',p.tpcA,p.tpcR,p.tpcDelta,'g')).join('')||empty()}</div>
-  </div>
-  <div class="panel">
-    <div class="ph"><div><div class="pt">📉 TPC Turun</div><div class="pd">Total Project Cost berkurang vs awal</div></div><span class="chip r">${tpcDn.length}</span></div>
-    <div class="clist">${tpcDn.slice(0,12).map(p=>ciDelta(p,'tpc-dn',p.tpcA,p.tpcR,p.tpcDelta,'r')).join('')||empty()}</div>
-  </div>
-</div>
-
-<div class="grid2" style="margin-bottom:12px">
-  <div class="panel">
-    <div class="ph"><div><div class="pt">📈 Kebutuhan Naik</div><div class="pd">Kebutuhan 1 Tahun bertambah vs awal</div></div><span class="chip g">${kebUp.length}</span></div>
-    <div class="clist">${kebUp.slice(0,12).map(p=>ciDelta(p,'keb-up',p.kebA,p.kebR,p.kebDelta,'g')).join('')||empty()}</div>
-  </div>
-  <div class="panel">
-    <div class="ph"><div><div class="pt">📉 Kebutuhan Turun</div><div class="pd">Kebutuhan 1 Tahun berkurang vs awal</div></div><span class="chip r">${kebDn.length}</span></div>
-    <div class="clist">${kebDn.slice(0,12).map(p=>ciDelta(p,'keb-dn',p.kebA,p.kebR,p.kebDelta,'r')).join('')||empty()}</div>
-  </div>
-</div>
-
-<div class="grid2" style="margin-bottom:12px">
-  <div class="panel">
-    <div class="ph"><div><div class="pt">✏️ Perubahan Scope / Nama Proyek</div><div class="pd">Nama awal ≠ nama akhir (redefinisi scope)</div></div><span class="chip b">${scope.length}</span></div>
-    <div class="clist">${scope.slice(0,12).map(p=>ciScope(p)).join('')||empty()}</div>
-  </div>
-  <div class="panel">
-    <div class="ph"><div><div class="pt">⚖️ Selisih vs Minimum Alokasi ISG</div><div class="pd">Gap antara yang diminta INF vs minimum ISG</div></div><span class="chip a">${selAll.length}</span></div>
-    <div class="clist">${selAll.slice(0,12).map(p=>ciSelisih(p)).join('')||empty()}</div>
-  </div>
-</div>
-
-<div class="grid2">
-  <div class="panel">
-    <div class="ph"><div><div class="pt">➕ Unplanned / Proyek Baru</div><div class="pd">Pengadaan baru dari Nota Dinas</div></div><span class="chip o">${newP.length}</span></div>
-    <div class="clist">${newP.slice(0,12).map(p=>ciRow(p,'new',fmtRp(p.alok,true),'o','')).join('')||empty()}</div>
-  </div>
-  <div class="panel">
-    <div class="ph"><div><div class="pt">❌ Batal &amp; Ditunda</div><div class="pd">Proyek yang dibatalkan / ditunda</div></div><span class="chip r">${batal.length}</span></div>
-    <div class="clist">${batal.slice(0,12).map(p=>ciRow(p,'cancel',fmtRp(p.alok||p.kebA,true),'','',true)).join('')||empty()}</div>
-  </div>
+  <div class="tfoot"><span id="pFoot"></span><span>Klik header untuk sort · Klik baris untuk detail</span></div>
 </div>`;
 
-  el.querySelectorAll('.ci').forEach(el=>{
-    el.addEventListener('click',()=>{ const idx=parseInt(el.dataset.idx,10); if(S.rows[idx]) openDrawer(S.rows[idx]); });
+  // KPI card click handlers
+  el.querySelectorAll('.kpi.clickable').forEach(card=>{
+    card.addEventListener('click',()=>openCardModal(card.dataset.card));
   });
+
+  // Table events
+  document.getElementById('pQ').addEventListener('input',e=>{S.filter.q=e.target.value;renderPTable();});
+  document.getElementById('pStatus').addEventListener('change',e=>{S.filter.status=e.target.value;renderPTable();});
+  document.getElementById('pDept').addEventListener('change',e=>{S.filter.dept=e.target.value;renderPTable();});
+  document.getElementById('pPlanned').addEventListener('change',e=>{S.filter.planned=e.target.value;renderPTable();});
+  document.getElementById('pChange').addEventListener('change',e=>{S.filter.change=e.target.value;renderPTable();});
+  document.querySelectorAll('#view-main thead th[data-k]').forEach(th=>{
+    th.addEventListener('click',()=>{
+      const k=th.dataset.k;
+      S.sort.d=(S.sort.k===k&&S.sort.d==='desc')?'asc':'desc';
+      S.sort.k=k; renderPTable();
+    });
+  });
+  renderPTable();
 }
 
 /* ── CI ROW BUILDERS ── */
@@ -754,86 +799,63 @@ function ciSelisih(p){
   </div>`;
 }
 
-/* ── VIEW 2: SEMUA PROYEK ── */
-function renderProjects(){
-  const rows=S.rows;
-  const statuses=[...new Set(rows.map(p=>p.status))].sort();
-  const depts=[...new Set(rows.map(p=>p.dept).filter(Boolean))].sort();
-
-  document.getElementById('view-projects').innerHTML=`
-<div style="margin-bottom:14px">
-  <div style="font-size:17px;font-weight:800;letter-spacing:-.01em">Semua Proyek</div>
-  <div style="font-size:11.5px;color:var(--t3);margin-top:3px">Tabel lengkap dengan filter &amp; sort. Klik baris untuk detail.</div>
-</div>
-<div class="twrap">
-  <div class="tbar">
-    <div class="sbox">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="pQ" placeholder="Cari nama, ID RKA, vendor…" value="${esc(S.filter.q)}">
+function ciDeltaKeb(p){
+  // Shows: Alokasi Update (ISG, col AB) vs Kebutuhan 1 Thn Rev (INF, col AF)
+  const cls=p.kebDelta>0?'keb-up':'keb-dn', amtCls=p.kebDelta>0?'g':'r';
+  return `<div class="ci ${cls}" data-idx="${S.rows.indexOf(p)}">
+    <div>
+      <div class="ci-name">${esc(p.name)}</div>
+      <div class="ci-meta">${ciMeta(p)}</div>
+      <div class="ci-delta">Alokasi ISG: <s>${fmtRp(p.alokUpdate,true)}</s><span class="arr"> → </span>Keb INF: <b>${fmtRp(p.kebRev,true)}</b></div>
     </div>
-    <select class="fsel" id="pStatus">
-      <option value="all">Semua Status</option>
-      ${statuses.map(s=>`<option value="${esc(s)}" ${S.filter.status===s?'selected':''}>${esc(s)}</option>`).join('')}
-    </select>
-    <select class="fsel" id="pDept">
-      <option value="all">Semua DEPT</option>
-      ${depts.map(d=>`<option value="${esc(d)}" ${S.filter.dept===d?'selected':''}>${esc(d)}</option>`).join('')}
-    </select>
-    <select class="fsel" id="pPlanned">
-      <option value="all">Planned &amp; Unplanned</option>
-      <option value="Planned" ${S.filter.planned==='Planned'?'selected':''}>Planned</option>
-      <option value="Unplanned" ${S.filter.planned==='Unplanned'?'selected':''}>Unplanned</option>
-    </select>
-    <select class="fsel" id="pChange">
-      <option value="all">Semua Perubahan</option>
-      <option value="sw">Ada Switching</option>
-      <option value="tpc">TPC Berubah</option>
-      <option value="keb">Kebutuhan Berubah</option>
-      <option value="scope">Nama Berubah</option>
-      <option value="new">Unplanned Baru</option>
-      <option value="batal">Batal/Ditunda</option>
-    </select>
-    <button onclick="resetFilter()" style="padding:7px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:11.5px;color:var(--t2);background:var(--card)">Reset</button>
-  </div>
-  <div class="tscroll">
-    <table>
-      <thead><tr>
-        <th data-k="id">ID RKA</th>
-        <th data-k="name">Nama Proyek</th>
-        <th data-k="dept">DEPT</th>
-        <th>Status</th>
-        <th data-k="alok" style="text-align:right">Alokasi Revisi</th>
-        <th data-k="rTot" style="text-align:right">Realisasi</th>
-        <th data-k="sw" style="text-align:right">Switching</th>
-        <th data-k="tpcDelta" style="text-align:right">Δ TPC</th>
-        <th data-k="kebDelta" style="text-align:right">Δ Kebutuhan</th>
-        <th data-k="serapan" style="text-align:right">% Serap</th>
-      </tr></thead>
-      <tbody id="pTbody"></tbody>
-    </table>
-  </div>
-  <div class="tfoot"><span id="pFoot"></span><span>Klik header untuk sort · Klik baris untuk detail</span></div>
-</div>`;
-
-  document.getElementById('pQ').addEventListener('input',e=>{S.filter.q=e.target.value;renderPTable();});
-  document.getElementById('pStatus').addEventListener('change',e=>{S.filter.status=e.target.value;renderPTable();});
-  document.getElementById('pDept').addEventListener('change',e=>{S.filter.dept=e.target.value;renderPTable();});
-  document.getElementById('pPlanned').addEventListener('change',e=>{S.filter.planned=e.target.value;renderPTable();});
-  document.getElementById('pChange').addEventListener('change',e=>{S.filter.change=e.target.value;renderPTable();});
-  document.querySelectorAll('#view-projects thead th[data-k]').forEach(th=>{
-    th.addEventListener('click',()=>{
-      const k=th.dataset.k;
-      S.sort.d=(S.sort.k===k&&S.sort.d==='desc')?'asc':'desc';
-      S.sort.k=k;
-      renderPTable();
-    });
-  });
-  renderPTable();
+    <div class="ci-amt ${amtCls}">${sign(p.kebDelta)}${fmtRp(p.kebDelta,true)}</div>
+  </div>`;
 }
 
+/* ── CARD MODAL ── */
+function openCardModal(key){
+  const c=S.cardData[key]; if(!c) return;
+  document.getElementById('cmTitle').textContent=c.title;
+  document.getElementById('cmSub').textContent=c.items.length+' proyek';
+  const body=document.getElementById('cmBody');
+  body.innerHTML=c.items.length
+    ? c.items.map(p=>c.renderFn(p)).join('')
+    : '<div class="empty">Tidak ada data</div>';
+  // When clicking an item inside the modal: close modal first, then open drawer
+  body.querySelectorAll('.ci').forEach(el=>{
+    el.addEventListener('click', e=>{
+      e.stopPropagation();
+      const idx=parseInt(el.dataset.idx,10);
+      const p=S.rows[idx];
+      if(!p) return;
+      // Close modal immediately (no animation wait needed — drawer slides in from right)
+      closeCardModal(false);
+      // Small delay so modal fade-out starts before drawer opens
+      setTimeout(()=>openDrawer(p, key), 80);
+    });
+  });
+  document.getElementById('cmodal').classList.add('open');
+  document.getElementById('cmodalOv').classList.add('open');
+}
+function closeCardModal(animate=true){
+  document.getElementById('cmodal').classList.remove('open');
+  document.getElementById('cmodalOv').classList.remove('open');
+}
+document.getElementById('cmClose').addEventListener('click',()=>closeCardModal());
+document.getElementById('cmodalOv').addEventListener('click',()=>closeCardModal());
+// Close modal on Escape (but only if drawer is not open)
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){
+    const drawerOpen=document.getElementById('drawer').classList.contains('open');
+    if(drawerOpen){ closeDrawer(); }
+    else { closeCardModal(); }
+  }
+});
+
+/* ── FILTER & TABLE ── */
 function resetFilter(){
   S.filter={q:'',status:'all',dept:'all',planned:'all',change:'all'};
-  renderProjects();
+  renderMain();
 }
 
 function filterRows(){
@@ -881,7 +903,6 @@ function renderPTable(){
   if(!sorted.length){ tbody.innerHTML=`<tr><td colspan="10" class="empty">Tidak ada proyek yang cocok</td></tr>`; return; }
 
   tbody.innerHTML=sorted.map(p=>{
-    const sc=p.serapan, scCls=sc>=80?'g':sc>=40?'a':'r';
     const swCls=p.sw>0?'up':p.sw<0?'dn':'neu';
     const tCls=p.tpcDelta>0?'up':p.tpcDelta<0?'dn':'neu';
     const kCls=p.kebDelta>0?'up':p.kebDelta<0?'dn':'neu';
@@ -901,21 +922,32 @@ function renderPTable(){
       <td class="num"><span class="dbadge ${swCls}">${p.sw!==0?(sign(p.sw)+fmtRp(p.sw,true)):'-'}</span></td>
       <td class="num"><span class="dbadge ${tCls}">${p.tpcDelta!==0?(sign(p.tpcDelta)+fmtRp(p.tpcDelta,true)):'-'}</span></td>
       <td class="num"><span class="dbadge ${kCls}">${p.kebDelta!==0?(sign(p.kebDelta)+fmtRp(p.kebDelta,true)):'-'}</span></td>
-      <td class="num"><span class="chip ${scCls}">${fmtPct(sc)}</span></td>
     </tr>`;
   }).join('');
 
   tbody.querySelectorAll('tr').forEach(tr=>{
-    tr.addEventListener('click',()=>{ const p=S.rows[parseInt(tr.dataset.idx,10)]; if(p) openDrawer(p); });
+    tr.addEventListener('click',()=>{ const p=S.rows[parseInt(tr.dataset.idx,10)]; if(p) openDrawer(p, null); });
   });
 }
 
 /* ── DRAWER ── */
 const drawer=document.getElementById('drawer');
 const ov=document.getElementById('ov');
-function openDrawer(p){
+let _drawerFromCard=null; // track which card key opened this drawer
+
+function openDrawer(p, fromCardKey){
+  _drawerFromCard = fromCardKey || null;
   document.getElementById('dTitle').textContent=p.name;
-  document.getElementById('dMeta').innerHTML=`${esc(p.id||'-')} · ${esc(p.dept||'-')}/${esc(p.tim||'-')} · <span class="chip ${STATUS_COLOR[p.status]||''}">${esc(p.status)}</span>`;
+
+  // Build meta with optional "back" breadcrumb
+  const backBtn = _drawerFromCard
+    ? `<button id="dBackBtn" style="display:inline-flex;align-items:center;gap:4px;font-size:10.5px;color:var(--blue);background:none;border:none;cursor:pointer;padding:0;margin-bottom:4px;font-family:inherit;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        Kembali ke daftar
+      </button><br>`
+    : '';
+
+  document.getElementById('dMeta').innerHTML=`${backBtn}${esc(p.id||'-')} · ${esc(p.dept||'-')}/${esc(p.tim||'-')} · <span class="chip ${STATUS_COLOR[p.status]||''}">${esc(p.status)}</span>`;
 
   const deltaBoxes=[];
   if(p.hasTpcChange) deltaBoxes.push(`
@@ -931,10 +963,10 @@ function openDrawer(p){
   if(p.hasKebChange) deltaBoxes.push(`
     <div class="delta-box ${p.kebDelta>0?'up':'dn'}">
       <div style="flex:1">
-        <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:4px">Delta Kebutuhan 1 Tahun</div>
-        <span class="old">${fmtRp(p.kebA,true)}</span>
-        <span class="arr"> → </span>
-        <span class="new ${p.kebDelta>0?'g':'r'}">${fmtRp(p.kebR,true)}</span>
+        <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:4px">Delta Kebutuhan vs Alokasi ISG</div>
+        <div style="font-size:10px;color:var(--t3);margin-bottom:3px">Alokasi Update (ISG): <b>${fmtRp(p.alokUpdate,true)}</b></div>
+        <span style="color:var(--t2)">Keb Rev (INF): </span>
+        <span class="new ${p.kebDelta>0?'g':'r'}">${fmtRp(p.kebRev,true)}</span>
       </div>
       <div class="badge" style="color:${p.kebDelta>0?'var(--green)':'var(--red)'}">${sign(p.kebDelta)}${fmtRp(p.kebDelta,true)}</div>
     </div>`);
@@ -983,8 +1015,22 @@ function openDrawer(p){
     ${p.catatan?`<div class="df" style="margin-top:8px"><div class="dl">Catatan / Update Progress</div><div class="dblock">${esc(p.catatan)}</div></div>`:''}
   `;
   drawer.classList.add('open'); ov.classList.add('open');
+
+  // Attach back button if present
+  const dBackBtn=document.getElementById('dBackBtn');
+  if(dBackBtn){
+    dBackBtn.addEventListener('click', ()=>{
+      const key=_drawerFromCard;
+      closeDrawer();
+      if(key) setTimeout(()=>openCardModal(key), 80);
+    });
+  }
 }
-function closeDrawer(){ drawer.classList.remove('open'); ov.classList.remove('open'); }
+function closeDrawer(){
+  drawer.classList.remove('open');
+  ov.classList.remove('open');
+  _drawerFromCard=null;
+}
 document.getElementById('dClose').addEventListener('click',closeDrawer);
 ov.addEventListener('click',closeDrawer);
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer(); });
@@ -997,11 +1043,14 @@ window.__autoRender = function(data){
     p.prog=p.prog||[0,0,0,0,0,0,0,0,0,0,0,0];
     p.progK=p.prog_kum||[0,0,0,0,0,0,0,0,0,0,0,0];
     p.rTot=p.real_total||0; p.pTot=p.prog_total||0;
-    p.alok=p.alokasi_update||0; p.sw=p.nominal_switching||0;
+    p.alokUpdate=p.alokasi_update||0; p.sw=p.nominal_switching||0;
     p.sel=p.selisih_alokasi||0; p.nomMin=p.nominal_min_alokasi||0;
     p.tpcA=p.tpc_awal||0; p.tpcR=p.tpc_revisi||0;
-    p.kebA=p.kebutuhan_1thn||0; p.kebR=p.kebutuhan_1thn_rev||0;
-    p.tpcDelta=p.tpc_delta||0; p.kebDelta=p.keb_delta||0;
+    p.kebRev=p.kebutuhan_1thn_rev||0;
+    p.alok=p.kebRev||p.alokUpdate;
+    p.tpcDelta=p.tpc_delta||0;
+    // kebDelta: kebutuhan_1thn_rev (INF, col AF) - alokasi_update (ISG, col AB)
+    p.kebDelta=p.keb_delta||0;
     p.id=p.id_rka_ti||''; p.pc=p.parent_child||'';
     p.gl=p.nama_gl||''; p.ac=p.asset_class||'';
     p.nameA=p.name_awal||''; p.nameR=p.name_rev||'';

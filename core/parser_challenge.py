@@ -444,6 +444,7 @@ def _project_from_row(raw: tuple, row_idx: int) -> ProjectRow:
 
     # Primary allocation: prefer revisi result (col 31), fallback to alokasi_update (col 27)
     alokasi = _num(g(COL["kebutuhan_1thn_rev"])) or _num(g(COL["alokasi_update"]))
+    alokasi_update_raw = _num(g(COL["alokasi_update"]))  # col AB — raw ISG allocation
 
     status_raw = _text(g(COL["status_pengadaan"])) or _text(g(COL["update_progress"]))
     status_norm = _normalize_status(status_raw)
@@ -485,7 +486,7 @@ def _project_from_row(raw: tuple, row_idx: int) -> ProjectRow:
         kebutuhan_1thn=_num(g(COL["kebutuhan_1thn"])),
         kebutuhan_1thn_rev=_num(g(COL["kebutuhan_1thn_rev"])),
         nominal_switching=nominal_sw,
-        alokasi_update=alokasi,
+        alokasi_update=alokasi_update_raw,  # col AB — raw ISG allocation (for delta calc)
         nominal_min_alokasi=_num(g(COL["nominal_min_alokasi"])),
         selisih_alokasi=_num(g(COL["selisih_alokasi"])),
 
@@ -532,7 +533,12 @@ def _project_from_row(raw: tuple, row_idx: int) -> ProjectRow:
 
     # Delta detection
     pr.tpc_delta = pr.tpc_revisi - pr.tpc_awal if (pr.tpc_awal > 0 and pr.tpc_revisi > 0) else 0.0
-    pr.keb_delta = pr.kebutuhan_1thn_rev - pr.kebutuhan_1thn if (pr.kebutuhan_1thn > 0 and pr.kebutuhan_1thn_rev > 0) else 0.0
+    # keb_delta: Kebutuhan 1 Thn Revisi (INF, col AF) - Alokasi Update (ISG, col AB)
+    # Positif = INF minta lebih dari alokasi ISG | Negatif = alokasi ISG sudah cukup
+    alok_update_raw = _num(g(COL["alokasi_update"]))
+    keb_rev_raw = _num(g(COL["kebutuhan_1thn_rev"]))
+    # Show delta whenever either value is non-zero (not just when both are non-zero)
+    pr.keb_delta = (keb_rev_raw - alok_update_raw) if (alok_update_raw != 0 or keb_rev_raw != 0) else 0.0
     pr.has_tpc_change = abs(pr.tpc_delta) > 1000
     pr.has_keb_change = abs(pr.keb_delta) > 1000
     pr.has_name_change = bool(
@@ -541,7 +547,7 @@ def _project_from_row(raw: tuple, row_idx: int) -> ProjectRow:
     )
     pr.has_switching = nominal_sw != 0
     pr.has_selisih = pr.selisih_alokasi != 0
-    pr.is_new_unplanned = (planned.lower() == "unplanned") and pr.kebutuhan_1thn == 0
+    pr.is_new_unplanned = (planned.lower() == "unplanned") and alok_update_raw == 0 and keb_rev_raw == 0
 
     return pr
 
