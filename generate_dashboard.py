@@ -151,7 +151,7 @@ window.__autoRender = function(data) {
     latest = OUTPUT_DIR / "dashboard_latest.html"
     latest.write_text(html, encoding="utf-8")
 
-    print(f"\n✓ Dashboard generated: {output_path}")
+    print(f"\n[OK] Dashboard generated: {output_path}")
     print(f"  Alias: {latest}")
 
     # Auto-open

@@ -301,11 +301,20 @@ class ProjectRow:
     spk_selesai: str = ""
     principle: str = ""
     bp: str = ""
-    # Derived
+    # Derived — change detection
     switching_log: list = field(default_factory=list)
     change_type: str = ""
     serapan_pct: float = 0.0
     source_row: int = 0
+    # Delta fields (revision tracking)
+    tpc_delta: float = 0.0          # tpc_revisi - tpc_awal
+    keb_delta: float = 0.0          # kebutuhan_1thn_rev - kebutuhan_1thn
+    has_tpc_change: bool = False
+    has_keb_change: bool = False
+    has_name_change: bool = False
+    has_switching: bool = False
+    has_selisih: bool = False
+    is_new_unplanned: bool = False   # Unplanned + no baseline
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -520,6 +529,20 @@ def _project_from_row(raw: tuple, row_idx: int) -> ProjectRow:
 
     pr.change_type = _classify_change(planned, nominal_sw, status_norm)
     pr.serapan_pct = (pr.real_total / alokasi * 100.0) if alokasi > 0 else 0.0
+
+    # Delta detection
+    pr.tpc_delta = pr.tpc_revisi - pr.tpc_awal if (pr.tpc_awal > 0 and pr.tpc_revisi > 0) else 0.0
+    pr.keb_delta = pr.kebutuhan_1thn_rev - pr.kebutuhan_1thn if (pr.kebutuhan_1thn > 0 and pr.kebutuhan_1thn_rev > 0) else 0.0
+    pr.has_tpc_change = abs(pr.tpc_delta) > 1000
+    pr.has_keb_change = abs(pr.keb_delta) > 1000
+    pr.has_name_change = bool(
+        pr.name_awal and pr.name and pr.name_awal != "-" and pr.name != "-"
+        and pr.name_awal != pr.name and len(pr.name_awal) > 3
+    )
+    pr.has_switching = nominal_sw != 0
+    pr.has_selisih = pr.selisih_alokasi != 0
+    pr.is_new_unplanned = (planned.lower() == "unplanned") and pr.kebutuhan_1thn == 0
+
     return pr
 
 

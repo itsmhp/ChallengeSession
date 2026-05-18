@@ -168,6 +168,24 @@ def build_context(parsed: dict, *, source_file: str = "", period_label: str = ""
         "year_totals": year_totals,
         "year_entries": year_entries,
 
+        # Change detection aggregates
+        "revision": {
+            "total_with_changes": sum(1 for p in projects if p.get("has_tpc_change") or p.get("has_keb_change") or p.get("has_name_change") or p.get("has_switching")),
+            "tpc_changed": sum(1 for p in projects if p.get("has_tpc_change")),
+            "keb_changed": sum(1 for p in projects if p.get("has_keb_change")),
+            "name_changed": sum(1 for p in projects if p.get("has_name_change")),
+            "has_switching": sum(1 for p in projects if p.get("has_switching")),
+            "has_selisih": sum(1 for p in projects if p.get("has_selisih")),
+            "new_unplanned": sum(1 for p in projects if p.get("is_new_unplanned")),
+            "total_tpc_delta": sum(p.get("tpc_delta", 0) for p in projects),
+            "total_keb_delta": sum(p.get("keb_delta", 0) for p in projects),
+            "total_selisih": sum(p.get("selisih_alokasi", 0) for p in projects),
+            "tpc_increased": sorted([p for p in projects if p.get("tpc_delta", 0) > 0], key=lambda p: -p["tpc_delta"])[:15],
+            "tpc_decreased": sorted([p for p in projects if p.get("tpc_delta", 0) < 0], key=lambda p: p["tpc_delta"])[:15],
+            "name_changes": [p for p in projects if p.get("has_name_change")][:20],
+            "biggest_selisih": sorted([p for p in projects if p.get("selisih_alokasi", 0) != 0], key=lambda p: -abs(p["selisih_alokasi"]))[:15],
+        },
+
         "projects": projects,
 
         "filters": {
@@ -189,6 +207,7 @@ def build_context(parsed: dict, *, source_file: str = "", period_label: str = ""
     context["json_year_totals"] = _safe_json(year_totals)
     context["json_year_entries"] = _safe_json(year_entries)
     context["json_totals"] = _safe_json(context["totals"])
+    context["json_revision"] = _safe_json(context["revision"])
     context["json_by_dept_value"] = _safe_json(context["by_dept_value"])
     context["json_by_gl_value"] = _safe_json(context["by_gl_value"])
     context["json_by_asset_value"] = _safe_json(context["by_asset_value"])
