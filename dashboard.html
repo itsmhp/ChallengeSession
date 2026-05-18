@@ -1,901 +1,446 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Challenge Session Dashboard · RKA TI Revisi 2026</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Challenge Session · RKA TI Revisi 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
-/* =====================================================================
-   Design tokens — BRI-inspired but modernized for dashboard UX
-   ===================================================================== */
-:root {
-  /* Brand */
-  --bri-blue: #00529C;
-  --bri-blue-600: #003F7A;
-  --bri-blue-700: #002D58;
-  --bri-orange: #F37021;
-  --bri-orange-600: #D85A10;
-
-  /* Neutrals — Slate scale (cool blue-gray) */
-  --slate-50:  #F6F8FB;
-  --slate-100: #EEF2F7;
-  --slate-200: #DCE3ED;
-  --slate-300: #BBC6D6;
-  --slate-400: #8C9BB0;
-  --slate-500: #5F7089;
-  --slate-600: #42536A;
-  --slate-700: #2C3A50;
-  --slate-800: #1C2738;
-  --slate-900: #121B2A;
-
-  /* Semantic */
-  --success: #13A888;
-  --success-soft: #DCF3EC;
-  --warning: #E6A700;
-  --warning-soft: #FCF3D3;
-  --danger:  #D93A3A;
-  --danger-soft:  #FBE2E2;
-  --info:    #3B82C4;
-  --info-soft:    #DCEBF7;
-  --neutral: #8C9BB0;
-  --neutral-soft: #EEF2F7;
-
-  /* Data-viz 12-series */
-  --dv-1: #00529C; --dv-2: #F37021;
-  --dv-3: #13A888; --dv-4: #E6A700;
-  --dv-5: #8B5CF6; --dv-6: #EC4899;
-  --dv-7: #3B82C4; --dv-8: #14B8A6;
-  --dv-9: #64748B; --dv-10:#F59E0B;
-  --dv-11:#A855F7; --dv-12:#EF4444;
-
-  /* Surfaces (Light) */
-  --bg:        #F6F8FB;
-  --bg-alt:    #EEF2F7;
-  --card:      #FFFFFF;
-  --border:    #E2E8F2;
-  --border-strong: #C9D3E1;
-
-  --text-1:    #121B2A;
-  --text-2:    #42536A;
-  --text-3:    #8C9BB0;
-  --text-inv:  #FFFFFF;
-
-  /* Elevation */
-  --sh-1: 0 1px 2px rgba(15,23,42,.05), 0 1px 1px rgba(15,23,42,.04);
-  --sh-2: 0 4px 12px rgba(15,23,42,.08), 0 2px 4px rgba(15,23,42,.05);
-  --sh-3: 0 16px 40px rgba(15,23,42,.12), 0 4px 12px rgba(15,23,42,.08);
-
-  /* Radii */
-  --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-xl: 20px;
-
-  /* Motion */
-  --t-fast: 120ms cubic-bezier(.4,0,.2,1);
-  --t-mid:  240ms cubic-bezier(.4,0,.2,1);
+:root{
+  --blue:#00529C;--blue-d:#003F7A;--blue-dd:#002D58;--orange:#F37021;
+  --green:#13A888;--green-s:rgba(19,168,136,.12);
+  --red:#D93A3A;--red-s:rgba(217,58,58,.12);
+  --amber:#E6A700;--amber-s:rgba(230,167,0,.12);
+  --sky:#3B82C4;--sky-s:rgba(59,130,196,.12);
+  --purple:#8B5CF6;--purple-s:rgba(139,92,246,.12);
+  --bg:#F4F7FB;--card:#fff;--border:#E2E8F2;--border2:#C9D3E1;
+  --t1:#0F1C2E;--t2:#3D5166;--t3:#8A9BB0;
+  --sh1:0 1px 3px rgba(15,28,46,.06);--sh2:0 4px 16px rgba(15,28,46,.09);
+  --r:10px;--r2:14px;--tf:140ms cubic-bezier(.4,0,.2,1);
 }
-html.dark {
-  --bg:        #0D1625;
-  --bg-alt:    #121E33;
-  --card:      #172743;
-  --border:    #233756;
-  --border-strong: #334B70;
-
-  --text-1:    #E8EEF7;
-  --text-2:    #A9B7CC;
-  --text-3:    #6B7C95;
-  --text-inv:  #0D1625;
-
-  --success-soft: rgba(19,168,136,.14);
-  --warning-soft: rgba(230,167,0,.14);
-  --danger-soft:  rgba(217,58,58,.14);
-  --info-soft:    rgba(59,130,196,.14);
-  --neutral-soft: rgba(140,155,176,.14);
-
-  --sh-1: 0 1px 2px rgba(0,0,0,.3);
-  --sh-2: 0 4px 12px rgba(0,0,0,.4);
-  --sh-3: 0 16px 40px rgba(0,0,0,.5);
+html.dark{
+  --bg:#0B1628;--card:#112240;--border:#1E3A5F;--border2:#2A5080;
+  --t1:#E2EAF4;--t2:#8AAAC8;--t3:#4A6A8A;
+  --green-s:rgba(19,168,136,.18);--red-s:rgba(217,58,58,.18);
+  --amber-s:rgba(230,167,0,.18);--sky-s:rgba(59,130,196,.18);--purple-s:rgba(139,92,246,.18);
 }
-
-/* =====================================================================
-   Base
-   ===================================================================== */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
-body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--text-1);
-  background: var(--bg);
-  -webkit-font-smoothing: antialiased;
-  font-feature-settings: 'cv11', 'ss01';
-}
-button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-input, select { font-family: inherit; }
-.tnum { font-variant-numeric: tabular-nums; }
-a { color: var(--bri-blue); text-decoration: none; }
-html.dark a { color: #4B96E6; }
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: var(--slate-400); }
-
-/* =====================================================================
-   Layout
-   ===================================================================== */
-.app { display: flex; flex-direction: column; min-height: 100vh; }
-
-.topbar {
-  height: 56px;
-  padding: 0 20px;
-  background: linear-gradient(140deg, var(--bri-blue-700) 0%, var(--bri-blue-600) 40%, var(--bri-blue) 100%);
-  display: flex; align-items: center; gap: 16px;
-  position: sticky; top: 0; z-index: 100;
-  box-shadow: var(--sh-2);
-}
-.topbar-brand { display: flex; align-items: center; gap: 10px; }
-.topbar-logo {
-  width: 30px; height: 30px; background: rgba(255,255,255,.15);
-  border-radius: 7px; display: grid; place-items: center;
-  font-weight: 800; color: #fff; font-size: 12px; letter-spacing: .5px;
-}
-.topbar-title { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.1; }
-.topbar-subtitle { color: rgba(255,255,255,.55); font-size: 10px; margin-top: 2px; }
-
-.topbar-nav { display: flex; gap: 2px; margin-left: 20px; }
-.nav-btn {
-  padding: 7px 14px; font-size: 12px; font-weight: 500;
-  color: rgba(255,255,255,.65); border-radius: 7px;
-  transition: all var(--t-fast);
-}
-.nav-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
-.nav-btn.active { background: rgba(255,255,255,.17); color: #fff; font-weight: 600; }
-
-.topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-.meta-pill {
-  font-size: 10px; color: rgba(255,255,255,.7);
-  padding: 4px 10px; background: rgba(255,255,255,.08);
-  border-radius: 20px;
-}
-.icon-btn {
-  width: 32px; height: 32px; border-radius: 8px;
-  display: grid; place-items: center;
-  background: rgba(255,255,255,.1); color: #fff;
-  transition: background var(--t-fast);
-}
-.icon-btn:hover { background: rgba(255,255,255,.2); }
-.icon-btn svg { width: 15px; height: 15px; }
-
-.main { flex: 1; padding: 20px 24px 40px; max-width: 1600px; width: 100%; margin: 0 auto; }
-
-/* =====================================================================
-   Upload / Landing
-   ===================================================================== */
-.landing {
-  min-height: calc(100vh - 56px);
-  display: grid; place-items: center;
-  padding: 40px 24px;
-}
-.landing-card {
-  width: 100%; max-width: 720px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--r-xl);
-  padding: 48px 56px;
-  box-shadow: var(--sh-2);
-  text-align: center;
-}
-.landing h1 {
-  font-size: 28px; font-weight: 800; margin-bottom: 8px;
-  letter-spacing: -0.01em;
-  background: linear-gradient(135deg, var(--bri-blue) 0%, var(--bri-orange) 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.landing .lead { color: var(--text-2); font-size: 14px; margin-bottom: 32px; }
-
-.dropzone {
-  border: 2px dashed var(--border-strong);
-  border-radius: var(--r-lg);
-  padding: 48px 24px;
-  background: var(--bg-alt);
-  transition: all var(--t-mid);
-  cursor: pointer;
-  position: relative;
-}
-.dropzone:hover, .dropzone.drag {
-  border-color: var(--bri-blue);
-  background: var(--info-soft);
-}
-.dropzone-icon {
-  width: 56px; height: 56px; margin: 0 auto 16px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--bri-blue) 0%, var(--bri-blue-600) 100%);
-  display: grid; place-items: center;
-  color: #fff;
-  box-shadow: 0 8px 24px rgba(0,82,156,.3);
-}
-.dropzone-icon svg { width: 28px; height: 28px; }
-.dropzone-title { font-size: 14px; font-weight: 600; color: var(--text-1); margin-bottom: 4px; }
-.dropzone-hint { font-size: 12px; color: var(--text-3); }
-.dropzone-hint b { color: var(--bri-blue); font-weight: 600; }
-
-.landing-status {
-  margin-top: 20px;
-  padding: 12px 16px;
-  background: var(--bg-alt);
-  border-radius: var(--r-md);
-  font-size: 12px;
-  color: var(--text-2);
-  display: none;
-}
-.landing-status.show { display: block; }
-.landing-status.ok { background: var(--success-soft); color: var(--success); }
-.landing-status.err { background: var(--danger-soft); color: var(--danger); }
-
-.process-btn {
-  margin-top: 24px;
-  padding: 13px 32px;
-  background: linear-gradient(135deg, var(--bri-blue) 0%, var(--bri-blue-600) 100%);
-  color: #fff;
-  font-size: 13px; font-weight: 600;
-  border-radius: var(--r-md);
-  transition: all var(--t-fast);
-  box-shadow: var(--sh-2);
-  letter-spacing: .2px;
-  display: inline-flex; align-items: center; gap: 8px;
-}
-.process-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--sh-3); }
-.process-btn:disabled { opacity: .5; cursor: not-allowed; }
-.process-btn svg { width: 14px; height: 14px; }
-
-.landing-footer {
-  margin-top: 32px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
-  font-size: 11px;
-  color: var(--text-3);
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
-}
-
-/* =====================================================================
-   Dashboard Sections
-   ===================================================================== */
-.section-head {
-  display: flex; align-items: end; justify-content: space-between;
-  margin-bottom: 16px; gap: 16px; flex-wrap: wrap;
-}
-.section-title { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
-.section-desc { font-size: 12px; color: var(--text-3); margin-top: 2px; }
-
-/* KPI grid */
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.kpi-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: 16px 18px;
-  box-shadow: var(--sh-1);
-  position: relative;
-  overflow: hidden;
-}
-.kpi-card::before {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-  width: 3px; background: var(--accent, var(--bri-blue));
-}
-.kpi-label {
-  font-size: 10px; font-weight: 600; text-transform: uppercase;
-  letter-spacing: .05em; color: var(--text-3); margin-bottom: 8px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.kpi-icon {
-  width: 28px; height: 28px; border-radius: 8px;
-  background: var(--accent-soft, var(--info-soft));
-  color: var(--accent, var(--bri-blue));
-  display: grid; place-items: center;
-}
-.kpi-icon svg { width: 14px; height: 14px; }
-.kpi-value {
-  font-size: 22px; font-weight: 700; line-height: 1.15;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
-}
-.kpi-sub {
-  font-size: 11px; color: var(--text-2); margin-top: 6px;
-  font-variant-numeric: tabular-nums;
-}
-.kpi-sub .delta { font-weight: 600; }
-.kpi-sub .delta.up { color: var(--success); }
-.kpi-sub .delta.down { color: var(--danger); }
-
-.kpi-card.primary { --accent: var(--bri-blue); --accent-soft: var(--info-soft); }
-.kpi-card.accent { --accent: var(--bri-orange); --accent-soft: rgba(243,112,33,.12); }
-.kpi-card.success { --accent: var(--success); --accent-soft: var(--success-soft); }
-.kpi-card.warning { --accent: var(--warning); --accent-soft: var(--warning-soft); }
-.kpi-card.danger { --accent: var(--danger); --accent-soft: var(--danger-soft); }
-.kpi-card.neutral { --accent: var(--slate-500); --accent-soft: var(--neutral-soft); }
-
-/* Grid of cards */
-.grid { display: grid; gap: 12px; }
-.grid-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-4 { grid-template-columns: repeat(4, 1fr); }
-@media (max-width: 1024px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 640px)  { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
-
-.panel {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: 16px 18px;
-  box-shadow: var(--sh-1);
-}
-.panel-head { display: flex; align-items: start; justify-content: space-between; margin-bottom: 12px; gap: 12px; }
-.panel-title { font-size: 13px; font-weight: 600; }
-.panel-desc { font-size: 11px; color: var(--text-3); margin-top: 2px; }
-.panel-toolbar { display: flex; gap: 6px; align-items: center; }
-.chart-slot { width: 100%; height: 320px; }
-.chart-slot.sm { height: 240px; }
-.chart-slot.lg { height: 420px; }
-
-/* Chips */
-.chip {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 3px 9px;
-  font-size: 10px; font-weight: 600;
-  background: var(--neutral-soft); color: var(--text-2);
-  border-radius: 20px;
-  letter-spacing: .02em;
-  white-space: nowrap;
-}
-.chip.sm { padding: 2px 7px; font-size: 9.5px; }
-.chip.success { background: var(--success-soft); color: var(--success); }
-.chip.warning { background: var(--warning-soft); color: var(--warning); }
-.chip.danger { background: var(--danger-soft); color: var(--danger); }
-.chip.info { background: var(--info-soft); color: var(--info); }
-.chip.primary { background: var(--info-soft); color: var(--bri-blue); }
-.chip.accent { background: rgba(243,112,33,.12); color: var(--bri-orange); }
-.chip-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-
-/* =====================================================================
-   Table
-   ===================================================================== */
-.table-wrap {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-1);
-  overflow: hidden;
-}
-.table-toolbar {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--border);
-  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-}
-.search-box {
-  flex: 1; min-width: 220px;
-  position: relative;
-}
-.search-box input {
-  width: 100%;
-  padding: 8px 12px 8px 34px;
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  background: var(--bg-alt);
-  color: var(--text-1);
-  font-size: 12px;
-  transition: all var(--t-fast);
-}
-.search-box input:focus {
-  outline: none;
-  border-color: var(--bri-blue);
-  box-shadow: 0 0 0 3px rgba(0,82,156,.1);
-  background: var(--card);
-}
-.search-box svg {
-  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
-  width: 14px; height: 14px; color: var(--text-3);
-}
-.filter-select {
-  padding: 8px 28px 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  background: var(--bg-alt);
-  color: var(--text-1);
-  font-size: 12px;
-  appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238C9BB0' stroke-width='2.5'><polyline points='6 9 12 15 18 9'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  max-width: 220px;
-  transition: all var(--t-fast);
-}
-.filter-select:focus {
-  outline: none;
-  border-color: var(--bri-blue);
-  box-shadow: 0 0 0 3px rgba(0,82,156,.1);
-}
-.btn-ghost {
-  padding: 7px 12px;
-  font-size: 12px; font-weight: 500;
-  color: var(--text-2);
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  background: var(--card);
-  display: inline-flex; align-items: center; gap: 6px;
-  transition: all var(--t-fast);
-}
-.btn-ghost:hover { background: var(--bg-alt); color: var(--text-1); border-color: var(--border-strong); }
-.btn-ghost svg { width: 13px; height: 13px; }
-.btn-primary {
-  padding: 7px 14px;
-  font-size: 12px; font-weight: 600;
-  background: var(--bri-blue); color: #fff;
-  border-radius: var(--r-md);
-  display: inline-flex; align-items: center; gap: 6px;
-  transition: all var(--t-fast);
-}
-.btn-primary:hover { background: var(--bri-blue-600); }
-.btn-primary svg { width: 13px; height: 13px; }
-
-.tbl { width: 100%; border-collapse: collapse; }
-.tbl thead th {
-  text-align: left; font-size: 10px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: .04em;
-  color: var(--text-3);
-  padding: 10px 14px;
-  background: var(--bg-alt);
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-  position: sticky; top: 0; z-index: 2;
-}
-.tbl thead th.sortable { cursor: pointer; user-select: none; }
-.tbl thead th.sortable:hover { color: var(--text-1); }
-.tbl thead th .sort-ind { display: inline-block; margin-left: 4px; opacity: .4; font-size: 9px; }
-.tbl thead th.sorted .sort-ind { opacity: 1; color: var(--bri-blue); }
-.tbl tbody td {
-  padding: 11px 14px;
-  border-bottom: 1px solid var(--border);
-  font-size: 12px;
-  vertical-align: top;
-}
-.tbl tbody tr { transition: background var(--t-fast); cursor: pointer; }
-.tbl tbody tr:hover { background: var(--bg-alt); }
-.tbl tbody td.num { text-align: right; font-variant-numeric: tabular-nums; }
-.tbl tbody tr:last-child td { border-bottom: none; }
-.tbl-cell-name {
-  font-weight: 500; max-width: 380px;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-  overflow: hidden; line-height: 1.4;
-}
-.tbl-cell-sub { font-size: 10px; color: var(--text-3); margin-top: 3px; }
-
-.table-scroll { max-height: 640px; overflow: auto; }
-.table-footer {
-  padding: 10px 16px;
-  border-top: 1px solid var(--border);
-  display: flex; justify-content: space-between; align-items: center;
-  font-size: 11px; color: var(--text-3);
-  background: var(--bg-alt);
-}
-
-/* =====================================================================
-   Drawer (detail proyek)
-   ===================================================================== */
-.drawer-overlay {
-  position: fixed; inset: 0;
-  background: rgba(15,23,42,.4);
-  backdrop-filter: blur(4px);
-  opacity: 0; pointer-events: none;
-  transition: opacity var(--t-mid);
-  z-index: 200;
-}
-.drawer-overlay.open { opacity: 1; pointer-events: auto; }
-.drawer {
-  position: fixed; top: 0; right: 0; bottom: 0;
-  width: 640px; max-width: 100vw;
-  background: var(--card);
-  transform: translateX(100%);
-  transition: transform var(--t-mid);
-  z-index: 201;
-  display: flex; flex-direction: column;
-  box-shadow: var(--sh-3);
-}
-.drawer.open { transform: translateX(0); }
-.drawer-head {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: start; justify-content: space-between; gap: 16px;
-}
-.drawer-head h3 {
-  font-size: 16px; font-weight: 700; line-height: 1.4; margin-bottom: 4px;
-}
-.drawer-head .meta { font-size: 11px; color: var(--text-3); }
-.drawer-body { flex: 1; overflow: auto; padding: 24px; }
-.drawer-close {
-  width: 32px; height: 32px; border-radius: 8px;
-  display: grid; place-items: center;
-  color: var(--text-3);
-  transition: all var(--t-fast);
-  flex-shrink: 0;
-}
-.drawer-close:hover { background: var(--bg-alt); color: var(--text-1); }
-.drawer-close svg { width: 16px; height: 16px; }
-
-.dfield {
-  margin-bottom: 16px;
-}
-.dfield-label {
-  font-size: 10px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: .05em;
-  color: var(--text-3); margin-bottom: 5px;
-}
-.dfield-value { font-size: 13px; color: var(--text-1); line-height: 1.5; }
-.dfield-value.num { font-variant-numeric: tabular-nums; font-weight: 600; }
-
-.dfield-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
-
-.info-block {
-  background: var(--bg-alt);
-  border-radius: var(--r-md);
-  padding: 12px 14px;
-  margin-bottom: 12px;
-  font-size: 11.5px;
-  color: var(--text-2);
-  line-height: 1.6;
-  white-space: pre-wrap;
-}
-.info-block.info { background: var(--info-soft); color: var(--info); }
-.info-block.warning { background: var(--warning-soft); color: #8B6400; }
-html.dark .info-block.warning { color: var(--warning); }
-
-.switch-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 12px;
-  background: var(--bg-alt);
-  border-radius: var(--r-md);
-  margin-bottom: 6px;
-  font-size: 12px;
-}
-.switch-row.in  { border-left: 3px solid var(--success); }
-.switch-row.out { border-left: 3px solid var(--danger); }
-.switch-row .amt { font-weight: 700; font-variant-numeric: tabular-nums; margin-left: auto; white-space: nowrap; }
-.switch-row.in  .amt { color: var(--success); }
-.switch-row.out .amt { color: var(--danger); }
-.switch-row .desc { flex: 1; color: var(--text-2); font-size: 11px; line-height: 1.5; }
-
-/* =====================================================================
-   Empty state
-   ===================================================================== */
-.empty {
-  padding: 60px 24px;
-  text-align: center;
-  color: var(--text-3);
-}
-.empty svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: .5; }
-.empty-title { font-size: 14px; font-weight: 600; color: var(--text-2); margin-bottom: 4px; }
-.empty-desc { font-size: 12px; }
-
-/* =====================================================================
-   Hide helpers
-   ===================================================================== */
-.hidden { display: none !important; }
-.loading-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,.4);
-  backdrop-filter: blur(4px);
-  display: none; place-items: center;
-  z-index: 500;
-  color: #fff; font-size: 13px;
-}
-.loading-overlay.show { display: grid; }
-.spinner {
-  width: 40px; height: 40px;
-  border: 3px solid rgba(255,255,255,.2);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 700ms linear infinite;
-  margin: 0 auto 14px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* Print */
-@media print {
-  .topbar, .dropzone, .process-btn, .table-toolbar, .panel-toolbar, .drawer, .drawer-overlay {
-    display: none !important;
-  }
-  body { background: white; color: black; }
-  .panel, .kpi-card, .table-wrap { box-shadow: none; break-inside: avoid; }
-}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;
+  line-height:1.5;color:var(--t1);background:var(--bg);-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select{font-family:inherit}
+.tnum{font-variant-numeric:tabular-nums}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:8px}
+/* ── TOPBAR ── */
+.topbar{height:52px;padding:0 20px;display:flex;align-items:center;gap:14px;
+  background:linear-gradient(135deg,var(--blue-dd),var(--blue-d) 50%,var(--blue));
+  position:sticky;top:0;z-index:100;box-shadow:var(--sh2)}
+.tb-logo{width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,.15);
+  display:grid;place-items:center;font-weight:800;color:#fff;font-size:11px;flex-shrink:0}
+.tb-title{color:#fff;font-weight:700;font-size:13px}
+.tb-sub{color:rgba(255,255,255,.5);font-size:10px;margin-top:1px}
+.tb-nav{display:flex;gap:2px;margin-left:16px}
+.tab-btn{padding:6px 14px;font-size:12px;font-weight:500;color:rgba(255,255,255,.6);
+  border-radius:7px;transition:all var(--tf)}
+.tab-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.tab-btn.active{background:rgba(255,255,255,.18);color:#fff;font-weight:600}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.pill{font-size:10px;color:rgba(255,255,255,.65);padding:3px 10px;
+  background:rgba(255,255,255,.08);border-radius:20px}
+.ib{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;
+  background:rgba(255,255,255,.1);color:#fff;transition:background var(--tf)}
+.ib:hover{background:rgba(255,255,255,.2)}
+.ib svg{width:14px;height:14px}
+/* ── UPLOAD LANDING ── */
+.landing{min-height:calc(100vh - 52px);display:grid;place-items:center;padding:32px 20px}
+.lcard{width:100%;max-width:640px;background:var(--card);border:1px solid var(--border);
+  border-radius:20px;padding:44px 48px;box-shadow:var(--sh2);text-align:center}
+.lcard h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;
+  background:linear-gradient(135deg,var(--blue),var(--orange));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.lcard p{color:var(--t2);font-size:13px;margin-bottom:28px}
+.dropzone{border:2px dashed var(--border2);border-radius:var(--r2);padding:40px 20px;
+  background:var(--bg);transition:all var(--tf);cursor:pointer;position:relative}
+.dropzone:hover,.dropzone.drag{border-color:var(--blue);background:var(--sky-s)}
+.dz-icon{width:52px;height:52px;margin:0 auto 14px;border-radius:14px;
+  background:linear-gradient(135deg,var(--blue),var(--blue-d));
+  display:grid;place-items:center;color:#fff;box-shadow:0 8px 20px rgba(0,82,156,.25)}
+.dz-icon svg{width:26px;height:26px}
+.dz-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.dz-hint{font-size:11px;color:var(--t3)}
+.dz-hint b{color:var(--blue)}
+.lstat{margin-top:16px;padding:10px 14px;border-radius:var(--r);font-size:12px;
+  color:var(--t2);background:var(--bg);display:none}
+.lstat.show{display:block}
+.lstat.ok{background:var(--green-s);color:var(--green)}
+.lstat.err{background:var(--red-s);color:var(--red)}
+.proc-btn{margin-top:20px;padding:12px 28px;background:linear-gradient(135deg,var(--blue),var(--blue-d));
+  color:#fff;font-size:13px;font-weight:700;border-radius:var(--r);
+  display:inline-flex;align-items:center;gap:8px;transition:all var(--tf);box-shadow:var(--sh2)}
+.proc-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,82,156,.3)}
+.proc-btn:disabled{opacity:.45;cursor:not-allowed}
+.proc-btn svg{width:14px;height:14px}
+.lfooter{margin-top:24px;padding-top:16px;border-top:1px solid var(--border);
+  font-size:10px;color:var(--t3);display:flex;justify-content:space-between}
+/* ── MAIN LAYOUT ── */
+.main{padding:18px 22px 40px;max-width:1560px;width:100%;margin:0 auto}
+.view{display:none}.view.active{display:block}
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);
+  padding:14px 16px;box-shadow:var(--sh1);position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ac,var(--blue))}
+.kpi-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--t3);margin-bottom:7px}
+.kpi-val{font-size:20px;font-weight:700;line-height:1.15;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.kpi-sub{font-size:10.5px;color:var(--t2);margin-top:5px;font-variant-numeric:tabular-nums}
+.kpi.blue{--ac:var(--blue)}.kpi.green{--ac:var(--green)}.kpi.red{--ac:var(--red)}
+.kpi.amber{--ac:var(--amber)}.kpi.orange{--ac:var(--orange)}.kpi.sky{--ac:var(--sky)}
+.kpi.purple{--ac:var(--purple)}
+/* ── PANELS ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:1100px){.grid2,.grid3{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);
+  padding:14px 16px;box-shadow:var(--sh1)}
+.ph{display:flex;align-items:start;justify-content:space-between;margin-bottom:10px;gap:10px}
+.pt{font-size:12px;font-weight:700}
+.pd{font-size:10.5px;color:var(--t3);margin-top:2px}
+.chart-box{width:100%;height:300px}
+.chart-box.sm{height:220px}
+/* ── CHIPS ── */
+.chip{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;font-size:10px;
+  font-weight:600;border-radius:20px;white-space:nowrap;background:rgba(140,155,176,.12);color:var(--t2)}
+.chip.g{background:var(--green-s);color:var(--green)}
+.chip.r{background:var(--red-s);color:var(--red)}
+.chip.a{background:var(--amber-s);color:var(--amber)}
+.chip.b{background:var(--sky-s);color:var(--sky)}
+.chip.o{background:rgba(243,112,33,.12);color:var(--orange)}
+.chip.p{background:var(--purple-s);color:var(--purple)}
+.chip-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+/* ── CHANGE ITEMS ── */
+.clist{max-height:480px;overflow-y:auto;display:flex;flex-direction:column;gap:5px}
+.ci{padding:9px 11px;border-radius:var(--r);border:1px solid var(--border);
+  background:var(--bg);cursor:pointer;transition:all var(--tf);
+  display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start}
+.ci:hover{background:var(--card);border-color:var(--border2);transform:translateY(-1px);box-shadow:var(--sh1)}
+.ci.in{border-left:3px solid var(--green)}
+.ci.out{border-left:3px solid var(--red)}
+.ci.new{border-left:3px solid var(--orange)}
+.ci.cancel{border-left:3px solid var(--red);opacity:.85}
+.ci.tpc-up{border-left:3px solid var(--green)}
+.ci.tpc-dn{border-left:3px solid var(--red)}
+.ci.keb-up{border-left:3px solid var(--green)}
+.ci.keb-dn{border-left:3px solid var(--red)}
+.ci.scope{border-left:3px solid var(--sky)}
+.ci.gap{border-left:3px solid var(--amber)}
+.ci-name{font-size:11.5px;font-weight:600;line-height:1.4;margin-bottom:3px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ci-meta{font-size:10px;color:var(--t3);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.ci-amt{font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ci-amt.g{color:var(--green)}.ci-amt.r{color:var(--red)}.ci-amt.o{color:var(--orange)}
+.ci-amt.a{color:var(--amber)}.ci-amt.b{color:var(--sky)}
+.ci-delta{font-size:9.5px;color:var(--t3);margin-top:2px;font-variant-numeric:tabular-nums}
+.ci-delta s{opacity:.6}.ci-delta .arr{margin:0 3px}
+.ci-old{font-size:9.5px;color:var(--t3);text-decoration:line-through;margin-top:2px;
+  display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+/* ── TABLE ── */
+.twrap{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);
+  box-shadow:var(--sh1);overflow:hidden}
+.tbar{padding:12px 14px;border-bottom:1px solid var(--border);
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sbox{flex:1;min-width:200px;position:relative}
+.sbox input{width:100%;padding:7px 10px 7px 30px;border:1px solid var(--border);
+  border-radius:var(--r);background:var(--bg);color:var(--t1);font-size:12px;transition:all var(--tf)}
+.sbox input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,82,156,.1);background:var(--card)}
+.sbox svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--t3)}
+.fsel{padding:7px 24px 7px 10px;border:1px solid var(--border);border-radius:var(--r);
+  background:var(--bg);color:var(--t1);font-size:12px;appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238A9BB0' stroke-width='2.5'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat:no-repeat;background-position:right 8px center;max-width:200px}
+.fsel:focus{outline:none;border-color:var(--blue)}
+.tscroll{max-height:620px;overflow:auto}
+table{width:100%;border-collapse:collapse}
+thead th{text-align:left;font-size:9.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--t3);padding:9px 12px;background:var(--bg);
+  border-bottom:1px solid var(--border);white-space:nowrap;
+  position:sticky;top:0;z-index:2;cursor:pointer;user-select:none}
+thead th:hover{color:var(--t1)}
+thead th.sorted{color:var(--blue)}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:11.5px;vertical-align:top}
+tbody tr{transition:background var(--tf);cursor:pointer}
+tbody tr:hover{background:var(--bg)}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.tfoot{padding:9px 14px;border-top:1px solid var(--border);display:flex;
+  justify-content:space-between;align-items:center;font-size:10.5px;color:var(--t3);background:var(--bg)}
+.cell-name{font-weight:600;max-width:340px;display:-webkit-box;
+  -webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4}
+.cell-sub{font-size:9.5px;color:var(--t3);margin-top:2px}
+/* ── DELTA BADGE in table ── */
+.dbadge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;
+  font-size:10px;font-weight:700;border-radius:20px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dbadge.up{background:var(--green-s);color:var(--green)}
+.dbadge.dn{background:var(--red-s);color:var(--red)}
+.dbadge.neu{background:rgba(140,155,176,.1);color:var(--t3)}
+/* ── DRAWER ── */
+.ov{position:fixed;inset:0;background:rgba(10,20,40,.45);backdrop-filter:blur(4px);
+  opacity:0;pointer-events:none;transition:opacity var(--tf);z-index:200}
+.ov.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:600px;max-width:100vw;
+  background:var(--card);transform:translateX(100%);transition:transform var(--tf);
+  z-index:201;display:flex;flex-direction:column;box-shadow:-8px 0 40px rgba(0,0,0,.15)}
+.drawer.open{transform:translateX(0)}
+.dh{padding:18px 22px;border-bottom:1px solid var(--border);
+  display:flex;align-items:start;justify-content:space-between;gap:14px}
+.dh h3{font-size:15px;font-weight:700;line-height:1.4;margin-bottom:3px}
+.dh .dm{font-size:10.5px;color:var(--t3)}
+.dc-btn{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;
+  color:var(--t3);transition:all var(--tf);flex-shrink:0}
+.dc-btn:hover{background:var(--bg);color:var(--t1)}
+.dc-btn svg{width:15px;height:15px}
+.db{flex:1;overflow:auto;padding:20px 22px}
+.df{margin-bottom:14px}
+.dl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:4px}
+.dv{font-size:12.5px;color:var(--t1);line-height:1.5}
+.dv.num{font-variant-numeric:tabular-nums;font-weight:600}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px}
+.dblock{background:var(--bg);border-radius:var(--r);padding:10px 12px;
+  font-size:11px;color:var(--t2);line-height:1.6;white-space:pre-wrap;margin-bottom:8px}
+.dblock.info{background:var(--sky-s);color:var(--sky)}
+.sw-row{display:flex;align-items:start;gap:8px;padding:8px 10px;
+  background:var(--bg);border-radius:var(--r);margin-bottom:5px;font-size:11px}
+.sw-row.sw-in{border-left:3px solid var(--green)}
+.sw-row.sw-out{border-left:3px solid var(--red)}
+.sw-desc{flex:1;color:var(--t2);line-height:1.5}
+.sw-amt{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sw-amt.g{color:var(--green)}.sw-amt.r{color:var(--red)}
+/* ── DELTA HIGHLIGHT in drawer ── */
+.delta-box{display:flex;align-items:center;gap:8px;padding:10px 12px;
+  border-radius:var(--r);margin-bottom:8px;font-size:11.5px}
+.delta-box.up{background:var(--green-s)}
+.delta-box.dn{background:var(--red-s)}
+.delta-box .old{color:var(--t3);text-decoration:line-through;font-variant-numeric:tabular-nums}
+.delta-box .arr{color:var(--t3);font-size:14px}
+.delta-box .new{font-weight:700;font-variant-numeric:tabular-nums}
+.delta-box .new.g{color:var(--green)}.delta-box .new.r{color:var(--red)}
+.delta-box .badge{margin-left:auto;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums}
+/* ── MISC ── */
+.hidden{display:none!important}
+.loading{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);
+  display:none;place-items:center;z-index:500;color:#fff;font-size:12px}
+.loading.show{display:grid}
+.spin{width:36px;height:36px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;
+  border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{padding:40px 20px;text-align:center;color:var(--t3);font-size:12px}
+@media print{.topbar,.tbar{display:none!important}body{background:#fff;color:#000}}
 </style>
 </head>
 <body>
-<div class="app">
-  <!-- ================== TOPBAR ================== -->
-  <header class="topbar" id="topbar" style="display:none;">
-    <div class="topbar-brand">
-      <div class="topbar-logo">CS</div>
-      <div>
-        <div class="topbar-title">Challenge Session · Revisi RKA TI 2026</div>
-        <div class="topbar-subtitle">PMO Infrastruktur · IT Directorate BRI</div>
-      </div>
-    </div>
-    <nav class="topbar-nav" id="topNav">
-      <button class="nav-btn active" data-view="overview">Overview</button>
-      <button class="nav-btn" data-view="changes">Perubahan</button>
-      <button class="nav-btn" data-view="pengadaan">Pengadaan</button>
-      <button class="nav-btn" data-view="rka">RKA TI</button>
-      <button class="nav-btn" data-view="cje0">CJE0</button>
-    </nav>
-    <div class="topbar-actions">
-      <span class="meta-pill tnum" id="metaCutoff">—</span>
-      <span class="meta-pill tnum" id="metaRows">0 proyek</span>
-      <button class="icon-btn" id="btnReload" title="Ganti file">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-      </button>
-      <button class="icon-btn" id="btnExport" title="Export">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-      </button>
-      <button class="icon-btn" id="btnTheme" title="Toggle theme">
-        <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
-      </button>
-    </div>
-  </header>
-
-  <!-- ================== LANDING ================== -->
-  <main class="landing" id="landing">
-    <div class="landing-card">
-      <h1>Challenge Session Dashboard</h1>
-      <p class="lead">Drop file <b>Challenge Session.xlsx</b> untuk langsung lihat ringkasan revisi anggaran, switching flow, status pengadaan, dan prognosa RKA TI 2026.</p>
-
-      <div class="dropzone" id="dropzone">
-        <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsm" style="position:absolute;inset:0;opacity:0;cursor:pointer;" />
-        <div class="dropzone-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-        </div>
-        <div class="dropzone-title" id="dropTitle">Drop Excel di sini atau klik untuk pilih</div>
-        <div class="dropzone-hint">Format didukung: <b>.xlsx</b>, <b>.xls</b>, <b>.xlsm</b> · Semua proses berjalan lokal di browser</div>
-      </div>
-
-      <div class="landing-status" id="landingStatus"></div>
-
-      <button class="process-btn" id="processBtn" disabled>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-        Proses File
-      </button>
-
-      <div class="landing-footer">
-        <span>v1.0 · May 2026</span>
-        <span>Data tidak dikirim ke server. Seluruh parsing dilakukan di mesin Anda.</span>
-      </div>
-    </div>
-  </main>
-
-  <!-- ================== DASHBOARD (hidden by default) ================== -->
-  <main class="main hidden" id="dashboard">
-    <!-- Views diisi oleh JS -->
-    <section id="view-overview" class="view"></section>
-    <section id="view-changes" class="view hidden"></section>
-    <section id="view-pengadaan" class="view hidden"></section>
-    <section id="view-rka" class="view hidden"></section>
-    <section id="view-cje0" class="view hidden"></section>
-  </main>
-</div>
-
-<!-- Drawer -->
-<div class="drawer-overlay" id="drawerOverlay"></div>
-<aside class="drawer" id="drawer">
-  <div class="drawer-head">
-    <div>
-      <h3 id="drawerTitle">—</h3>
-      <div class="meta" id="drawerMeta">—</div>
-    </div>
-    <button class="drawer-close" id="drawerClose">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+<!-- TOPBAR -->
+<header class="topbar" id="topbar" style="display:none">
+  <div class="tb-logo">CS</div>
+  <div>
+    <div class="tb-title">Challenge Session · RKA TI Revisi 2026</div>
+    <div class="tb-sub">PMO Infrastruktur · IT Directorate BRI</div>
+  </div>
+  <nav class="tb-nav" id="topNav">
+    <button class="tab-btn active" data-view="changes">Perubahan</button>
+    <button class="tab-btn" data-view="projects">Semua Proyek</button>
+  </nav>
+  <div class="tb-right">
+    <span class="pill tnum" id="metaCutoff"></span>
+    <span class="pill tnum" id="metaRows"></span>
+    <button class="ib" id="btnReload" title="Ganti file">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+      </svg>
+    </button>
+    <button class="ib" id="btnTheme" title="Toggle dark mode">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </svg>
     </button>
   </div>
-  <div class="drawer-body" id="drawerBody"></div>
+</header>
+
+<!-- LANDING -->
+<main class="landing" id="landing">
+  <div class="lcard">
+    <h1>Challenge Session Dashboard</h1>
+    <p>Drop file Excel untuk langsung lihat ringkasan perubahan, switching anggaran, dan status pengadaan RKA TI 2026.</p>
+    <div class="dropzone" id="dropzone">
+      <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsm"
+        style="position:absolute;inset:0;opacity:0;cursor:pointer">
+      <div class="dz-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+      </div>
+      <div class="dz-title" id="dzTitle">Drop Excel di sini atau klik untuk pilih</div>
+      <div class="dz-hint">Format: <b>.xlsx</b> · Semua proses lokal di browser</div>
+    </div>
+    <div class="lstat" id="lstat"></div>
+    <button class="proc-btn" id="procBtn" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+      Proses File
+    </button>
+    <div class="lfooter">
+      <span>v2.0 · May 2026</span>
+      <span>Data tidak dikirim ke server</span>
+    </div>
+  </div>
+</main>
+
+<!-- DASHBOARD -->
+<main class="main hidden" id="dashboard">
+  <section class="view active" id="view-changes"></section>
+  <section class="view" id="view-projects"></section>
+</main>
+
+<!-- DRAWER -->
+<div class="ov" id="ov"></div>
+<aside class="drawer" id="drawer">
+  <div class="dh">
+    <div>
+      <h3 id="dTitle"></h3>
+      <div class="dm" id="dMeta"></div>
+    </div>
+    <button class="dc-btn" id="dClose">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <div class="db" id="dBody"></div>
 </aside>
 
-<!-- Loading -->
-<div class="loading-overlay" id="loading">
-  <div style="text-align:center;">
-    <div class="spinner"></div>
-    <div id="loadingMsg">Memproses file…</div>
-  </div>
+<!-- LOADING -->
+<div class="loading" id="loading">
+  <div><div class="spin"></div><div id="loadMsg">Memproses…</div></div>
 </div>
 
 <script>
-/* ============================================================
-   Challenge Session Dashboard · Single-file app
-   ============================================================ */
 (function(){
 'use strict';
 
-/* ============================================================
-   COLUMN MAP — fixed layout from Excel inspection
-   Header structure: row 8–11 merged headers, data starts row 18
-   All indices are 0-based from aoa[row][col].
-   ============================================================ */
+/* ── COLUMN MAP (0-indexed) ── */
 const COL = {
-  no: 1, parentChild: 2, planned: 3, notaDinas: 4,
-  kanpus: 5, hoRo: 6, group: 7, dept: 8, tim: 9,
-  // SK RKA TI 2026 (awal)
-  jenisAnggaran1: 10, namaGL1: 11, assetClass1: 12, idAC1: 13,
-  // SK RKA TI 2026 Revisi
-  jenisAnggaran2: 14, namaGL2: 15, assetClass2: 16, idAC2: 17,
-  idRka2025: 18, kodeNomor: 19, idRka2026: 20,
-  namaProyekAwal: 21, namaProyekRev: 22, namaProyekAkhir: 23,
-  // RKA TI 2026 awal
-  tpcAwal: 24, kebutuhan1Thn: 25, nominalSwitching: 26, alokasiUpdate: 27,
-  ipSwitching: 28, keteranganSwitching: 29,
-  // Revisi
-  tpcRevisi: 30, kebutuhan1ThnRev: 31, nominalMinAlokasi: 32, selisihAlokasi: 33,
-  keteranganRevisi: 34, updateProgress: 35, catatan: 36,
-  // IT Budget Forum realisasi bulanan (non kumulatif)
-  realJan: 37, realFeb: 38, realMar: 39, realApr: 40, realMei: 41, realJun: 42,
-  realJul: 43, realAgst: 44, realSep: 45, realOkt: 46, realNov: 47, realDes: 48,
-  realTotal: 49, realSelisih: 50,
-  // Meta klasifikasi
-  siRbb: 51, jps: 52, programKerja: 53, mendukung: 54, namaAplikasi: 55,
-  grpAplikasi: 56, resource: 57, fungsiTim: 58,
-  mulai: 59, selesai: 60, kategori: 61, klasifikasi: 62,
-  rutin: 63, baru: 64, statusPengadaan: 65,
-  nomorSpk: 66, namaSpk: 67, nominalSpk: 68, spkMulai: 69, spkSelesai: 70,
-  principle: 71, bp: 72,
-  // Prognosa Non Kumulatif
-  progJan: 73, progFeb: 74, progMar: 75, progApr: 76, progMei: 77, progJun: 78,
-  progJul: 79, progAgst: 80, progSep: 81, progOkt: 82, progNov: 83, progDes: 84,
-  progTotal: 85, progSelisih: 86,
-  // Prognosa Kumulatif
-  progKumJan: 87, progKumFeb: 88, progKumMar: 89, progKumApr: 90, progKumMei: 91, progKumJun: 92,
-  progKumJul: 93, progKumAgst: 94, progKumSep: 95, progKumOkt: 96, progKumNov: 97, progKumDes: 98,
-  progKumSelisih: 99
+  no:1,pc:2,planned:3,nota:4,kanpus:5,ho:6,group:7,dept:8,tim:9,
+  ja1:10,gl1:11,ac1:12,id1:13,ja2:14,gl2:15,ac2:16,id2:17,
+  id25:18,kode:19,id26:20,
+  nm1:21,nm2:22,nm3:23,
+  tpc_awal:24,keb1:25,sw:26,alok:27,ip_sw:28,ket_sw:29,
+  tpc_rev:30,keb_rev:31,nom_min:32,selisih:33,ket_rev:34,
+  progress:35,catatan:36,
+  r0:37,r1:38,r2:39,r3:40,r4:41,r5:42,r6:43,r7:44,r8:45,r9:46,r10:47,r11:48,
+  r_tot:49,r_sel:50,
+  si_rbb:51,jps:52,prog_kerja:53,mendukung:54,aplikasi:55,grp_app:56,resource:57,fungsi:58,
+  mulai:59,selesai:60,kategori:61,klasifikasi:62,rutin:63,baru:64,status:65,
+  no_spk:66,nm_spk:67,nom_spk:68,spk_mul:69,spk_sel:70,principle:71,bp:72,
+  p0:73,p1:74,p2:75,p3:76,p4:77,p5:78,p6:79,p7:80,p8:81,p9:82,p10:83,p11:84,
+  p_tot:85,p_sel:86,
+  pk0:87,pk1:88,pk2:89,pk3:90,pk4:91,pk5:92,pk6:93,pk7:94,pk8:95,pk9:96,pk10:97,pk11:98,pk_sel:99
 };
+const REAL_IDX = [37,38,39,40,41,42,43,44,45,46,47,48];
+const PROG_IDX = [73,74,75,76,77,78,79,80,81,82,83,84];
+const PROG_KUM = [87,88,89,90,91,92,93,94,95,96,97,98];
+const MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'];
+const MONTHS_FULL = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const DATA_START = 17;
 
-const REAL_COLS = [COL.realJan, COL.realFeb, COL.realMar, COL.realApr, COL.realMei, COL.realJun,
-                   COL.realJul, COL.realAgst, COL.realSep, COL.realOkt, COL.realNov, COL.realDes];
-const PROG_COLS = [COL.progJan, COL.progFeb, COL.progMar, COL.progApr, COL.progMei, COL.progJun,
-                   COL.progJul, COL.progAgst, COL.progSep, COL.progOkt, COL.progNov, COL.progDes];
-const PROG_KUM_COLS = [COL.progKumJan, COL.progKumFeb, COL.progKumMar, COL.progKumApr, COL.progKumMei, COL.progKumJun,
-                       COL.progKumJul, COL.progKumAgst, COL.progKumSep, COL.progKumOkt, COL.progKumNov, COL.progKumDes];
-const MONTH_LABELS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'];
-const MONTH_LABELS_FULL = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-
-const DATA_START_ROW = 17; // safe lower bound — we'll scan and skip header-ish rows
-
-/* ============================================================
-   Utilities
-   ============================================================ */
-function num(v) {
-  if (v === null || v === undefined || v === '') return 0;
+/* ── UTILS ── */
+const num = v => {
+  if (v == null || v === '') return 0;
   if (typeof v === 'number') return isFinite(v) ? v : 0;
-  const s = String(v).replace(/[^\d.\-]/g, '');
-  const n = parseFloat(s);
-  return isFinite(n) ? n : 0;
-}
-function str(v) {
-  if (v === null || v === undefined) return '';
-  return String(v).trim();
-}
-function fmt(n) {
-  if (!isFinite(n) || n === 0) return '0';
-  const abs = Math.abs(n);
-  return (n < 0 ? '-' : '') + abs.toLocaleString('id-ID', { maximumFractionDigits: 0 });
-}
-function fmtShort(n) {
-  if (!isFinite(n)) return '-';
-  const abs = Math.abs(n);
-  const sign = n < 0 ? '-' : '';
-  if (abs >= 1e12) return sign + (abs/1e12).toFixed(2) + ' T';
-  if (abs >= 1e9)  return sign + (abs/1e9).toFixed(2) + ' M';
-  if (abs >= 1e6)  return sign + (abs/1e6).toFixed(1) + ' Jt';
-  if (abs >= 1e3)  return sign + (abs/1e3).toFixed(0) + ' Rb';
-  return sign + abs.toFixed(0);
-}
-function fmtRp(n, short) { return 'Rp ' + (short ? fmtShort(n) : fmt(n)); }
-function fmtPct(n) { return (isFinite(n) ? n.toFixed(1) : '0') + '%'; }
-function escapeHtml(s) {
-  return String(s == null ? '' : s)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-}
+  const s = String(v).replace(/[^\d.\-]/g,'');
+  const n = parseFloat(s); return isFinite(n) ? n : 0;
+};
+const txt = v => v == null ? '' : String(v).trim();
+const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fmtN = n => { if(!isFinite(n)||n===0) return '0'; return Math.abs(n).toLocaleString('id-ID',{maximumFractionDigits:0}); };
+const fmtS = n => {
+  if(!isFinite(n)) return '-';
+  const a=Math.abs(n),s=n<0?'-':'';
+  if(a>=1e12) return s+(a/1e12).toFixed(2)+' T';
+  if(a>=1e9)  return s+(a/1e9).toFixed(2)+' M';
+  if(a>=1e6)  return s+(a/1e6).toFixed(1)+' Jt';
+  if(a>=1e3)  return s+(a/1e3).toFixed(0)+' Rb';
+  return s+a.toFixed(0);
+};
+const fmtRp = (n,short) => 'Rp '+(short?fmtS(n):fmtN(n));
+const fmtPct = n => (isFinite(n)?n.toFixed(1):'0')+'%';
+const sign = n => n>0?'+':'';
 
-/* ============================================================
-   State
-   ============================================================ */
-const state = {
-  file: null,
-  rows: [],           // parsed project rows
-  cutoffMonth: null,  // auto-detected (0-11)
-  view: 'overview',
-  theme: 'light',
-  chartInstances: {},
-  filter: {
-    search: '',
-    status: 'all',
-    dept: 'all',
-    kategori: 'all',
-    rutin: 'all',
-    planned: 'all',
-    changeType: 'all'
-  },
-  sort: { key: 'alokasi', dir: 'desc' }
+const STATUS_COLOR = {
+  'Selesai (Lunas)':'g','Pembayaran':'b','SPK Terbit':'b','IP Terbit':'b',
+  'Pengadaan':'o','Belum Mulai':'a','Batal':'r','Ditunda':'p','TBC':''
 };
 
-/* ============================================================
-   File handling
-   ============================================================ */
+/* ── STATE ── */
+const S = {
+  rows:[], cutoff:0, view:'changes', theme:'light',
+  charts:{}, filter:{q:'',status:'all',dept:'all',planned:'all',change:'all'},
+  sort:{k:'alok',d:'desc'}
+};
+
+/* ── THEME ── */
+const setTheme = t => {
+  S.theme = t;
+  document.documentElement.classList.toggle('dark', t==='dark');
+  localStorage.setItem('cs-theme', t);
+};
+document.getElementById('btnTheme').addEventListener('click', () => setTheme(S.theme==='dark'?'light':'dark'));
+if(localStorage.getItem('cs-theme')==='dark') setTheme('dark');
+
+/* ── FILE HANDLING ── */
 const fileInput = document.getElementById('fileInput');
-const dropzone = document.getElementById('dropzone');
-const processBtn = document.getElementById('processBtn');
-const landingStatus = document.getElementById('landingStatus');
-const dropTitle = document.getElementById('dropTitle');
+const dropzone  = document.getElementById('dropzone');
+const procBtn   = document.getElementById('procBtn');
+const lstat     = document.getElementById('lstat');
+const dzTitle   = document.getElementById('dzTitle');
+let pendingFile = null;
 
-['dragenter','dragover'].forEach(evt =>
-  dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.add('drag'); })
-);
-['dragleave','drop'].forEach(evt =>
-  dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.remove('drag'); })
-);
-dropzone.addEventListener('drop', e => {
-  const f = e.dataTransfer.files[0];
-  if (f) handleFile(f);
-});
-fileInput.addEventListener('change', e => {
-  const f = e.target.files[0];
-  if (f) handleFile(f);
-});
+['dragenter','dragover'].forEach(e => dropzone.addEventListener(e, ev => { ev.preventDefault(); dropzone.classList.add('drag'); }));
+['dragleave','drop'].forEach(e => dropzone.addEventListener(e, ev => { ev.preventDefault(); dropzone.classList.remove('drag'); }));
+dropzone.addEventListener('drop', ev => { const f=ev.dataTransfer.files[0]; if(f) setFile(f); });
+fileInput.addEventListener('change', ev => { const f=ev.target.files[0]; if(f) setFile(f); });
 
-function handleFile(f) {
-  if (!/\.(xlsx|xls|xlsm)$/i.test(f.name)) {
-    showStatus('File harus berformat Excel (.xlsx/.xls/.xlsm)', 'err');
-    return;
-  }
-  state.file = f;
-  dropTitle.textContent = f.name;
-  showStatus('File siap diproses: ' + f.name + ' (' + (f.size/1024).toFixed(1) + ' KB)', 'ok');
-  processBtn.disabled = false;
+function setFile(f) {
+  if(!/\.(xlsx|xls|xlsm)$/i.test(f.name)) { showStat('File harus .xlsx/.xls/.xlsm','err'); return; }
+  pendingFile = f;
+  dzTitle.textContent = f.name;
+  showStat('File siap: '+f.name+' ('+(f.size/1024).toFixed(1)+' KB)','ok');
+  procBtn.disabled = false;
 }
+function showStat(msg,type) { lstat.textContent=msg; lstat.className='lstat show '+(type||''); }
 
-function showStatus(msg, type) {
-  landingStatus.textContent = msg;
-  landingStatus.className = 'landing-status show ' + (type || '');
-}
-
-processBtn.addEventListener('click', async () => {
-  if (!state.file) return;
-  showLoading('Membaca file Excel…');
+procBtn.addEventListener('click', async () => {
+  if(!pendingFile) return;
+  showLoad('Membaca file Excel…');
   try {
-    const buf = await state.file.arrayBuffer();
-    showLoading('Parsing spreadsheet…');
-    const wb = XLSX.read(buf, { type: 'array', cellDates: false });
-    const sheet = wb.Sheets[wb.SheetNames[0]];
-    if (!sheet) throw new Error('Tidak ada sheet di file ini.');
-    const aoa = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null, raw: true });
-    showLoading('Mengekstrak proyek…');
-    const rows = parseProjects(aoa);
-    if (!rows.length) throw new Error('Tidak ada baris proyek valid ditemukan. Pastikan struktur file sesuai template Challenge Session.');
-    state.rows = rows;
-    state.cutoffMonth = detectCutoff(rows);
-    hideLoading();
+    const buf = await pendingFile.arrayBuffer();
+    showLoad('Parsing spreadsheet…');
+    const wb = XLSX.read(buf,{type:'array',cellDates:false});
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const aoa = XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:true});
+    showLoad('Mengekstrak proyek…');
+    S.rows = parseProjects(aoa);
+    if(!S.rows.length) throw new Error('Tidak ada proyek valid ditemukan.');
+    S.cutoff = detectCutoff(S.rows);
+    hideLoad();
     renderDashboard();
-  } catch (err) {
-    hideLoading();
-    console.error(err);
-    showStatus('Gagal memproses: ' + err.message, 'err');
+  } catch(e) {
+    hideLoad();
+    showStat('Error: '+e.message,'err');
   }
 });
 
@@ -903,1846 +448,579 @@ document.getElementById('btnReload').addEventListener('click', () => {
   document.getElementById('landing').classList.remove('hidden');
   document.getElementById('dashboard').classList.add('hidden');
   document.getElementById('topbar').style.display = 'none';
-  state.file = null;
-  state.rows = [];
-  fileInput.value = '';
-  dropTitle.textContent = 'Drop Excel di sini atau klik untuk pilih';
-  landingStatus.classList.remove('show');
-  processBtn.disabled = true;
+  pendingFile = null; S.rows = []; fileInput.value = '';
+  dzTitle.textContent = 'Drop Excel di sini atau klik untuk pilih';
+  lstat.className = 'lstat'; procBtn.disabled = true;
 });
 
-function showLoading(msg) {
-  document.getElementById('loadingMsg').textContent = msg || 'Memproses…';
-  document.getElementById('loading').classList.add('show');
-}
-function hideLoading() { document.getElementById('loading').classList.remove('show'); }
+const showLoad = msg => { document.getElementById('loadMsg').textContent=msg||'Memproses…'; document.getElementById('loading').classList.add('show'); };
+const hideLoad = () => document.getElementById('loading').classList.remove('show');
 
-/* ============================================================
-   Parser — convert sheet rows to project records
-   ============================================================ */
+/* ── PARSER ── */
+const RKA_RE = /^\d{4}-[A-Z]+-[A-Z]\.\d/i;
 function parseProjects(aoa) {
-  const out = [];
-  // Project detection:
-  //   A row is a NEW PROJECT if it has a recognizable identifier:
-  //   (1) idRka2026 matching the RKA pattern (e.g. "2026-INF-A.01.xxx"), OR
-  //   (2) a valid project name (len > 3, not just "-") combined with parent/child or planned marker.
-  //   Continuation rows (only text in keterangan/catatan) are merged into the preceding project.
-  let cur = null;
-  for (let i = DATA_START_ROW; i < aoa.length; i++) {
-    const r = aoa[i];
-    if (!r) continue;
-    const name = str(r[COL.namaProyekAkhir]) || str(r[COL.namaProyekRev]) || str(r[COL.namaProyekAwal]);
-    const idRka = str(r[COL.idRka2026]);
-    const pc = str(r[COL.parentChild]);
-    const plan = str(r[COL.planned]);
-
-    const idLooksValid = /^\d{4}-[A-Z]+-[A-Z]\.\d/i.test(idRka);
-    const nameLooksValid = name && name !== '-' && name.length > 3;
-    const hasMarker = (pc === 'Parent' || pc === 'Child') || (plan === 'Planned' || plan === 'Unplanned');
-
-    const isProject = idLooksValid || (nameLooksValid && hasMarker);
-
-    if (isProject) {
-      cur = projectFromRow(r, i);
-      out.push(cur);
-    } else if (cur) {
-      // Continuation row — append textual fields
-      const contKet = str(r[COL.keteranganSwitching]);
-      const contIp = str(r[COL.ipSwitching]);
-      const contCatatan = str(r[COL.catatan]);
-      const contKetRev = str(r[COL.keteranganRevisi]);
-      if (contKet) cur.switchingLog.push({ ip: contIp, desc: contKet });
-      if (contCatatan && !cur.catatan.includes(contCatatan)) cur.catatan += (cur.catatan ? '\n' : '') + contCatatan;
-      if (contKetRev && !cur.keteranganRevisi.includes(contKetRev)) cur.keteranganRevisi += (cur.keteranganRevisi ? '\n' : '') + contKetRev;
+  const out = []; let cur = null;
+  for(let i=DATA_START;i<aoa.length;i++){
+    const r=aoa[i]; if(!r) continue;
+    const g = idx => (idx<r.length?r[idx]:null);
+    const name = txt(g(COL.nm3))||txt(g(COL.nm2))||txt(g(COL.nm1));
+    const id   = txt(g(COL.id26));
+    const pc   = txt(g(COL.pc));
+    const plan = txt(g(COL.planned));
+    const idOk = RKA_RE.test(id);
+    const nmOk = name && name!=='-' && name.length>3;
+    const mark = pc==='Parent'||pc==='Child'||plan==='Planned'||plan==='Unplanned';
+    if(idOk||(nmOk&&mark)){
+      cur = buildRow(r,i); out.push(cur);
+    } else if(cur){
+      const ks=txt(g(COL.ket_sw)), ip=txt(g(COL.ip_sw));
+      const cat=txt(g(COL.catatan)), kr=txt(g(COL.ket_rev));
+      if(ks) cur.swLog.push({ip,desc:ks});
+      if(cat&&!cur.catatan.includes(cat)) cur.catatan+=(cur.catatan?'\n':'')+cat;
+      if(kr&&!cur.ketRev.includes(kr)) cur.ketRev+=(cur.ketRev?'\n':'')+kr;
     }
   }
   return out;
 }
 
-function projectFromRow(r, rowIdx) {
-  const name = str(r[COL.namaProyekAkhir]) || str(r[COL.namaProyekRev]) || str(r[COL.namaProyekAwal]);
-  const idRka = str(r[COL.idRka2026]) || str(r[COL.kodeNomor]);
-  const real = REAL_COLS.map(c => num(r[c]));
-  const prog = PROG_COLS.map(c => num(r[c]));
-  const progKum = PROG_KUM_COLS.map(c => num(r[c]));
+function buildRow(r,ri){
+  const g = idx => (idx<r.length?r[idx]:null);
+  const name = txt(g(COL.nm3))||txt(g(COL.nm2))||txt(g(COL.nm1));
+  const real = REAL_IDX.map(c=>num(g(c)));
+  const prog = PROG_IDX.map(c=>num(g(c)));
+  const progK= PROG_KUM.map(c=>num(g(c)));
+  const rTot = num(g(COL.r_tot))||real.reduce((a,b)=>a+b,0);
+  const pTot = num(g(COL.p_tot))||prog.reduce((a,b)=>a+b,0);
+  const alok = num(g(COL.keb_rev))||num(g(COL.alok));
+  const tpcA = num(g(COL.tpc_awal)), tpcR = num(g(COL.tpc_rev));
+  const kebA = num(g(COL.keb1)),     kebR = num(g(COL.keb_rev));
+  const sw   = num(g(COL.sw));
+  const sel  = num(g(COL.selisih));
+  const nomMin = num(g(COL.nom_min));
+  const plan = txt(g(COL.planned));
+  const statusRaw = txt(g(COL.status))||txt(g(COL.progress));
+  const status = normStatus(statusRaw);
+  const nameA = txt(g(COL.nm1)), nameR = txt(g(COL.nm2));
+  const swLog = [];
+  const ks = txt(g(COL.ket_sw));
+  if(ks) swLog.push({ip:txt(g(COL.ip_sw)),desc:ks});
 
-  const status = normalizeStatus(r[COL.statusPengadaan] || r[COL.updateProgress]);
+  const tpcDelta = (tpcA>0&&tpcR>0) ? tpcR-tpcA : 0;
+  const kebDelta = (kebA>0&&kebR>0) ? kebR-kebA : 0;
+  const hasNameChange = !!(nameA&&name&&nameA!=='-'&&name!=='-'&&nameA!==name&&nameA.length>3);
 
-  // Post-Challenge final allocation: prefer "Kebutuhan 1 Thn Revisi" (col 31)
-  // which represents the revised allocation after Challenge Session.
-  // Fallback to Alokasi Update (col 27) which is pre-revisi allocation.
-  const alokasi = num(r[COL.kebutuhan1ThnRev]) || num(r[COL.alokasiUpdate]);
-  const realisasi = num(r[COL.realTotal]) || real.reduce((a, b) => a + b, 0);
-  const prognosaTotal = num(r[COL.progTotal]) || prog.reduce((a, b) => a + b, 0);
-
-  // Extract switching events from keteranganSwitching text
-  const switchingLog = [];
-  const firstKet = str(r[COL.keteranganSwitching]);
-  if (firstKet) switchingLog.push({ ip: str(r[COL.ipSwitching]), desc: firstKet });
-
-  return {
-    rowIdx,
-    no: str(r[COL.no]),
-    parentChild: str(r[COL.parentChild]),
-    planned: str(r[COL.planned]),
-    notaDinas: str(r[COL.notaDinas]),
-    kanpus: str(r[COL.kanpus]),
-    hoRo: str(r[COL.hoRo]),
-    group: str(r[COL.group]),
-    dept: str(r[COL.dept]),
-    tim: str(r[COL.tim]),
-    assetClass: str(r[COL.assetClass2]) || str(r[COL.assetClass1]),
-    idAsset: str(r[COL.idAC2]) || str(r[COL.idAC1]),
-    namaGL: str(r[COL.namaGL2]) || str(r[COL.namaGL1]),
-    idRka2025: str(r[COL.idRka2025]),
-    idRka2026: idRka,
-    name,
-    nameAwal: str(r[COL.namaProyekAwal]),
-    nameRev: str(r[COL.namaProyekRev]),
-    tpcAwal: num(r[COL.tpcAwal]),
-    tpcRevisi: num(r[COL.tpcRevisi]),
-    kebutuhan1Thn: num(r[COL.kebutuhan1Thn]),
-    kebutuhan1ThnRev: num(r[COL.kebutuhan1ThnRev]),
-    nominalSwitching: num(r[COL.nominalSwitching]),
-    alokasiUpdate: alokasi,
-    nominalMinAlokasi: num(r[COL.nominalMinAlokasi]),
-    selisihAlokasi: num(r[COL.selisihAlokasi]),
-    keteranganRevisi: str(r[COL.keteranganRevisi]),
-    updateProgress: str(r[COL.updateProgress]),
-    catatan: str(r[COL.catatan]),
-    real, realisasi, realSelisih: num(r[COL.realSelisih]),
-    prog, prognosaTotal, progKum,
-    siRbb: str(r[COL.siRbb]),
-    jps: str(r[COL.jps]),
-    programKerja: str(r[COL.programKerja]),
-    namaAplikasi: str(r[COL.namaAplikasi]),
-    grpAplikasi: str(r[COL.grpAplikasi]),
-    fungsiTim: str(r[COL.fungsiTim]),
-    mulai: str(r[COL.mulai]),
-    selesai: str(r[COL.selesai]),
-    kategori: str(r[COL.kategori]),
-    klasifikasi: str(r[COL.klasifikasi]),
-    rutin: str(r[COL.rutin]),
-    baru: str(r[COL.baru]),
-    status,
-    statusRaw: str(r[COL.statusPengadaan]),
-    nomorSpk: str(r[COL.nomorSpk]),
-    namaSpk: str(r[COL.namaSpk]),
-    nominalSpk: num(r[COL.nominalSpk]),
-    spkMulai: str(r[COL.spkMulai]),
-    spkSelesai: str(r[COL.spkSelesai]),
-    principle: str(r[COL.principle]),
-    bp: str(r[COL.bp]),
-    switchingLog,
-    // Derived
-    get changeType() {
-      const s = this.nominalSwitching;
-      if (s > 0) return 'Bertambah';
-      if (s < 0) return 'Berkurang';
-      if ((this.planned || '').toLowerCase() === 'unplanned') return 'Baru (Unplanned)';
-      if (/batal|drop|dibatalkan/i.test(this.status) || /batal|drop/i.test(this.statusRaw)) return 'Batal';
-      return 'Tidak berubah';
-    },
-    get serapanPct() {
-      return this.alokasiUpdate > 0 ? (this.realisasi / this.alokasiUpdate * 100) : 0;
-    }
+  const p = {
+    ri, id:txt(g(COL.id26))||txt(g(COL.kode)), name,
+    nameA, nameR,
+    dept:txt(g(COL.dept)), tim:txt(g(COL.tim)), group:txt(g(COL.group)),
+    planned:plan, pc:txt(g(COL.pc)), nota:txt(g(COL.nota)),
+    gl:txt(g(COL.gl2))||txt(g(COL.gl1)),
+    ac:txt(g(COL.ac2))||txt(g(COL.ac1)),
+    kategori:txt(g(COL.kategori)), klasifikasi:txt(g(COL.klasifikasi)),
+    rutin:txt(g(COL.rutin)), baru:txt(g(COL.baru)),
+    status, statusRaw,
+    tpcA, tpcR, tpcDelta,
+    kebA, kebR, kebDelta,
+    alok, sw, sel, nomMin,
+    real, rTot, prog, pTot, progK,
+    ketRev:txt(g(COL.ket_rev)), catatan:txt(g(COL.catatan)),
+    progress:txt(g(COL.progress)),
+    noSpk:txt(g(COL.no_spk)), nmSpk:txt(g(COL.nm_spk)),
+    nomSpk:num(g(COL.nom_spk)),
+    principle:txt(g(COL.principle)), bp:txt(g(COL.bp)),
+    aplikasi:txt(g(COL.aplikasi)), grpApp:txt(g(COL.grp_app)),
+    mulai:txt(g(COL.mulai)), selesai:txt(g(COL.selesai)),
+    swLog,
+    hasTpcChange: Math.abs(tpcDelta)>1000,
+    hasKebChange: Math.abs(kebDelta)>1000,
+    hasNameChange,
+    hasSw: sw!==0,
+    hasSel: sel!==0,
+    isNew: plan.toLowerCase()==='unplanned'&&kebA===0,
+    get serapan(){ return this.alok>0?(this.rTot/this.alok*100):0; }
   };
+  return p;
 }
 
-function normalizeStatus(v) {
-  const s = str(v).toLowerCase();
-  if (!s) return 'Tidak diketahui';
-  if (s.includes('lunas') || s.includes('selesai')) return 'Selesai (Lunas)';
-  if (s.includes('batal') || s.includes('drop') || s.includes('dibatalkan')) return 'Batal';
-  if (s.includes('ditunda') || s.includes('hold')) return 'Ditunda';
-  if (s.includes('pembayaran')) return 'Pembayaran';
-  if (s.includes('spk')) return 'SPK Terbit';
-  if (s.includes('ip terbit')) return 'IP Terbit';
-  if (s.includes('pengadaan')) return 'Pengadaan';
-  if (s.includes('belum')) return 'Belum Mulai';
-  if (s.includes('tbc')) return 'TBC';
-  return str(v);
+function normStatus(s){
+  const l=s.toLowerCase();
+  if(!l) return 'Tidak diketahui';
+  if(l.includes('lunas')||l.includes('selesai')) return 'Selesai (Lunas)';
+  if(l.includes('batal')||l.includes('drop')) return 'Batal';
+  if(l.includes('ditunda')||l.includes('hold')) return 'Ditunda';
+  if(l.includes('pembayaran')) return 'Pembayaran';
+  if(l.includes('spk')||(/^4\d{9,}/.test(l))) return 'SPK Terbit';
+  if(l.includes('ip terbit')) return 'IP Terbit';
+  if(l.includes('pengadaan')) return 'Pengadaan';
+  if(l.includes('belum')) return 'Belum Mulai';
+  if(l.includes('tbc')) return 'TBC';
+  return s||'Tidak diketahui';
 }
 
-const STATUS_COLORS = {
-  'Selesai (Lunas)': 'success',
-  'Pembayaran': 'info',
-  'SPK Terbit': 'primary',
-  'IP Terbit': 'primary',
-  'Pengadaan': 'accent',
-  'Belum Mulai': 'warning',
-  'Batal': 'danger',
-  'Ditunda': 'warning',
-  'TBC': 'neutral',
-  'Tidak diketahui': 'neutral'
-};
-
-/* Detect cutoff: last month where cumulative realisasi changed */
-function detectCutoff(rows) {
-  const totals = Array(12).fill(0);
-  rows.forEach(p => p.real.forEach((v, i) => totals[i] += v));
-  let last = -1;
-  for (let i = 0; i < 12; i++) if (totals[i] !== 0) last = i;
-  // Default to current month if nothing detected
-  if (last < 0) return new Date().getMonth();
-  return last;
+function detectCutoff(rows){
+  const tot=Array(12).fill(0);
+  rows.forEach(p=>p.real.forEach((v,i)=>tot[i]+=v));
+  let last=-1; for(let i=0;i<12;i++) if(tot[i]!==0) last=i;
+  return last<0?new Date().getMonth():last;
 }
 
-/* ============================================================
-   Theme toggle
-   ============================================================ */
-const btnTheme = document.getElementById('btnTheme');
-function setTheme(t) {
-  state.theme = t;
-  if (t === 'dark') document.documentElement.classList.add('dark');
-  else document.documentElement.classList.remove('dark');
-  localStorage.setItem('cs-theme', t);
-  // Re-render charts with new theme
-  if (state.rows.length) Object.values(state.chartInstances).forEach(c => c && c.setOption(c.getOption(), { notMerge: false }));
-  setTimeout(() => { if (state.rows.length) rerenderCharts(); }, 50);
-}
-btnTheme.addEventListener('click', () => setTheme(state.theme === 'dark' ? 'light' : 'dark'));
-(function initTheme(){
-  const saved = localStorage.getItem('cs-theme');
-  if (saved === 'dark') setTheme('dark');
-})();
-
-/* ============================================================
-   Chart defaults (ECharts)
-   ============================================================ */
-function getThemeColors() {
-  const dark = state.theme === 'dark';
-  return {
-    text1: dark ? '#E8EEF7' : '#121B2A',
-    text2: dark ? '#A9B7CC' : '#42536A',
-    text3: dark ? '#6B7C95' : '#8C9BB0',
-    grid:  dark ? '#233756' : '#E2E8F2',
-    tooltipBg: dark ? '#172743' : '#FFFFFF',
-    tooltipBorder: dark ? '#334B70' : '#E2E8F2',
-    palette: ['#00529C','#F37021','#13A888','#E6A700','#8B5CF6','#EC4899','#3B82C4','#14B8A6','#64748B','#F59E0B','#A855F7','#EF4444']
-  };
-}
-function chartBase(extra) {
-  const c = getThemeColors();
-  return Object.assign({
-    textStyle: { fontFamily: 'Inter', color: c.text2, fontSize: 11 },
-    tooltip: {
-      backgroundColor: c.tooltipBg,
-      borderColor: c.tooltipBorder,
-      borderWidth: 1,
-      padding: [8, 12],
-      textStyle: { color: c.text1, fontSize: 12 },
-      extraCssText: 'box-shadow: 0 8px 24px rgba(15,23,42,.14); border-radius: 8px;'
-    },
-    color: c.palette
-  }, extra || {});
-}
-function ensureChart(id) {
-  const dom = document.getElementById(id);
-  if (!dom) return null;
-  if (state.chartInstances[id]) { state.chartInstances[id].dispose(); }
-  state.chartInstances[id] = echarts.init(dom, null, { renderer: 'canvas' });
-  return state.chartInstances[id];
-}
-function rerenderCharts() {
-  // Just re-call current view render
-  renderView(state.view);
-}
-
-/* ============================================================
-   Navigation & top-level render
-   ============================================================ */
-document.getElementById('topNav').addEventListener('click', e => {
-  const btn = e.target.closest('.nav-btn');
-  if (!btn) return;
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b === btn));
+/* ── NAV ── */
+document.getElementById('topNav').addEventListener('click', e=>{
+  const btn=e.target.closest('.tab-btn'); if(!btn) return;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));
   switchView(btn.dataset.view);
 });
-function switchView(v) {
-  state.view = v;
-  document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
-  const el = document.getElementById('view-' + v);
-  if (el) el.classList.remove('hidden');
+function switchView(v){
+  S.view=v;
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
   renderView(v);
 }
-function renderView(v) {
-  if (!state.rows.length) return;
-  switch (v) {
-    case 'overview':  renderOverview(); break;
-    case 'changes':   renderChanges(); break;
-    case 'pengadaan': renderPengadaan(); break;
-    case 'rka':       renderRka(); break;
-    case 'cje0':      renderCje0(); break;
-  }
-}
+function renderView(v){ if(!S.rows.length) return; v==='changes'?renderChanges():renderProjects(); }
 
-function renderDashboard() {
-  // Hide landing, show dashboard
+function renderDashboard(){
   document.getElementById('landing').classList.add('hidden');
-  document.getElementById('topbar').style.display = 'flex';
+  document.getElementById('topbar').style.display='flex';
   document.getElementById('dashboard').classList.remove('hidden');
-
-  // Meta pills
-  document.getElementById('metaRows').textContent = state.rows.length + ' proyek';
-  document.getElementById('metaCutoff').textContent = 'Cut-off: ' + MONTH_LABELS_FULL[state.cutoffMonth];
-
-  switchView(state.view);
+  document.getElementById('metaRows').textContent=S.rows.length+' proyek';
+  document.getElementById('metaCutoff').textContent='Cut-off: '+MONTHS_FULL[S.cutoff];
+  switchView(S.view);
 }
 
-/* ============================================================
-   Aggregations
-   ============================================================ */
-function aggregate(rows) {
-  const agg = {
-    count: rows.length,
-    totalAlokasi: 0, totalRealisasi: 0, totalPrognosa: 0,
-    totalTpcAwal: 0, totalTpcRevisi: 0, totalKebutuhan1Thn: 0,
-    totalSwitchIn: 0, totalSwitchOut: 0, totalMinAlokasi: 0,
-    realMonthly: Array(12).fill(0),
-    progMonthly: Array(12).fill(0),
-    progKumMonthly: Array(12).fill(0),
-    byStatus: {}, byDept: {}, byKategori: {},
-    byKlasifikasi: {}, byRutin: {}, byPlanned: {},
-    byAssetClass: {}, byGL: {}, byPrinciple: {}
+/* ── CHART HELPERS ── */
+function tc(){
+  const dk=S.theme==='dark';
+  return {
+    t1:dk?'#E2EAF4':'#0F1C2E', t2:dk?'#8AAAC8':'#3D5166', t3:dk?'#4A6A8A':'#8A9BB0',
+    grid:dk?'#1E3A5F':'#E2E8F2', bg:dk?'#112240':'#fff',
+    pal:['#00529C','#F37021','#13A888','#E6A700','#8B5CF6','#EC4899','#3B82C4','#14B8A6','#64748B','#F59E0B','#A855F7','#EF4444']
   };
-  rows.forEach(p => {
-    agg.totalAlokasi += p.alokasiUpdate;
-    agg.totalRealisasi += p.realisasi;
-    agg.totalPrognosa += p.prognosaTotal;
-    agg.totalTpcAwal += p.tpcAwal;
-    agg.totalTpcRevisi += p.tpcRevisi;
-    agg.totalKebutuhan1Thn += p.kebutuhan1Thn;
-    agg.totalMinAlokasi += p.nominalMinAlokasi;
-    if (p.nominalSwitching > 0) agg.totalSwitchIn += p.nominalSwitching;
-    if (p.nominalSwitching < 0) agg.totalSwitchOut += Math.abs(p.nominalSwitching);
-    p.real.forEach((v, i) => agg.realMonthly[i] += v);
-    p.prog.forEach((v, i) => agg.progMonthly[i] += v);
-    p.progKum.forEach((v, i) => agg.progKumMonthly[i] += v);
-
-    incr(agg.byStatus, p.status);
-    incr(agg.byDept, p.dept || '(lainnya)');
-    incr(agg.byKategori, p.kategori || '(lainnya)');
-    incr(agg.byKlasifikasi, p.klasifikasi || '(lainnya)');
-    incr(agg.byRutin, p.rutin || '(lainnya)');
-    incr(agg.byPlanned, p.planned || '(lainnya)');
-    incr(agg.byAssetClass, p.assetClass || '(lainnya)');
-    incr(agg.byGL, p.namaGL || '(lainnya)');
-    if (p.principle) incr(agg.byPrinciple, p.principle);
-  });
-  return agg;
 }
-function incr(m, k) { m[k] = (m[k] || 0) + 1; }
-
-function aggregateBy(rows, keyFn, valFn) {
-  const m = {};
-  rows.forEach(p => {
-    const k = keyFn(p) || '(lainnya)';
-    if (!m[k]) m[k] = 0;
-    m[k] += valFn(p);
-  });
-  return Object.entries(m).sort((a,b) => b[1] - a[1]);
+function mkChart(id){
+  const dom=document.getElementById(id); if(!dom) return null;
+  if(S.charts[id]) S.charts[id].dispose();
+  S.charts[id]=echarts.init(dom,null,{renderer:'canvas'});
+  return S.charts[id];
 }
-
-/* ============================================================
-   VIEW: OVERVIEW
-   ============================================================ */
-function renderOverview() {
-  const agg = aggregate(state.rows);
-  const realYTD = agg.realMonthly.slice(0, state.cutoffMonth + 1).reduce((a,b) => a+b, 0);
-  const serapan = agg.totalAlokasi > 0 ? (realYTD / agg.totalAlokasi * 100) : 0;
-  const sisa = agg.totalAlokasi - realYTD;
-  const deltaTpc = agg.totalTpcRevisi - agg.totalTpcAwal;
-
-  const statusGroups = Object.entries(agg.byStatus).sort((a,b) => b[1] - a[1]);
-  const deptGroups = aggregateBy(state.rows, p => p.dept, p => p.alokasiUpdate).slice(0, 10);
-
-  const html = `
-    <div class="section-head">
-      <div>
-        <div class="section-title">Ringkasan Revisi RKA TI 2026</div>
-        <div class="section-desc">Snapshot keseluruhan hasil Challenge Session — alokasi, realisasi, dan switching anggaran</div>
-      </div>
-    </div>
-
-    <div class="kpi-grid">
-      <div class="kpi-card primary">
-        <div class="kpi-label">Alokasi Update (Revisi)
-          <span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg></span>
-        </div>
-        <div class="kpi-value tnum">${fmtRp(agg.totalAlokasi, true)}</div>
-        <div class="kpi-sub">${agg.count} proyek · dari ${fmtRp(agg.totalKebutuhan1Thn, true)} awal</div>
-      </div>
-      <div class="kpi-card success">
-        <div class="kpi-label">Realisasi YTD
-          <span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></span>
-        </div>
-        <div class="kpi-value tnum">${fmtRp(realYTD, true)}</div>
-        <div class="kpi-sub"><span class="delta up">${fmtPct(serapan)}</span> terserap · per ${MONTH_LABELS_FULL[state.cutoffMonth]}</div>
-      </div>
-      <div class="kpi-card accent">
-        <div class="kpi-label">Switching Flow
-          <span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>
-        </div>
-        <div class="kpi-value tnum">${fmtRp(agg.totalSwitchIn, true)}</div>
-        <div class="kpi-sub">In · Out ${fmtRp(agg.totalSwitchOut, true)}</div>
-      </div>
-      <div class="kpi-card warning">
-        <div class="kpi-label">Sisa Anggaran
-          <span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
-        </div>
-        <div class="kpi-value tnum">${fmtRp(sisa, true)}</div>
-        <div class="kpi-sub">${fmtPct(100 - serapan)} belum terserap</div>
-      </div>
-      <div class="kpi-card ${deltaTpc >= 0 ? 'success' : 'danger'}">
-        <div class="kpi-label">Δ Total Project Cost
-          <span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="${deltaTpc >= 0 ? '23 6 13.5 15.5 8.5 10.5 1 18' : '23 18 13.5 8.5 8.5 13.5 1 6'}"/><polyline points="${deltaTpc >= 0 ? '17 6 23 6 23 12' : '17 18 23 18 23 12'}"/></svg></span>
-        </div>
-        <div class="kpi-value tnum">${deltaTpc >= 0 ? '+' : ''}${fmtRp(deltaTpc, true)}</div>
-        <div class="kpi-sub">Awal ${fmtRp(agg.totalTpcAwal, true)} → Revisi ${fmtRp(agg.totalTpcRevisi, true)}</div>
-      </div>
-      <div class="kpi-card neutral">
-        <div class="kpi-label">Prognosa 2026
-          <span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
-        </div>
-        <div class="kpi-value tnum">${fmtRp(agg.totalPrognosa, true)}</div>
-        <div class="kpi-sub">vs alokasi ${fmtPct(agg.totalAlokasi > 0 ? agg.totalPrognosa / agg.totalAlokasi * 100 : 0)}</div>
-      </div>
-    </div>
-
-    <div class="grid grid-2" style="margin-bottom:12px;">
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">Realisasi vs Prognosa Kumulatif 2026</div>
-            <div class="panel-desc">Perbandingan serapan aktual (kumulatif) dengan estimasi cashout — per bulan</div>
-          </div>
-        </div>
-        <div class="chart-slot" id="chart-real-vs-prog"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">Status Pengadaan</div>
-            <div class="panel-desc">Distribusi proyek berdasarkan status aktual pengadaan</div>
-          </div>
-        </div>
-        <div class="chart-slot" id="chart-status"></div>
-      </div>
-    </div>
-
-    <div class="grid grid-2" style="margin-bottom:12px;">
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">Top 10 Departemen — Alokasi Anggaran</div>
-            <div class="panel-desc">Alokasi Update per DEPT (Rp)</div>
-          </div>
-        </div>
-        <div class="chart-slot" id="chart-dept"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">Klasifikasi Pengadaan</div>
-            <div class="panel-desc">Run · Change · Transform</div>
-          </div>
-        </div>
-        <div class="chart-slot sm" id="chart-klasifikasi"></div>
-      </div>
-    </div>
-
-    <div class="grid grid-3">
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">Kategori Pengadaan</div></div></div>
-        <div class="chart-slot sm" id="chart-kategori"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">Asset Class</div></div></div>
-        <div class="chart-slot sm" id="chart-asset"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">Rutin vs Tidak Rutin</div></div></div>
-        <div class="chart-slot sm" id="chart-rutin"></div>
-      </div>
-    </div>
-  `;
-  document.getElementById('view-overview').innerHTML = html;
-
-  // Charts
-  renderRealVsProg('chart-real-vs-prog', agg);
-  renderPieStatus('chart-status', statusGroups);
-  renderBarDept('chart-dept', deptGroups);
-  renderPie('chart-klasifikasi', agg.byKlasifikasi);
-  renderPie('chart-kategori', agg.byKategori);
-  renderPie('chart-asset', agg.byAssetClass);
-  renderPie('chart-rutin', agg.byRutin);
+function base(extra){
+  const c=tc();
+  return Object.assign({textStyle:{fontFamily:'Inter',color:c.t2,fontSize:11},
+    tooltip:{backgroundColor:c.bg,borderColor:c.grid,borderWidth:1,padding:[8,12],
+      textStyle:{color:c.t1,fontSize:12},extraCssText:'box-shadow:0 8px 24px rgba(0,0,0,.12);border-radius:8px;'},
+    color:c.pal},extra||{});
 }
+window.addEventListener('resize',()=>{ let t; clearTimeout(t); t=setTimeout(()=>Object.values(S.charts).forEach(c=>c&&c.resize()),150); });
 
-function renderRealVsProg(id, agg) {
-  const c = getThemeColors();
-  const chart = ensureChart(id);
-  if (!chart) return;
-  // Build cumulative realisasi
-  const realKum = []; let acc = 0;
-  agg.realMonthly.forEach(v => { acc += v; realKum.push(acc); });
-  chart.setOption(chartBase({
-    grid: { left: 58, right: 20, top: 40, bottom: 30 },
-    legend: { data: ['Realisasi Kumulatif','Prognosa Kumulatif'], textStyle: { color: c.text2 }, right: 0, top: 0 },
-    tooltip: { trigger: 'axis', valueFormatter: v => fmtRp(v, true) },
-    xAxis: {
-      type: 'category', data: MONTH_LABELS,
-      axisLine: { lineStyle: { color: c.grid } },
-      axisLabel: { color: c.text3 }
-    },
-    yAxis: {
-      type: 'value',
-      axisLabel: { color: c.text3, formatter: v => fmtShort(v) },
-      splitLine: { lineStyle: { color: c.grid, type: 'dashed' } }
-    },
-    series: [
-      {
-        name: 'Realisasi Kumulatif', type: 'line', smooth: true, data: realKum,
-        itemStyle: { color: '#00529C' }, lineStyle: { width: 3 },
-        areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [
-          {offset:0, color: 'rgba(0,82,156,.28)'}, {offset:1, color: 'rgba(0,82,156,0)'}
-        ]}},
-        symbol: 'circle', symbolSize: 6
-      },
-      {
-        name: 'Prognosa Kumulatif', type: 'line', smooth: true, data: agg.progKumMonthly,
-        itemStyle: { color: '#F37021' }, lineStyle: { width: 3, type: 'dashed' },
-        symbol: 'circle', symbolSize: 6
-      }
-    ]
-  }));
-  window.addEventListener('resize', () => chart.resize());
-}
+/* ── VIEW 1: PERUBAHAN ── */
+function renderChanges(){
+  const rows=S.rows;
+  const swIn   = rows.filter(p=>p.sw>0).sort((a,b)=>b.sw-a.sw);
+  const swOut  = rows.filter(p=>p.sw<0).sort((a,b)=>a.sw-b.sw);
+  const tpcUp  = rows.filter(p=>p.hasTpcChange&&p.tpcDelta>0).sort((a,b)=>b.tpcDelta-a.tpcDelta);
+  const tpcDn  = rows.filter(p=>p.hasTpcChange&&p.tpcDelta<0).sort((a,b)=>a.tpcDelta-b.tpcDelta);
+  const kebUp  = rows.filter(p=>p.hasKebChange&&p.kebDelta>0).sort((a,b)=>b.kebDelta-a.kebDelta);
+  const kebDn  = rows.filter(p=>p.hasKebChange&&p.kebDelta<0).sort((a,b)=>a.kebDelta-b.kebDelta);
+  const scope  = rows.filter(p=>p.hasNameChange);
+  const selAll = rows.filter(p=>p.hasSel&&p.sel!==0).sort((a,b)=>Math.abs(b.sel)-Math.abs(a.sel));
+  const newP   = rows.filter(p=>p.isNew);
+  const batal  = rows.filter(p=>p.status==='Batal'||p.status==='Ditunda');
 
-function renderPieStatus(id, groups) {
-  const c = getThemeColors();
-  const statusColor = {
-    'Selesai (Lunas)': '#13A888', 'Pembayaran': '#3B82C4', 'SPK Terbit': '#00529C',
-    'IP Terbit': '#4B96E6', 'Pengadaan': '#F37021', 'Belum Mulai': '#E6A700',
-    'Batal': '#D93A3A', 'Ditunda': '#A855F7', 'TBC': '#8C9BB0', 'Tidak diketahui': '#64748B'
-  };
-  const chart = ensureChart(id);
-  if (!chart) return;
-  const data = groups.map(([k, v]) => ({ name: k, value: v, itemStyle: { color: statusColor[k] || '#64748B' } }));
-  chart.setOption(chartBase({
-    tooltip: { trigger: 'item', formatter: p => `<b>${p.name}</b><br>${p.value} proyek (${p.percent}%)` },
-    legend: { orient: 'vertical', right: 0, top: 20, textStyle: { color: c.text2, fontSize: 11 }, itemWidth: 10, itemHeight: 10 },
-    series: [{
-      type: 'pie', radius: ['52%','78%'], center: ['32%','50%'],
-      avoidLabelOverlap: true,
-      itemStyle: { borderColor: c.tooltipBg, borderWidth: 2 },
-      label: { show: false },
-      labelLine: { show: false },
-      data
-    }]
-  }));
-  window.addEventListener('resize', () => chart.resize());
-}
+  const totIn  = swIn.reduce((s,p)=>s+p.sw,0);
+  const totOut = Math.abs(swOut.reduce((s,p)=>s+p.sw,0));
+  const totTpcD= rows.reduce((s,p)=>s+(p.tpcDelta||0),0);
+  const totKebD= rows.reduce((s,p)=>s+(p.kebDelta||0),0);
+  const totSel = selAll.reduce((s,p)=>s+p.sel,0);
 
-function renderBarDept(id, groups) {
-  const c = getThemeColors();
-  const chart = ensureChart(id);
-  if (!chart) return;
-  const cats = groups.map(g => g[0]).reverse();
-  const vals = groups.map(g => g[1]).reverse();
-  chart.setOption(chartBase({
-    grid: { left: 60, right: 24, top: 10, bottom: 24 },
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, valueFormatter: v => fmtRp(v, true) },
-    xAxis: {
-      type: 'value',
-      axisLabel: { color: c.text3, formatter: v => fmtShort(v) },
-      splitLine: { lineStyle: { color: c.grid, type: 'dashed' } }
-    },
-    yAxis: {
-      type: 'category', data: cats,
-      axisLine: { lineStyle: { color: c.grid } },
-      axisLabel: { color: c.text2, fontSize: 11 }
-    },
-    series: [{
-      type: 'bar', data: vals,
-      itemStyle: {
-        color: { type: 'linear', x:0, y:0, x2:1, y2:0, colorStops: [
-          {offset:0, color:'#00529C'}, {offset:1, color:'#3B82C4'}
-        ]},
-        borderRadius: [0, 4, 4, 0]
-      },
-      barWidth: '65%'
-    }]
-  }));
-  window.addEventListener('resize', () => chart.resize());
-}
+  const el=document.getElementById('view-changes');
+  el.innerHTML=`
+<div style="margin-bottom:14px">
+  <div style="font-size:17px;font-weight:800;letter-spacing:-.01em">Perubahan &amp; Revisi Challenge Session</div>
+  <div style="font-size:11.5px;color:var(--t3);margin-top:3px">Highlight semua perubahan: switching, delta TPC, delta kebutuhan, perubahan scope, dan selisih vs minimum ISG</div>
+</div>
 
-function renderPie(id, mapObj) {
-  const c = getThemeColors();
-  const chart = ensureChart(id);
-  if (!chart) return;
-  const entries = Object.entries(mapObj).sort((a,b) => b[1]-a[1]);
-  const data = entries.map(([k,v]) => ({ name: k, value: v }));
-  chart.setOption(chartBase({
-    tooltip: { trigger: 'item', formatter: p => `<b>${p.name}</b><br>${p.value} proyek (${p.percent}%)` },
-    legend: { orient: 'vertical', right: 0, top: 'middle', textStyle: { color: c.text2, fontSize: 10 }, itemWidth: 9, itemHeight: 9 },
-    series: [{
-      type: 'pie', radius: ['50%','75%'], center: ['32%','50%'],
-      itemStyle: { borderColor: c.tooltipBg, borderWidth: 2 },
-      label: { show: false }, labelLine: { show: false },
-      data
-    }]
-  }));
-  window.addEventListener('resize', () => chart.resize());
-}
+<div class="kpi-grid">
+  ${kpi('Switching In','green',fmtRp(totIn,true),swIn.length+' proyek bertambah alokasi')}
+  ${kpi('Switching Out','red',fmtRp(totOut,true),swOut.length+' proyek berkurang alokasi')}
+  ${kpi('Delta TPC',totTpcD>=0?'green':'red',(totTpcD>=0?'+':'')+fmtRp(totTpcD,true),(tpcUp.length+tpcDn.length)+' proyek TPC berubah')}
+  ${kpi('Delta Kebutuhan 1 Thn',totKebD>=0?'green':'red',(totKebD>=0?'+':'')+fmtRp(totKebD,true),(kebUp.length+kebDn.length)+' proyek kebutuhan berubah')}
+  ${kpi('Perubahan Scope/Nama','sky',scope.length+' proyek','Nama proyek diubah')}
+  ${kpi('Selisih vs Min ISG','amber',fmtRp(totSel,true),selAll.length+' proyek ada gap')}
+  ${kpi('Unplanned Baru','orange',newP.length+' proyek',fmtRp(newP.reduce((s,p)=>s+p.alok,0),true))}
+  ${kpi('Batal / Ditunda','red',batal.length+' proyek',batal.filter(p=>p.status==='Batal').length+' batal, '+batal.filter(p=>p.status==='Ditunda').length+' ditunda')}
+</div>
 
-/* ============================================================
-   VIEW: CHANGES — highlight the revision activity
-   ============================================================ */
-function renderChanges() {
-  const rows = state.rows;
-  const changed = rows.filter(p => p.nominalSwitching !== 0);
-  const bertambah = changed.filter(p => p.nominalSwitching > 0).sort((a,b) => b.nominalSwitching - a.nominalSwitching);
-  const berkurang = changed.filter(p => p.nominalSwitching < 0).sort((a,b) => a.nominalSwitching - b.nominalSwitching);
-  const unplanned = rows.filter(p => (p.planned || '').toLowerCase() === 'unplanned');
-  const batal = rows.filter(p => p.status === 'Batal');
-  const ditunda = rows.filter(p => p.status === 'Ditunda');
+<div class="grid2" style="margin-bottom:12px">
+  <div class="panel">
+    <div class="ph"><div><div class="pt">🔺 Switching In — Bertambah Alokasi</div><div class="pd">Proyek penerima switching (urut nominal)</div></div><span class="chip g">${swIn.length}</span></div>
+    <div class="clist">${swIn.slice(0,15).map(p=>ciRow(p,'in',fmtRp(p.sw,true),'g','+')).join('')||empty()}</div>
+  </div>
+  <div class="panel">
+    <div class="ph"><div><div class="pt">🔻 Switching Out — Berkurang Alokasi</div><div class="pd">Proyek donor switching (urut nominal)</div></div><span class="chip r">${swOut.length}</span></div>
+    <div class="clist">${swOut.slice(0,15).map(p=>ciRow(p,'out',fmtRp(p.sw,true),'r','')).join('')||empty()}</div>
+  </div>
+</div>
 
-  const totalIn = bertambah.reduce((s,p) => s + p.nominalSwitching, 0);
-  const totalOut = Math.abs(berkurang.reduce((s,p) => s + p.nominalSwitching, 0));
-  const netChange = totalIn - totalOut;
+<div class="grid2" style="margin-bottom:12px">
+  <div class="panel">
+    <div class="ph"><div><div class="pt">📈 TPC Naik</div><div class="pd">Total Project Cost bertambah vs awal</div></div><span class="chip g">${tpcUp.length}</span></div>
+    <div class="clist">${tpcUp.slice(0,12).map(p=>ciDelta(p,'tpc-up',p.tpcA,p.tpcR,p.tpcDelta,'g')).join('')||empty()}</div>
+  </div>
+  <div class="panel">
+    <div class="ph"><div><div class="pt">📉 TPC Turun</div><div class="pd">Total Project Cost berkurang vs awal</div></div><span class="chip r">${tpcDn.length}</span></div>
+    <div class="clist">${tpcDn.slice(0,12).map(p=>ciDelta(p,'tpc-dn',p.tpcA,p.tpcR,p.tpcDelta,'r')).join('')||empty()}</div>
+  </div>
+</div>
 
-  // Delta analysis
-  const tpcChanged = rows.filter(p => p.hasTpcChange);
-  const kebChanged = rows.filter(p => p.hasKebChange);
-  const nameChanged = rows.filter(p => p.hasNameChange);
-  const withSelisih = rows.filter(p => p.hasSelisih && p.selisihAlokasi !== 0);
-  const totalTpcDelta = tpcChanged.reduce((s,p) => s + (p.tpcDelta || 0), 0);
-  const totalKebDelta = kebChanged.reduce((s,p) => s + (p.kebDelta || 0), 0);
-  const totalSelisih = withSelisih.reduce((s,p) => s + p.selisihAlokasi, 0);
+<div class="grid2" style="margin-bottom:12px">
+  <div class="panel">
+    <div class="ph"><div><div class="pt">📈 Kebutuhan Naik</div><div class="pd">Kebutuhan 1 Tahun bertambah vs awal</div></div><span class="chip g">${kebUp.length}</span></div>
+    <div class="clist">${kebUp.slice(0,12).map(p=>ciDelta(p,'keb-up',p.kebA,p.kebR,p.kebDelta,'g')).join('')||empty()}</div>
+  </div>
+  <div class="panel">
+    <div class="ph"><div><div class="pt">📉 Kebutuhan Turun</div><div class="pd">Kebutuhan 1 Tahun berkurang vs awal</div></div><span class="chip r">${kebDn.length}</span></div>
+    <div class="clist">${kebDn.slice(0,12).map(p=>ciDelta(p,'keb-dn',p.kebA,p.kebR,p.kebDelta,'r')).join('')||empty()}</div>
+  </div>
+</div>
 
-  const html = `
-    <div class="section-head">
-      <div>
-        <div class="section-title">Perubahan &amp; Revisi Challenge Session</div>
-        <div class="section-desc">Highlight semua perubahan: switching anggaran, perubahan TPC, perubahan kebutuhan, perubahan scope/nama, dan selisih vs minimum ISG</div>
-      </div>
-    </div>
+<div class="grid2" style="margin-bottom:12px">
+  <div class="panel">
+    <div class="ph"><div><div class="pt">✏️ Perubahan Scope / Nama Proyek</div><div class="pd">Nama awal ≠ nama akhir (redefinisi scope)</div></div><span class="chip b">${scope.length}</span></div>
+    <div class="clist">${scope.slice(0,12).map(p=>ciScope(p)).join('')||empty()}</div>
+  </div>
+  <div class="panel">
+    <div class="ph"><div><div class="pt">⚖️ Selisih vs Minimum Alokasi ISG</div><div class="pd">Gap antara yang diminta INF vs minimum ISG</div></div><span class="chip a">${selAll.length}</span></div>
+    <div class="clist">${selAll.slice(0,12).map(p=>ciSelisih(p)).join('')||empty()}</div>
+  </div>
+</div>
 
-    <!-- KPI Row 1: Switching -->
-    <div class="kpi-grid">
-      <div class="kpi-card success">
-        <div class="kpi-label">Switching In ↑</div>
-        <div class="kpi-value tnum">${fmtRp(totalIn, true)}</div>
-        <div class="kpi-sub">${bertambah.length} proyek bertambah alokasi</div>
-      </div>
-      <div class="kpi-card danger">
-        <div class="kpi-label">Switching Out ↓</div>
-        <div class="kpi-value tnum">${fmtRp(totalOut, true)}</div>
-        <div class="kpi-sub">${berkurang.length} proyek berkurang alokasi</div>
-      </div>
-      <div class="kpi-card ${netChange >= 0 ? 'primary' : 'warning'}">
-        <div class="kpi-label">Net Switching</div>
-        <div class="kpi-value tnum">${netChange >= 0 ? '+' : ''}${fmtRp(netChange, true)}</div>
-        <div class="kpi-sub">Selisih switching in - out</div>
-      </div>
-      <div class="kpi-card accent">
-        <div class="kpi-label">Unplanned (Baru)</div>
-        <div class="kpi-value tnum">${unplanned.length}</div>
-        <div class="kpi-sub">Total ${fmtRp(unplanned.reduce((s,p)=>s+p.alokasiUpdate,0), true)}</div>
-      </div>
-      <div class="kpi-card danger">
-        <div class="kpi-label">Dibatalkan / Ditunda</div>
-        <div class="kpi-value tnum">${batal.length + ditunda.length}</div>
-        <div class="kpi-sub">${batal.length} batal, ${ditunda.length} ditunda</div>
-      </div>
-    </div>
+<div class="grid2">
+  <div class="panel">
+    <div class="ph"><div><div class="pt">➕ Unplanned / Proyek Baru</div><div class="pd">Pengadaan baru dari Nota Dinas</div></div><span class="chip o">${newP.length}</span></div>
+    <div class="clist">${newP.slice(0,12).map(p=>ciRow(p,'new',fmtRp(p.alok,true),'o','')).join('')||empty()}</div>
+  </div>
+  <div class="panel">
+    <div class="ph"><div><div class="pt">❌ Batal &amp; Ditunda</div><div class="pd">Proyek yang dibatalkan / ditunda</div></div><span class="chip r">${batal.length}</span></div>
+    <div class="clist">${batal.slice(0,12).map(p=>ciRow(p,'cancel',fmtRp(p.alok||p.kebA,true),'','',true)).join('')||empty()}</div>
+  </div>
+</div>`;
 
-    <!-- KPI Row 2: Delta Analysis -->
-    <div class="kpi-grid" style="margin-bottom:20px;">
-      <div class="kpi-card ${totalTpcDelta >= 0 ? 'success' : 'danger'}">
-        <div class="kpi-label">Delta TPC (Total Project Cost)</div>
-        <div class="kpi-value tnum">${totalTpcDelta >= 0 ? '+' : ''}${fmtRp(totalTpcDelta, true)}</div>
-        <div class="kpi-sub">${tpcChanged.length} proyek TPC berubah</div>
-      </div>
-      <div class="kpi-card ${totalKebDelta >= 0 ? 'success' : 'danger'}">
-        <div class="kpi-label">Delta Kebutuhan 1 Tahun</div>
-        <div class="kpi-value tnum">${totalKebDelta >= 0 ? '+' : ''}${fmtRp(totalKebDelta, true)}</div>
-        <div class="kpi-sub">${kebChanged.length} proyek kebutuhan berubah</div>
-      </div>
-      <div class="kpi-card primary">
-        <div class="kpi-label">Perubahan Nama/Scope</div>
-        <div class="kpi-value tnum">${nameChanged.length}</div>
-        <div class="kpi-sub">Proyek dengan redefinisi scope</div>
-      </div>
-      <div class="kpi-card ${totalSelisih >= 0 ? 'success' : 'warning'}">
-        <div class="kpi-label">Total Selisih vs Min ISG</div>
-        <div class="kpi-value tnum">${fmtRp(totalSelisih, true)}</div>
-        <div class="kpi-sub">${withSelisih.length} proyek ada gap vs minimum ISG</div>
-      </div>
-    </div>
-
-    <!-- Switching Lists -->
-    <div class="grid grid-2" style="margin-bottom:12px;">
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">🔺 Bertambah Alokasi (Switching In)</div>
-            <div class="panel-desc">Top 15 proyek penerima switching</div>
-          </div>
-          <span class="chip success">${bertambah.length} proyek</span>
-        </div>
-        <div class="change-list">
-          ${bertambah.slice(0, 15).map(p => changeRow(p, 'in')).join('') || '<div class="empty"><div class="empty-desc">Tidak ada</div></div>'}
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">🔻 Berkurang Alokasi (Switching Out)</div>
-            <div class="panel-desc">Top 15 proyek donor switching</div>
-          </div>
-          <span class="chip danger">${berkurang.length} proyek</span>
-        </div>
-        <div class="change-list">
-          ${berkurang.slice(0, 15).map(p => changeRow(p, 'out')).join('') || '<div class="empty"><div class="empty-desc">Tidak ada</div></div>'}
-        </div>
-      </div>
-    </div>
-
-    <!-- TPC & Kebutuhan Delta -->
-    <div class="grid grid-2" style="margin-bottom:12px;">
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">📊 Perubahan TPC (Total Project Cost)</div>
-            <div class="panel-desc">Proyek yang TPC-nya berubah signifikan antara awal vs revisi</div>
-          </div>
-          <span class="chip primary">${tpcChanged.length} proyek</span>
-        </div>
-        <div class="change-list">
-          ${tpcChanged.sort((a,b) => Math.abs(b.tpcDelta) - Math.abs(a.tpcDelta)).slice(0, 15).map(p => deltaRow(p, 'tpc')).join('') || '<div class="empty"><div class="empty-desc">Tidak ada perubahan TPC</div></div>'}
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">📊 Perubahan Kebutuhan 1 Tahun</div>
-            <div class="panel-desc">Selisih kebutuhan awal vs revisi (yang diminta INF)</div>
-          </div>
-          <span class="chip primary">${kebChanged.length} proyek</span>
-        </div>
-        <div class="change-list">
-          ${kebChanged.sort((a,b) => Math.abs(b.kebDelta) - Math.abs(a.kebDelta)).slice(0, 15).map(p => deltaRow(p, 'keb')).join('') || '<div class="empty"><div class="empty-desc">Tidak ada perubahan kebutuhan</div></div>'}
-        </div>
-      </div>
-    </div>
-
-    <!-- Name Changes & Selisih vs ISG -->
-    <div class="grid grid-2" style="margin-bottom:12px;">
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">✏️ Perubahan Nama / Scope Proyek</div>
-            <div class="panel-desc">Proyek yang scope-nya diubah (nama awal ≠ nama akhir)</div>
-          </div>
-          <span class="chip accent">${nameChanged.length} proyek</span>
-        </div>
-        <div class="change-list">
-          ${nameChanged.slice(0, 15).map(p => nameChangeRow(p)).join('') || '<div class="empty"><div class="empty-desc">Tidak ada perubahan nama</div></div>'}
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">⚖️ Selisih vs Minimum Alokasi ISG</div>
-            <div class="panel-desc">Gap antara yang diminta INF (Keb Rev) vs minimum yang ditetapkan ISG</div>
-          </div>
-          <span class="chip warning">${withSelisih.length} proyek</span>
-        </div>
-        <div class="change-list">
-          ${withSelisih.sort((a,b) => Math.abs(b.selisihAlokasi) - Math.abs(a.selisihAlokasi)).slice(0, 15).map(p => selisihRow(p)).join('') || '<div class="empty"><div class="empty-desc">Tidak ada selisih</div></div>'}
-        </div>
-      </div>
-    </div>
-
-    <!-- Unplanned & Batal -->
-    <div class="grid grid-2">
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">➕ Unplanned / Proyek Baru</div>
-            <div class="panel-desc">Pengadaan baru dari Nota Dinas (tidak ada di RKA awal)</div>
-          </div>
-          <span class="chip accent">${unplanned.length} proyek</span>
-        </div>
-        <div class="change-list">
-          ${unplanned.slice(0, 12).map(p => unplannedRow(p)).join('') || '<div class="empty"><div class="empty-desc">Tidak ada</div></div>'}
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">❌ Batal &amp; Ditunda</div>
-            <div class="panel-desc">Proyek yang dibatalkan / ditunda setelah Challenge Session</div>
-          </div>
-          <span class="chip danger">${batal.length + ditunda.length} proyek</span>
-        </div>
-        <div class="change-list">
-          ${[...batal, ...ditunda].slice(0, 12).map(p => batalRow(p)).join('') || '<div class="empty"><div class="empty-desc">Tidak ada</div></div>'}
-        </div>
-      </div>
-    </div>
-
-    <style>
-      .change-list { max-height: 520px; overflow-y: auto; }
-      .change-item {
-        padding: 10px 12px; border-radius: var(--r-md);
-        margin-bottom: 6px;
-        border: 1px solid var(--border);
-        background: var(--bg-alt);
-        cursor: pointer;
-        transition: all var(--t-fast);
-        display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start;
-      }
-      .change-item:hover { background: var(--card); border-color: var(--border-strong); transform: translateY(-1px); box-shadow: var(--sh-1); }
-      .change-item.in { border-left: 3px solid var(--success); }
-      .change-item.out { border-left: 3px solid var(--danger); }
-      .change-item.unplanned { border-left: 3px solid var(--bri-orange); }
-      .change-item.batal { border-left: 3px solid var(--danger); opacity: 0.9; }
-      .change-item.delta-up { border-left: 3px solid var(--success); }
-      .change-item.delta-down { border-left: 3px solid var(--danger); }
-      .change-item.name-change { border-left: 3px solid var(--info); }
-      .change-item.selisih-neg { border-left: 3px solid var(--warning); }
-      .change-item.selisih-pos { border-left: 3px solid var(--success); }
-      .change-name { font-size: 12px; font-weight: 600; line-height: 1.4; margin-bottom: 4px;
-        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-      .change-meta { font-size: 10.5px; color: var(--text-3); display: flex; gap: 8px; flex-wrap: wrap; }
-      .change-amt { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
-      .change-amt.in { color: var(--success); }
-      .change-amt.out { color: var(--danger); }
-      .change-amt.unplanned { color: var(--bri-orange); }
-      .delta-detail { font-size: 10px; color: var(--text-3); margin-top: 3px; font-variant-numeric: tabular-nums; }
-      .delta-detail .old { text-decoration: line-through; opacity: 0.7; }
-      .delta-detail .arrow { margin: 0 4px; }
-      .delta-detail .new { font-weight: 600; color: var(--text-2); }
-      .name-old { font-size: 10.5px; color: var(--text-3); text-decoration: line-through; margin-top: 3px; line-height: 1.3;
-        display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-    </style>
-  `;
-  document.getElementById('view-changes').innerHTML = html;
-
-  // Attach click handlers
-  document.querySelectorAll('#view-changes .change-item').forEach(el => {
-    el.addEventListener('click', () => {
-      const idx = parseInt(el.dataset.idx, 10);
-      if (state.rows[idx]) openDrawer(state.rows[idx]);
-    });
+  el.querySelectorAll('.ci').forEach(el=>{
+    el.addEventListener('click',()=>{ const idx=parseInt(el.dataset.idx,10); if(S.rows[idx]) openDrawer(S.rows[idx]); });
   });
 }
 
-function changeRow(p, type) {
-  const sign = type === 'in' ? '+' : '';
-  return `
-    <div class="change-item ${type}" data-idx="${state.rows.indexOf(p)}">
-      <div>
-        <div class="change-name">${escapeHtml(p.name)}</div>
-        <div class="change-meta">
-          <span>${escapeHtml(p.idRka2026 || p.kodeNomor || '')}</span>
-          <span>·</span>
-          <span>${escapeHtml(p.dept || '-')}/${escapeHtml(p.tim || '-')}</span>
-          <span class="chip sm ${STATUS_COLORS[p.status] || 'neutral'}"><span class="chip-dot"></span>${escapeHtml(p.status)}</span>
-        </div>
-      </div>
-      <div class="change-amt ${type}">${sign}${fmtRp(p.nominalSwitching, true)}</div>
-    </div>`;
+/* ── CI ROW BUILDERS ── */
+function kpi(lbl,cls,val,sub){
+  return `<div class="kpi ${cls}"><div class="kpi-lbl">${lbl}</div><div class="kpi-val tnum">${val}</div><div class="kpi-sub">${sub}</div></div>`;
 }
-function unplannedRow(p) {
-  return `
-    <div class="change-item unplanned" data-idx="${state.rows.indexOf(p)}">
-      <div>
-        <div class="change-name">${escapeHtml(p.name)}</div>
-        <div class="change-meta">
-          <span>${escapeHtml(p.notaDinas || p.idRka2026 || '')}</span>
-          <span>·</span>
-          <span>${escapeHtml(p.dept || '-')}/${escapeHtml(p.tim || '-')}</span>
-          <span class="chip sm ${STATUS_COLORS[p.status] || 'neutral'}"><span class="chip-dot"></span>${escapeHtml(p.status)}</span>
-        </div>
-      </div>
-      <div class="change-amt unplanned">${fmtRp(p.alokasiUpdate, true)}</div>
-    </div>`;
-}
-function batalRow(p) {
-  return `
-    <div class="change-item batal" data-idx="${state.rows.indexOf(p)}">
-      <div>
-        <div class="change-name">${escapeHtml(p.name)}</div>
-        <div class="change-meta">
-          <span>${escapeHtml(p.idRka2026 || '')}</span>
-          <span>·</span>
-          <span>${escapeHtml(p.dept || '-')}/${escapeHtml(p.tim || '-')}</span>
-          <span class="chip sm ${STATUS_COLORS[p.status] || 'neutral'}"><span class="chip-dot"></span>${escapeHtml(p.status)}</span>
-        </div>
-      </div>
-      <div class="change-amt" style="color:var(--text-3);">${fmtRp(p.alokasiUpdate || p.kebutuhan1Thn, true)}</div>
-    </div>`;
-}
+function empty(){ return '<div class="empty">Tidak ada data</div>'; }
+function ciMeta(p){ return `<span>${esc(p.id||'-')}</span><span>·</span><span>${esc(p.dept||'-')}/${esc(p.tim||'-')}</span><span class="chip ${STATUS_COLOR[p.status]||''}"><span class="chip-dot"></span>${esc(p.status)}</span>`; }
 
-function deltaRow(p, type) {
-  const delta = type === 'tpc' ? (p.tpcDelta || 0) : (p.kebDelta || 0);
-  const oldVal = type === 'tpc' ? p.tpcAwal : p.kebutuhan1Thn;
-  const newVal = type === 'tpc' ? p.tpcRevisi : p.kebutuhan1ThnRev;
-  const cls = delta > 0 ? 'delta-up' : 'delta-down';
-  const sign = delta > 0 ? '+' : '';
-  return `
-    <div class="change-item ${cls}" data-idx="${state.rows.indexOf(p)}">
-      <div>
-        <div class="change-name">${escapeHtml(p.name)}</div>
-        <div class="change-meta">
-          <span>${escapeHtml(p.idRka2026 || '')}</span>
-          <span>·</span>
-          <span>${escapeHtml(p.dept || '-')}/${escapeHtml(p.tim || '-')}</span>
-        </div>
-        <div class="delta-detail">
-          <span class="old">${fmtRp(oldVal, true)}</span>
-          <span class="arrow">→</span>
-          <span class="new">${fmtRp(newVal, true)}</span>
-        </div>
-      </div>
-      <div class="change-amt ${delta > 0 ? 'in' : 'out'}">${sign}${fmtRp(delta, true)}</div>
-    </div>`;
+function ciRow(p,cls,amt,amtCls,prefix,grey){
+  return `<div class="ci ${cls}" data-idx="${S.rows.indexOf(p)}">
+    <div><div class="ci-name">${esc(p.name)}</div><div class="ci-meta">${ciMeta(p)}</div></div>
+    <div class="ci-amt ${grey?'':amtCls}">${prefix}${amt}</div>
+  </div>`;
 }
-
-function nameChangeRow(p) {
-  return `
-    <div class="change-item name-change" data-idx="${state.rows.indexOf(p)}">
-      <div>
-        <div class="change-name">${escapeHtml(p.name)}</div>
-        <div class="name-old">Sebelum: ${escapeHtml(p.nameAwal || '-')}</div>
-        <div class="change-meta">
-          <span>${escapeHtml(p.idRka2026 || '')}</span>
-          <span>·</span>
-          <span>${escapeHtml(p.dept || '-')}/${escapeHtml(p.tim || '-')}</span>
-        </div>
-      </div>
-      <div class="change-amt" style="color:var(--info);">${fmtRp(p.alokasiUpdate, true)}</div>
-    </div>`;
-}
-
-function selisihRow(p) {
-  const sel = p.selisihAlokasi || 0;
-  const cls = sel < 0 ? 'selisih-neg' : 'selisih-pos';
-  const sign = sel > 0 ? '+' : '';
-  return `
-    <div class="change-item ${cls}" data-idx="${state.rows.indexOf(p)}">
-      <div>
-        <div class="change-name">${escapeHtml(p.name)}</div>
-        <div class="change-meta">
-          <span>${escapeHtml(p.idRka2026 || '')}</span>
-          <span>·</span>
-          <span>${escapeHtml(p.dept || '-')}/${escapeHtml(p.tim || '-')}</span>
-        </div>
-        <div class="delta-detail">
-          <span>Keb Rev: ${fmtRp(p.kebutuhan1ThnRev, true)}</span>
-          <span class="arrow">vs Min:</span>
-          <span>${fmtRp(p.nominalMinAlokasi, true)}</span>
-        </div>
-      </div>
-      <div class="change-amt ${sel < 0 ? 'out' : 'in'}">${sign}${fmtRp(sel, true)}</div>
-    </div>`;
-}
-
-/* ============================================================
-   VIEW: PENGADAAN — searchable/filterable table
-   ============================================================ */
-function renderPengadaan() {
-  const rows = state.rows;
-  const statuses = [...new Set(rows.map(p => p.status))].sort();
-  const depts = [...new Set(rows.map(p => p.dept).filter(Boolean))].sort();
-  const kategoris = [...new Set(rows.map(p => p.kategori).filter(Boolean))].sort();
-  const rutins = [...new Set(rows.map(p => p.rutin).filter(Boolean))].sort();
-
-  const html = `
-    <div class="section-head">
-      <div>
-        <div class="section-title">Pengadaan — Semua Proyek</div>
-        <div class="section-desc">Tabel lengkap dengan filter &amp; pencarian. Klik baris untuk detail.</div>
-      </div>
+function ciDelta(p,cls,oldV,newV,delta,amtCls){
+  return `<div class="ci ${cls}" data-idx="${S.rows.indexOf(p)}">
+    <div>
+      <div class="ci-name">${esc(p.name)}</div>
+      <div class="ci-meta">${ciMeta(p)}</div>
+      <div class="ci-delta"><s>${fmtRp(oldV,true)}</s><span class="arr"> → </span><b>${fmtRp(newV,true)}</b></div>
     </div>
-
-    <div class="table-wrap">
-      <div class="table-toolbar">
-        <div class="search-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="pSearch" placeholder="Cari nama proyek, ID RKA, SPK, vendor…" />
-        </div>
-        <select class="filter-select" id="pStatus">
-          <option value="all">Semua Status</option>
-          ${statuses.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('')}
-        </select>
-        <select class="filter-select" id="pDept">
-          <option value="all">Semua DEPT</option>
-          ${depts.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('')}
-        </select>
-        <select class="filter-select" id="pKategori">
-          <option value="all">Semua Kategori</option>
-          ${kategoris.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join('')}
-        </select>
-        <select class="filter-select" id="pPlanned">
-          <option value="all">Planned &amp; Unplanned</option>
-          <option value="Planned">Planned</option>
-          <option value="Unplanned">Unplanned</option>
-        </select>
-        <select class="filter-select" id="pChange">
-          <option value="all">Semua Perubahan</option>
-          <option value="Bertambah">🔺 Bertambah</option>
-          <option value="Berkurang">🔻 Berkurang</option>
-          <option value="Baru (Unplanned)">➕ Baru Unplanned</option>
-          <option value="Batal">✕ Batal</option>
-          <option value="Tidak berubah">− Tidak berubah</option>
-        </select>
-        <button class="btn-ghost" id="pReset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>Reset</button>
-        <button class="btn-primary" id="pExportCsv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV</button>
-      </div>
-      <div class="table-scroll">
-        <table class="tbl">
-          <thead>
-            <tr>
-              <th class="sortable" data-sort="idRka2026">ID RKA</th>
-              <th class="sortable" data-sort="name">Nama Proyek</th>
-              <th class="sortable" data-sort="dept">DEPT / Tim</th>
-              <th>Status</th>
-              <th>Kategori</th>
-              <th class="sortable" data-sort="alokasiUpdate" style="text-align:right;">Alokasi Update</th>
-              <th class="sortable" data-sort="realisasi" style="text-align:right;">Realisasi</th>
-              <th class="sortable" data-sort="nominalSwitching" style="text-align:right;">Switching</th>
-              <th class="sortable" data-sort="serapanPct" style="text-align:right;">% Serap</th>
-            </tr>
-          </thead>
-          <tbody id="pTbody"></tbody>
-        </table>
-      </div>
-      <div class="table-footer">
-        <span id="pFooter">—</span>
-        <span>Klik header kolom untuk sort · Klik baris untuk detail</span>
-      </div>
+    <div class="ci-amt ${amtCls}">${sign(delta)}${fmtRp(delta,true)}</div>
+  </div>`;
+}
+function ciScope(p){
+  return `<div class="ci scope" data-idx="${S.rows.indexOf(p)}">
+    <div>
+      <div class="ci-name">${esc(p.name)}</div>
+      <div class="ci-old">Sebelum: ${esc(p.nameA||'-')}</div>
+      <div class="ci-meta">${ciMeta(p)}</div>
     </div>
-  `;
-  document.getElementById('view-pengadaan').innerHTML = html;
+    <div class="ci-amt b">${fmtRp(p.alok,true)}</div>
+  </div>`;
+}
+function ciSelisih(p){
+  const cls=p.sel<0?'gap':'in', amtCls=p.sel<0?'a':'g';
+  return `<div class="ci ${cls}" data-idx="${S.rows.indexOf(p)}">
+    <div>
+      <div class="ci-name">${esc(p.name)}</div>
+      <div class="ci-meta">${ciMeta(p)}</div>
+      <div class="ci-delta">Keb Rev: ${fmtRp(p.kebR,true)} <span class="arr">vs Min:</span> ${fmtRp(p.nomMin,true)}</div>
+    </div>
+    <div class="ci-amt ${amtCls}">${sign(p.sel)}${fmtRp(p.sel,true)}</div>
+  </div>`;
+}
 
-  // Apply current filter values
-  document.getElementById('pSearch').value = state.filter.search;
-  document.getElementById('pStatus').value = state.filter.status;
-  document.getElementById('pDept').value = state.filter.dept;
-  document.getElementById('pKategori').value = state.filter.kategori;
-  document.getElementById('pPlanned').value = state.filter.planned;
-  document.getElementById('pChange').value = state.filter.changeType;
+/* ── VIEW 2: SEMUA PROYEK ── */
+function renderProjects(){
+  const rows=S.rows;
+  const statuses=[...new Set(rows.map(p=>p.status))].sort();
+  const depts=[...new Set(rows.map(p=>p.dept).filter(Boolean))].sort();
 
-  // Events
-  document.getElementById('pSearch').addEventListener('input', e => { state.filter.search = e.target.value; renderPTable(); });
-  document.getElementById('pStatus').addEventListener('change', e => { state.filter.status = e.target.value; renderPTable(); });
-  document.getElementById('pDept').addEventListener('change', e => { state.filter.dept = e.target.value; renderPTable(); });
-  document.getElementById('pKategori').addEventListener('change', e => { state.filter.kategori = e.target.value; renderPTable(); });
-  document.getElementById('pPlanned').addEventListener('change', e => { state.filter.planned = e.target.value; renderPTable(); });
-  document.getElementById('pChange').addEventListener('change', e => { state.filter.changeType = e.target.value; renderPTable(); });
-  document.getElementById('pReset').addEventListener('click', () => {
-    state.filter = { search:'',status:'all',dept:'all',kategori:'all',rutin:'all',planned:'all',changeType:'all' };
-    renderPengadaan();
-  });
-  document.getElementById('pExportCsv').addEventListener('click', exportFilteredCsv);
-  document.querySelectorAll('#view-pengadaan th.sortable').forEach(th => {
-    th.addEventListener('click', () => {
-      const key = th.dataset.sort;
-      if (state.sort.key === key) state.sort.dir = state.sort.dir === 'asc' ? 'desc' : 'asc';
-      else { state.sort.key = key; state.sort.dir = 'desc'; }
+  document.getElementById('view-projects').innerHTML=`
+<div style="margin-bottom:14px">
+  <div style="font-size:17px;font-weight:800;letter-spacing:-.01em">Semua Proyek</div>
+  <div style="font-size:11.5px;color:var(--t3);margin-top:3px">Tabel lengkap dengan filter &amp; sort. Klik baris untuk detail.</div>
+</div>
+<div class="twrap">
+  <div class="tbar">
+    <div class="sbox">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="pQ" placeholder="Cari nama, ID RKA, vendor…" value="${esc(S.filter.q)}">
+    </div>
+    <select class="fsel" id="pStatus">
+      <option value="all">Semua Status</option>
+      ${statuses.map(s=>`<option value="${esc(s)}" ${S.filter.status===s?'selected':''}>${esc(s)}</option>`).join('')}
+    </select>
+    <select class="fsel" id="pDept">
+      <option value="all">Semua DEPT</option>
+      ${depts.map(d=>`<option value="${esc(d)}" ${S.filter.dept===d?'selected':''}>${esc(d)}</option>`).join('')}
+    </select>
+    <select class="fsel" id="pPlanned">
+      <option value="all">Planned &amp; Unplanned</option>
+      <option value="Planned" ${S.filter.planned==='Planned'?'selected':''}>Planned</option>
+      <option value="Unplanned" ${S.filter.planned==='Unplanned'?'selected':''}>Unplanned</option>
+    </select>
+    <select class="fsel" id="pChange">
+      <option value="all">Semua Perubahan</option>
+      <option value="sw">Ada Switching</option>
+      <option value="tpc">TPC Berubah</option>
+      <option value="keb">Kebutuhan Berubah</option>
+      <option value="scope">Nama Berubah</option>
+      <option value="new">Unplanned Baru</option>
+      <option value="batal">Batal/Ditunda</option>
+    </select>
+    <button onclick="resetFilter()" style="padding:7px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:11.5px;color:var(--t2);background:var(--card)">Reset</button>
+  </div>
+  <div class="tscroll">
+    <table>
+      <thead><tr>
+        <th data-k="id">ID RKA</th>
+        <th data-k="name">Nama Proyek</th>
+        <th data-k="dept">DEPT</th>
+        <th>Status</th>
+        <th data-k="alok" style="text-align:right">Alokasi Revisi</th>
+        <th data-k="rTot" style="text-align:right">Realisasi</th>
+        <th data-k="sw" style="text-align:right">Switching</th>
+        <th data-k="tpcDelta" style="text-align:right">Δ TPC</th>
+        <th data-k="kebDelta" style="text-align:right">Δ Kebutuhan</th>
+        <th data-k="serapan" style="text-align:right">% Serap</th>
+      </tr></thead>
+      <tbody id="pTbody"></tbody>
+    </table>
+  </div>
+  <div class="tfoot"><span id="pFoot"></span><span>Klik header untuk sort · Klik baris untuk detail</span></div>
+</div>`;
+
+  document.getElementById('pQ').addEventListener('input',e=>{S.filter.q=e.target.value;renderPTable();});
+  document.getElementById('pStatus').addEventListener('change',e=>{S.filter.status=e.target.value;renderPTable();});
+  document.getElementById('pDept').addEventListener('change',e=>{S.filter.dept=e.target.value;renderPTable();});
+  document.getElementById('pPlanned').addEventListener('change',e=>{S.filter.planned=e.target.value;renderPTable();});
+  document.getElementById('pChange').addEventListener('change',e=>{S.filter.change=e.target.value;renderPTable();});
+  document.querySelectorAll('#view-projects thead th[data-k]').forEach(th=>{
+    th.addEventListener('click',()=>{
+      const k=th.dataset.k;
+      S.sort.d=(S.sort.k===k&&S.sort.d==='desc')?'asc':'desc';
+      S.sort.k=k;
       renderPTable();
     });
   });
-
   renderPTable();
 }
 
-function filterRows() {
-  const f = state.filter;
-  const q = f.search.trim().toLowerCase();
-  return state.rows.filter(p => {
-    if (f.status !== 'all' && p.status !== f.status) return false;
-    if (f.dept !== 'all' && p.dept !== f.dept) return false;
-    if (f.kategori !== 'all' && p.kategori !== f.kategori) return false;
-    if (f.planned !== 'all' && p.planned !== f.planned) return false;
-    if (f.changeType !== 'all' && p.changeType !== f.changeType) return false;
-    if (q) {
-      const hay = [p.name, p.idRka2026, p.nomorSpk, p.principle, p.bp, p.namaAplikasi, p.notaDinas].join(' ').toLowerCase();
-      if (!hay.includes(q)) return false;
+function resetFilter(){
+  S.filter={q:'',status:'all',dept:'all',planned:'all',change:'all'};
+  renderProjects();
+}
+
+function filterRows(){
+  const f=S.filter, q=f.q.trim().toLowerCase();
+  return S.rows.filter(p=>{
+    if(f.status!=='all'&&p.status!==f.status) return false;
+    if(f.dept!=='all'&&p.dept!==f.dept) return false;
+    if(f.planned!=='all'&&p.planned!==f.planned) return false;
+    if(f.change!=='all'){
+      if(f.change==='sw'&&!p.hasSw) return false;
+      if(f.change==='tpc'&&!p.hasTpcChange) return false;
+      if(f.change==='keb'&&!p.hasKebChange) return false;
+      if(f.change==='scope'&&!p.hasNameChange) return false;
+      if(f.change==='new'&&!p.isNew) return false;
+      if(f.change==='batal'&&p.status!=='Batal'&&p.status!=='Ditunda') return false;
+    }
+    if(q){
+      const hay=[p.name,p.id,p.noSpk,p.principle,p.bp,p.aplikasi,p.nota].join(' ').toLowerCase();
+      if(!hay.includes(q)) return false;
     }
     return true;
   });
 }
 
-function renderPTable() {
-  const filtered = filterRows();
-  const sorted = filtered.slice().sort((a, b) => {
-    const k = state.sort.key;
-    const av = a[k], bv = b[k];
-    const dir = state.sort.dir === 'asc' ? 1 : -1;
-    if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dir;
-    return String(av || '').localeCompare(String(bv || '')) * dir;
-  });
-  // Update sort indicators
-  document.querySelectorAll('#view-pengadaan th.sortable').forEach(th => {
-    const active = th.dataset.sort === state.sort.key;
-    th.classList.toggle('sorted', active);
-    const ind = th.querySelector('.sort-ind');
-    if (ind) ind.remove();
-    if (active) {
-      const s = document.createElement('span');
-      s.className = 'sort-ind';
-      s.textContent = state.sort.dir === 'asc' ? '▲' : '▼';
-      th.appendChild(s);
-    }
+function renderPTable(){
+  const filtered=filterRows();
+  const k=S.sort.k, dir=S.sort.d==='asc'?1:-1;
+  const sorted=filtered.slice().sort((a,b)=>{
+    const av=a[k],bv=b[k];
+    if(typeof av==='number'&&typeof bv==='number') return (av-bv)*dir;
+    return String(av||'').localeCompare(String(bv||''))*dir;
   });
 
-  const totAlokasi = filtered.reduce((s,p) => s + p.alokasiUpdate, 0);
-  const totReal = filtered.reduce((s,p) => s + p.realisasi, 0);
-  const tbody = document.getElementById('pTbody');
-  const footer = document.getElementById('pFooter');
-  footer.innerHTML = `<b>${filtered.length}</b> proyek · Alokasi <b class="tnum">${fmtRp(totAlokasi, true)}</b> · Realisasi <b class="tnum">${fmtRp(totReal, true)}</b>`;
+  document.querySelectorAll('#view-projects thead th[data-k]').forEach(th=>{
+    th.classList.toggle('sorted',th.dataset.k===k);
+    th.textContent=th.textContent.replace(/ [▲▼]$/,'');
+    if(th.dataset.k===k) th.textContent+=' '+(S.sort.d==='asc'?'▲':'▼');
+  });
 
-  if (!sorted.length) {
-    tbody.innerHTML = `<tr><td colspan="9" style="padding:40px;text-align:center;color:var(--text-3);">Tidak ada proyek yang cocok dengan filter</td></tr>`;
-    return;
-  }
+  const totA=filtered.reduce((s,p)=>s+p.alok,0);
+  const totR=filtered.reduce((s,p)=>s+p.rTot,0);
+  document.getElementById('pFoot').innerHTML=`<b>${filtered.length}</b> proyek · Alokasi <b class="tnum">${fmtRp(totA,true)}</b> · Realisasi <b class="tnum">${fmtRp(totR,true)}</b>`;
 
-  tbody.innerHTML = sorted.map(p => {
-    const chg = p.nominalSwitching;
-    const chgClass = chg > 0 ? 'success' : chg < 0 ? 'danger' : 'neutral';
-    const chgSym = chg > 0 ? '↑' : chg < 0 ? '↓' : '—';
-    const stColor = STATUS_COLORS[p.status] || 'neutral';
-    const serapan = p.serapanPct;
-    const serapanColor = serapan >= 80 ? 'success' : serapan >= 40 ? 'warning' : serapan > 0 ? 'danger' : 'neutral';
-    return `
-      <tr data-idx="${state.rows.indexOf(p)}">
-        <td><span class="tnum" style="font-size:11px;color:var(--text-3);">${escapeHtml(p.idRka2026 || '-')}</span></td>
-        <td>
-          <div class="tbl-cell-name">${escapeHtml(p.name)}</div>
-          <div class="tbl-cell-sub">
-            ${p.planned ? `<span class="chip sm ${p.planned === 'Unplanned' ? 'accent' : 'info'}">${escapeHtml(p.planned)}</span>` : ''}
-            ${p.parentChild ? `<span class="chip sm" style="margin-left:4px;">${escapeHtml(p.parentChild)}</span>` : ''}
-            ${p.assetClass ? `<span class="chip sm" style="margin-left:4px;">${escapeHtml(p.assetClass)}</span>` : ''}
-          </div>
-        </td>
-        <td><span style="font-weight:600;">${escapeHtml(p.dept || '-')}</span><div class="tbl-cell-sub">${escapeHtml(p.tim || '')}</div></td>
-        <td><span class="chip ${stColor}"><span class="chip-dot"></span>${escapeHtml(p.status)}</span></td>
-        <td><span style="font-size:11px;">${escapeHtml(p.kategori || '-')}</span><div class="tbl-cell-sub">${escapeHtml(p.klasifikasi || '')}</div></td>
-        <td class="num">${fmt(p.alokasiUpdate)}</td>
-        <td class="num">${fmt(p.realisasi)}</td>
-        <td class="num"><span class="chip sm ${chgClass}">${chgSym} ${fmt(Math.abs(chg))}</span></td>
-        <td class="num"><span class="chip sm ${serapanColor}">${fmtPct(serapan)}</span></td>
-      </tr>
-    `;
+  const tbody=document.getElementById('pTbody');
+  if(!sorted.length){ tbody.innerHTML=`<tr><td colspan="10" class="empty">Tidak ada proyek yang cocok</td></tr>`; return; }
+
+  tbody.innerHTML=sorted.map(p=>{
+    const sc=p.serapan, scCls=sc>=80?'g':sc>=40?'a':'r';
+    const swCls=p.sw>0?'up':p.sw<0?'dn':'neu';
+    const tCls=p.tpcDelta>0?'up':p.tpcDelta<0?'dn':'neu';
+    const kCls=p.kebDelta>0?'up':p.kebDelta<0?'dn':'neu';
+    const tags=[
+      p.hasSw?`<span class="chip ${p.sw>0?'g':'r'}" style="font-size:9px">SW</span>`:'',
+      p.hasTpcChange?`<span class="chip b" style="font-size:9px">TPC</span>`:'',
+      p.hasNameChange?`<span class="chip o" style="font-size:9px">Scope</span>`:'',
+      p.isNew?`<span class="chip o" style="font-size:9px">Baru</span>`:'',
+    ].filter(Boolean).join(' ');
+    return `<tr data-idx="${S.rows.indexOf(p)}">
+      <td><span class="tnum" style="font-size:10.5px;color:var(--t3)">${esc(p.id||'-')}</span></td>
+      <td><div class="cell-name">${esc(p.name)}</div><div class="cell-sub">${tags}</div></td>
+      <td><b>${esc(p.dept||'-')}</b><div class="cell-sub">${esc(p.tim||'')}</div></td>
+      <td><span class="chip ${STATUS_COLOR[p.status]||''}"><span class="chip-dot"></span>${esc(p.status)}</span></td>
+      <td class="num">${fmtN(p.alok)}</td>
+      <td class="num">${fmtN(p.rTot)}</td>
+      <td class="num"><span class="dbadge ${swCls}">${p.sw!==0?(sign(p.sw)+fmtRp(p.sw,true)):'-'}</span></td>
+      <td class="num"><span class="dbadge ${tCls}">${p.tpcDelta!==0?(sign(p.tpcDelta)+fmtRp(p.tpcDelta,true)):'-'}</span></td>
+      <td class="num"><span class="dbadge ${kCls}">${p.kebDelta!==0?(sign(p.kebDelta)+fmtRp(p.kebDelta,true)):'-'}</span></td>
+      <td class="num"><span class="chip ${scCls}">${fmtPct(sc)}</span></td>
+    </tr>`;
   }).join('');
 
-  tbody.querySelectorAll('tr').forEach(tr => {
-    tr.addEventListener('click', () => openDrawer(state.rows[parseInt(tr.dataset.idx, 10)]));
+  tbody.querySelectorAll('tr').forEach(tr=>{
+    tr.addEventListener('click',()=>{ const p=S.rows[parseInt(tr.dataset.idx,10)]; if(p) openDrawer(p); });
   });
 }
 
-/* ============================================================
-   VIEW: RKA TI — switching flow & monthly cashout
-   ============================================================ */
-function renderRka() {
-  const agg = aggregate(state.rows);
+/* ── DRAWER ── */
+const drawer=document.getElementById('drawer');
+const ov=document.getElementById('ov');
+function openDrawer(p){
+  document.getElementById('dTitle').textContent=p.name;
+  document.getElementById('dMeta').innerHTML=`${esc(p.id||'-')} · ${esc(p.dept||'-')}/${esc(p.tim||'-')} · <span class="chip ${STATUS_COLOR[p.status]||''}">${esc(p.status)}</span>`;
 
-  // Switching pairs — parse from keterangan logs
-  const switchPairs = extractSwitchingPairs(state.rows);
-
-  const html = `
-    <div class="section-head">
-      <div>
-        <div class="section-title">RKA TI 2026 — Switching &amp; Cashout</div>
-        <div class="section-desc">Aliran switching antar proyek, realisasi vs prognosa per bulan, breakdown anggaran</div>
+  const deltaBoxes=[];
+  if(p.hasTpcChange) deltaBoxes.push(`
+    <div class="delta-box ${p.tpcDelta>0?'up':'dn'}">
+      <div style="flex:1">
+        <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:4px">Delta TPC</div>
+        <span class="old">${fmtRp(p.tpcA,true)}</span>
+        <span class="arr"> → </span>
+        <span class="new ${p.tpcDelta>0?'g':'r'}">${fmtRp(p.tpcR,true)}</span>
       </div>
+      <div class="badge ${p.tpcDelta>0?'g':'r'}" style="color:${p.tpcDelta>0?'var(--green)':'var(--red)'}">${sign(p.tpcDelta)}${fmtRp(p.tpcDelta,true)}</div>
+    </div>`);
+  if(p.hasKebChange) deltaBoxes.push(`
+    <div class="delta-box ${p.kebDelta>0?'up':'dn'}">
+      <div style="flex:1">
+        <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:4px">Delta Kebutuhan 1 Tahun</div>
+        <span class="old">${fmtRp(p.kebA,true)}</span>
+        <span class="arr"> → </span>
+        <span class="new ${p.kebDelta>0?'g':'r'}">${fmtRp(p.kebR,true)}</span>
+      </div>
+      <div class="badge" style="color:${p.kebDelta>0?'var(--green)':'var(--red)'}">${sign(p.kebDelta)}${fmtRp(p.kebDelta,true)}</div>
+    </div>`);
+  if(p.hasNameChange) deltaBoxes.push(`
+    <div class="delta-box" style="background:var(--sky-s)">
+      <div style="flex:1">
+        <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:4px">Perubahan Nama/Scope</div>
+        <div style="text-decoration:line-through;color:var(--t3);font-size:11px">${esc(p.nameA)}</div>
+        <div style="font-weight:600;color:var(--sky);font-size:11.5px;margin-top:2px">${esc(p.name)}</div>
+      </div>
+    </div>`);
+  if(p.hasSel&&p.sel!==0) deltaBoxes.push(`
+    <div class="delta-box ${p.sel<0?'dn':'up'}">
+      <div style="flex:1">
+        <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:4px">Selisih vs Minimum ISG</div>
+        <span style="color:var(--t2)">Keb Rev: ${fmtRp(p.kebR,true)}</span>
+        <span class="arr"> vs Min: </span>
+        <span style="color:var(--t2)">${fmtRp(p.nomMin,true)}</span>
+      </div>
+      <div class="badge" style="color:${p.sel<0?'var(--amber)':'var(--green)'}">${sign(p.sel)}${fmtRp(p.sel,true)}</div>
+    </div>`);
+
+  const swHtml=p.swLog.map(l=>{
+    const isIn=/bertambah/i.test(l.desc);
+    return `<div class="sw-row ${isIn?'sw-in':'sw-out'}">
+      <div class="sw-desc">${esc(l.desc)}${l.ip?`<br><a href="${l.ip.match(/https?:\/\/\S+/)?.[0]||'#'}" target="_blank" style="font-size:9.5px">${esc(l.ip)}</a>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('dBody').innerHTML=`
+    ${deltaBoxes.length?`<div style="margin-bottom:16px">${deltaBoxes.join('')}</div>`:''}
+    <div class="dgrid" style="margin-bottom:16px">
+      <div class="df"><div class="dl">Alokasi Revisi</div><div class="dv num">${fmtRp(p.alok)}</div></div>
+      <div class="df"><div class="dl">Realisasi YTD</div><div class="dv num">${fmtRp(p.rTot)}<div style="font-size:10px;color:var(--t3);margin-top:2px">${fmtPct(p.serapan)} terserap</div></div></div>
+      <div class="df"><div class="dl">TPC Revisi</div><div class="dv num">${fmtRp(p.tpcR||p.tpcA)}</div></div>
+      <div class="df"><div class="dl">Prognosa 2026</div><div class="dv num">${fmtRp(p.pTot)}</div></div>
+      <div class="df"><div class="dl">Nominal Switching</div><div class="dv num" style="color:${p.sw>0?'var(--green)':p.sw<0?'var(--red)':'inherit'}">${sign(p.sw)}${fmtRp(p.sw)}</div></div>
+      <div class="df"><div class="dl">Kategori / Klasifikasi</div><div class="dv">${esc(p.kategori||'-')} · ${esc(p.klasifikasi||'-')}</div></div>
     </div>
-
-    <div class="grid grid-2" style="margin-bottom:12px;">
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">Realisasi vs Prognosa Bulanan (Non-Kumulatif)</div>
-            <div class="panel-desc">Cashout per bulan — bar = realisasi, garis = prognosa</div>
-          </div>
-        </div>
-        <div class="chart-slot" id="chart-monthly"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">Komposisi Alokasi per Asset Class &amp; GL</div>
-            <div class="panel-desc">Sunburst — Investasi TI (Hardware/Software) → Asset Class</div>
-          </div>
-        </div>
-        <div class="chart-slot" id="chart-sunburst"></div>
-      </div>
-    </div>
-
-    <div class="panel" style="margin-bottom:12px;">
-      <div class="panel-head">
-        <div>
-          <div class="panel-title">Switching Flow — Donor → Recipient</div>
-          <div class="panel-desc">Pasangan switching teridentifikasi dari kolom keterangan IP. ${switchPairs.length} aliran terdeteksi.</div>
-        </div>
-      </div>
-      <div class="chart-slot lg" id="chart-sankey"></div>
-    </div>
-
-    <div class="grid grid-2">
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">Top 15 Proyek by Alokasi</div>
-            <div class="panel-desc">Proyek terbesar setelah revisi</div>
-          </div>
-        </div>
-        <div class="chart-slot lg" id="chart-top-projects"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">Heatmap Realisasi per DEPT × Bulan</div>
-            <div class="panel-desc">Intensitas realisasi tiap departemen sepanjang tahun</div>
-          </div>
-        </div>
-        <div class="chart-slot lg" id="chart-heatmap"></div>
-      </div>
-    </div>
+    ${p.nota?`<div class="df"><div class="dl">Nomor Nota Dinas</div><div class="dv">${esc(p.nota)}</div></div>`:''}
+    ${p.principle||p.bp?`<div class="df"><div class="dl">Vendor</div><div class="dv"><b>${esc(p.principle||'-')}</b>${p.bp?`<div style="font-size:10.5px;color:var(--t3);margin-top:2px;white-space:pre-line">${esc(p.bp)}</div>`:''}</div></div>`:''}
+    ${p.noSpk&&p.noSpk!=='-'?`<div class="df"><div class="dl">SPK</div><div class="dv tnum">${esc(p.noSpk)}${p.nomSpk?` · ${fmtRp(p.nomSpk,true)}`:''}</div></div>`:''}
+    ${swHtml?`<div class="df" style="margin-top:12px"><div class="dl">Riwayat Switching</div>${swHtml}</div>`:''}
+    ${p.ketRev?`<div class="df" style="margin-top:12px"><div class="dl">Keterangan Revisi</div><div class="dblock info">${esc(p.ketRev)}</div></div>`:''}
+    ${p.catatan?`<div class="df" style="margin-top:8px"><div class="dl">Catatan / Update Progress</div><div class="dblock">${esc(p.catatan)}</div></div>`:''}
   `;
-  document.getElementById('view-rka').innerHTML = html;
-
-  renderMonthly('chart-monthly', agg);
-  renderSunburst('chart-sunburst');
-  renderSankey('chart-sankey', switchPairs);
-  renderTopProjects('chart-top-projects');
-  renderHeatmap('chart-heatmap');
+  drawer.classList.add('open'); ov.classList.add('open');
 }
+function closeDrawer(){ drawer.classList.remove('open'); ov.classList.remove('open'); }
+document.getElementById('dClose').addEventListener('click',closeDrawer);
+ov.addEventListener('click',closeDrawer);
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer(); });
 
-function renderMonthly(id, agg) {
-  const c = getThemeColors();
-  const chart = ensureChart(id);
-  if (!chart) return;
-  chart.setOption(chartBase({
-    grid: { left: 60, right: 24, top: 36, bottom: 28 },
-    legend: { right: 0, top: 0, textStyle: { color: c.text2 } },
-    tooltip: { trigger: 'axis', valueFormatter: v => fmtRp(v, true) },
-    xAxis: { type: 'category', data: MONTH_LABELS, axisLabel: { color: c.text3 }, axisLine: { lineStyle: { color: c.grid } } },
-    yAxis: { type: 'value', axisLabel: { color: c.text3, formatter: v => fmtShort(v) }, splitLine: { lineStyle: { color: c.grid, type: 'dashed' } } },
-    series: [
-      {
-        name: 'Realisasi', type: 'bar', data: agg.realMonthly,
-        itemStyle: { color: '#00529C', borderRadius: [4,4,0,0] }, barMaxWidth: 28
-      },
-      {
-        name: 'Prognosa', type: 'line', smooth: true, data: agg.progMonthly,
-        itemStyle: { color: '#F37021' }, lineStyle: { width: 3 },
-        symbol: 'circle', symbolSize: 6
-      }
-    ]
-  }));
-  window.addEventListener('resize', () => chart.resize());
-}
-
-function renderSunburst(id) {
-  const c = getThemeColors();
-  const chart = ensureChart(id);
-  if (!chart) return;
-  // Build hierarchy: namaGL > assetClass
-  const tree = {};
-  state.rows.forEach(p => {
-    const gl = p.namaGL || '(lainnya)';
-    const ac = p.assetClass || '(lainnya)';
-    tree[gl] = tree[gl] || {};
-    tree[gl][ac] = (tree[gl][ac] || 0) + p.alokasiUpdate;
+/* ── AUTO-RENDER HOOK (injected by app.py / generate_dashboard.py) ── */
+window.__autoRender = function(data){
+  S.rows = data.projects.map(function(p,idx){
+    p.ri=idx;
+    p.real=p.real||[0,0,0,0,0,0,0,0,0,0,0,0];
+    p.prog=p.prog||[0,0,0,0,0,0,0,0,0,0,0,0];
+    p.progK=p.prog_kum||[0,0,0,0,0,0,0,0,0,0,0,0];
+    p.rTot=p.real_total||0; p.pTot=p.prog_total||0;
+    p.alok=p.alokasi_update||0; p.sw=p.nominal_switching||0;
+    p.sel=p.selisih_alokasi||0; p.nomMin=p.nominal_min_alokasi||0;
+    p.tpcA=p.tpc_awal||0; p.tpcR=p.tpc_revisi||0;
+    p.kebA=p.kebutuhan_1thn||0; p.kebR=p.kebutuhan_1thn_rev||0;
+    p.tpcDelta=p.tpc_delta||0; p.kebDelta=p.keb_delta||0;
+    p.id=p.id_rka_ti||''; p.pc=p.parent_child||'';
+    p.gl=p.nama_gl||''; p.ac=p.asset_class||'';
+    p.nameA=p.name_awal||''; p.nameR=p.name_rev||'';
+    p.ketRev=p.keterangan_revisi||''; p.catatan=p.catatan||'';
+    p.progress=p.update_progress||''; p.nota=p.nota_dinas||'';
+    p.aplikasi=p.nama_aplikasi||''; p.grpApp=p.grp_aplikasi||'';
+    p.noSpk=p.nomor_spk||''; p.nmSpk=p.nama_spk||''; p.nomSpk=p.nominal_spk||0;
+    p.swLog=p.switching_log||[];
+    p.hasTpcChange=p.has_tpc_change||false; p.hasKebChange=p.has_keb_change||false;
+    p.hasNameChange=p.has_name_change||false; p.hasSw=p.has_switching||false;
+    p.hasSel=p.has_selisih||false; p.isNew=p.is_new_unplanned||false;
+    Object.defineProperty(p,'serapan',{get:function(){return this.alok>0?(this.rTot/this.alok*100):0;},configurable:true});
+    return p;
   });
-  const data = Object.entries(tree).map(([gl, kids], i) => ({
-    name: gl,
-    itemStyle: { color: getThemeColors().palette[i % 12] },
-    children: Object.entries(kids).map(([ac, v]) => ({ name: ac, value: v }))
-  }));
-  chart.setOption(chartBase({
-    tooltip: { formatter: p => `<b>${p.name}</b><br>${fmtRp(p.value, true)}` },
-    series: [{
-      type: 'sunburst', data, radius: ['18%','92%'],
-      label: { color: '#fff', fontSize: 10, fontWeight: 600 },
-      itemStyle: { borderColor: c.tooltipBg, borderWidth: 2 },
-      levels: [{}, { r0:'18%', r:'58%', label:{rotate:'tangential'} }, { r0:'58%', r:'88%', label:{align:'right'} }]
-    }]
-  }));
-  window.addEventListener('resize', () => chart.resize());
-}
+  S.cutoff=data.cutoff_month||0;
+  renderDashboard();
+};
 
-function extractSwitchingPairs(rows) {
-  const pairs = [];
-  const idMap = new Map(rows.map(p => [p.idRka2026, p]));
-  rows.forEach(p => {
-    p.switchingLog.forEach(log => {
-      const desc = log.desc || '';
-      // Pattern: "Bertambah, sebesar Rp X dari [Nama Proyek] (ID-RKA)"
-      // Pattern: "Berkurang, sebesar Rp X ke [Nama Proyek] (ID-RKA)"
-      const match = desc.match(/(Bertambah|Berkurang)[^.]*?Rp\s*([\d.,]+)[^()]*\(([^)]+)\)/i);
-      if (match) {
-        const dir = /bertambah/i.test(match[1]) ? 'in' : 'out';
-        const amount = parseFloat(match[2].replace(/\./g,'').replace(/,/g,'.'));
-        const otherId = match[3].trim().replace(/^[\d\s]+\s+INF\s+/, '');
-        const other = idMap.get(otherId) || rows.find(x => x.idRka2026 && otherId.includes(x.idRka2026));
-        if (!isFinite(amount)) return;
-        if (dir === 'in') {
-          pairs.push({ source: other ? other.name : otherId, target: p.name, value: amount });
-        } else {
-          pairs.push({ source: p.name, target: other ? other.name : otherId, value: amount });
-        }
-      }
-    });
-  });
-  // Dedup
-  const uniq = new Map();
-  pairs.forEach(p => {
-    const key = p.source + '||' + p.target;
-    if (!uniq.has(key)) uniq.set(key, p);
-    else uniq.get(key).value = Math.max(uniq.get(key).value, p.value);
-  });
-  return Array.from(uniq.values()).filter(p => p.value > 0).sort((a,b) => b.value - a.value).slice(0, 30);
-}
-
-function renderSankey(id, pairs) {
-  const c = getThemeColors();
-  const chart = ensureChart(id);
-  if (!chart) return;
-  if (!pairs.length) {
-    chart.setOption(chartBase({
-      title: { text: 'Belum ada pasangan switching teridentifikasi.', left: 'center', top: 'middle',
-        textStyle: { color: c.text3, fontSize: 13, fontWeight: 400 } }
-    }));
-    return;
-  }
-  const nodeSet = new Set();
-  pairs.forEach(p => { nodeSet.add(p.source); nodeSet.add(p.target); });
-  const nodes = Array.from(nodeSet).map(n => ({ name: n }));
-  chart.setOption(chartBase({
-    tooltip: { trigger: 'item', formatter: p => {
-      if (p.dataType === 'edge') return `<b>${p.data.source}</b> → <b>${p.data.target}</b><br>${fmtRp(p.data.value, true)}`;
-      return `<b>${p.name}</b>`;
-    }},
-    series: [{
-      type: 'sankey',
-      data: nodes,
-      links: pairs,
-      emphasis: { focus: 'adjacency' },
-      label: { color: c.text2, fontSize: 10, formatter: p => p.name.length > 50 ? p.name.slice(0, 47) + '…' : p.name },
-      lineStyle: { color: 'gradient', curveness: 0.5, opacity: 0.55 },
-      nodeAlign: 'justify',
-      left: 8, right: 320, top: 10, bottom: 10
-    }]
-  }));
-  window.addEventListener('resize', () => chart.resize());
-}
-
-function renderTopProjects(id) {
-  const c = getThemeColors();
-  const chart = ensureChart(id);
-  if (!chart) return;
-  const top = state.rows.slice().sort((a,b) => b.alokasiUpdate - a.alokasiUpdate).slice(0, 15);
-  chart.setOption(chartBase({
-    grid: { left: 8, right: 24, top: 8, bottom: 24, containLabel: true },
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, valueFormatter: v => fmtRp(v, true) },
-    xAxis: { type: 'value', axisLabel: { color: c.text3, formatter: v => fmtShort(v) }, splitLine: { lineStyle: { color: c.grid, type: 'dashed' } } },
-    yAxis: {
-      type: 'category', data: top.map(p => p.name.length > 50 ? p.name.slice(0, 47)+'…' : p.name).reverse(),
-      axisLine: { lineStyle: { color: c.grid } }, axisLabel: { color: c.text2, fontSize: 10 }
-    },
-    series: [{
-      type: 'bar', data: top.map(p => p.alokasiUpdate).reverse(),
-      itemStyle: {
-        color: { type: 'linear', x:0, y:0, x2:1, y2:0, colorStops: [
-          {offset:0, color:'#00529C'}, {offset:1, color:'#F37021'}
-        ]},
-        borderRadius: [0,4,4,0]
-      },
-      barMaxWidth: 16
-    }]
-  }));
-  window.addEventListener('resize', () => chart.resize());
-}
-
-function renderHeatmap(id) {
-  const c = getThemeColors();
-  const chart = ensureChart(id);
-  if (!chart) return;
-  // Aggregate real per dept × month
-  const deptMap = {};
-  state.rows.forEach(p => {
-    const d = p.dept || '(lain)';
-    if (!deptMap[d]) deptMap[d] = Array(12).fill(0);
-    p.real.forEach((v, i) => deptMap[d][i] += v);
-  });
-  const depts = Object.keys(deptMap).filter(d => deptMap[d].some(v => v > 0));
-  const data = [];
-  let maxV = 0;
-  depts.forEach((d, di) => {
-    deptMap[d].forEach((v, mi) => {
-      data.push([mi, di, v]);
-      if (v > maxV) maxV = v;
-    });
-  });
-  chart.setOption(chartBase({
-    grid: { left: 50, right: 24, top: 24, bottom: 60, containLabel: true },
-    tooltip: { position: 'top', formatter: p => `<b>${depts[p.value[1]]}</b> · ${MONTH_LABELS_FULL[p.value[0]]}<br>${fmtRp(p.value[2], true)}` },
-    xAxis: { type: 'category', data: MONTH_LABELS, axisLine: { lineStyle: { color: c.grid } }, axisLabel: { color: c.text3 }, splitArea: { show: true } },
-    yAxis: { type: 'category', data: depts, axisLine: { lineStyle: { color: c.grid } }, axisLabel: { color: c.text2, fontSize: 11 } },
-    visualMap: {
-      min: 0, max: maxV || 1, calculable: false, orient: 'horizontal', left: 'center', bottom: 6,
-      textStyle: { color: c.text3, fontSize: 10 },
-      inRange: { color: ['#F6F8FB','#A9C7E5','#3B82C4','#00529C','#002D58'] }
-    },
-    series: [{
-      type: 'heatmap', data,
-      label: { show: false },
-      itemStyle: { borderColor: c.tooltipBg, borderWidth: 1 },
-      emphasis: { itemStyle: { shadowColor: 'rgba(0,0,0,.3)', shadowBlur: 8 } }
-    }]
-  }));
-  window.addEventListener('resize', () => chart.resize());
-}
-
-/* ============================================================
-   VIEW: CJE0 — multi-year projection
-   ============================================================ */
-function renderCje0() {
-  // Parse all "Estimasi realisasi maksimum tahun XXXX" from keteranganRevisi/catatan/keteranganSwitching
-  const yearTotals = {};
-  const yearRows = {};
-  state.rows.forEach(p => {
-    const text = [p.keteranganRevisi, p.catatan, ...p.switchingLog.map(l => l.desc)].join('\n');
-    const re = /tahun\s*(20\d\d)\s*:?\s*Rp\s*([\d.,]+)/gi;
-    let m;
-    while ((m = re.exec(text)) !== null) {
-      const year = parseInt(m[1], 10);
-      const amt = parseFloat(m[2].replace(/\./g,'').replace(/,/g,'.'));
-      if (!isFinite(amt)) continue;
-      yearTotals[year] = (yearTotals[year] || 0) + amt;
-      yearRows[year] = yearRows[year] || [];
-      yearRows[year].push({ p, amt });
-    }
-  });
-
-  // Also include 2026 alokasi update
-  if (!yearTotals[2026]) yearTotals[2026] = state.rows.reduce((s,p) => s + p.alokasiUpdate, 0);
-
-  const years = Object.keys(yearTotals).map(Number).sort();
-  const totalMultiyear = years.reduce((s,y) => s + yearTotals[y], 0);
-
-  const html = `
-    <div class="section-head">
-      <div>
-        <div class="section-title">CJE0 — Cash Journey Estimation (Multi-Year)</div>
-        <div class="section-desc">Proyeksi cashout multi-tahun berdasarkan estimasi termin pembayaran (DP, delivery, implementasi, maintenance) yang tertulis di kolom keterangan</div>
-      </div>
-    </div>
-
-    <div class="kpi-grid">
-      <div class="kpi-card primary">
-        <div class="kpi-label">Total Multi-Year Commitment</div>
-        <div class="kpi-value tnum">${fmtRp(totalMultiyear, true)}</div>
-        <div class="kpi-sub">Mencakup ${years.length} tahun: ${years.join(', ')}</div>
-      </div>
-      ${years.slice(0, 5).map(y => {
-        const isCur = y === 2026;
-        return `
-          <div class="kpi-card ${isCur ? 'accent' : 'neutral'}">
-            <div class="kpi-label">${y}${isCur ? ' (Aktif)' : ''}</div>
-            <div class="kpi-value tnum">${fmtRp(yearTotals[y], true)}</div>
-            <div class="kpi-sub">${(yearRows[y] || []).length} entri estimasi</div>
-          </div>`;
-      }).join('')}
-    </div>
-
-    <div class="grid grid-2" style="margin-bottom:12px;">
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">Proyeksi Cashout per Tahun</div>
-            <div class="panel-desc">Total komitmen vs alokasi tahun berjalan</div>
-          </div>
-        </div>
-        <div class="chart-slot" id="chart-multiyear"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">Top Kontribusi Multi-Year (≥ 2027)</div>
-            <div class="panel-desc">Proyek dengan estimasi cashout terbesar di tahun mendatang</div>
-          </div>
-        </div>
-        <div class="chart-slot" id="chart-future"></div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-head">
-        <div>
-          <div class="panel-title">Detail Estimasi per Tahun</div>
-          <div class="panel-desc">Klik baris untuk melihat detail proyek</div>
-        </div>
-      </div>
-      <div style="max-height:480px;overflow-y:auto;">
-        ${years.map(y => `
-          <details ${y === 2026 ? 'open' : ''} style="border-bottom:1px solid var(--border);padding:10px 4px;">
-            <summary style="cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:600;font-size:13px;">
-              <span>Tahun ${y}</span>
-              <span class="chip primary">${(yearRows[y] || []).length} entri</span>
-              <span class="tnum" style="margin-left:auto;color:var(--bri-blue);">${fmtRp(yearTotals[y], true)}</span>
-            </summary>
-            <div style="margin-top:8px;padding-left:8px;">
-              ${y === 2026
-                ? `<div style="font-size:11px;color:var(--text-3);padding:8px;">Tahun aktif — total alokasi update agregat. Lihat halaman Pengadaan untuk rincian per proyek.</div>`
-                : (yearRows[y] || []).slice().sort((a,b) => b.amt - a.amt).slice(0, 30).map(({p, amt}) => `
-                  <div class="change-item" data-idx="${state.rows.indexOf(p)}" style="margin-bottom:4px;">
-                    <div>
-                      <div class="change-name">${escapeHtml(p.name)}</div>
-                      <div class="change-meta">
-                        <span>${escapeHtml(p.idRka2026 || '-')}</span>
-                        <span>·</span>
-                        <span>${escapeHtml(p.dept || '-')}</span>
-                      </div>
-                    </div>
-                    <div class="change-amt" style="color:var(--bri-blue);">${fmtRp(amt, true)}</div>
-                  </div>
-                `).join('')
-              }
-            </div>
-          </details>
-        `).join('')}
-      </div>
-    </div>
-  `;
-  document.getElementById('view-cje0').innerHTML = html;
-
-  renderMultiYear('chart-multiyear', years, yearTotals);
-  renderFutureProjects('chart-future', yearRows, years);
-
-  document.querySelectorAll('#view-cje0 .change-item').forEach(el => {
-    el.addEventListener('click', () => openDrawer(state.rows[parseInt(el.dataset.idx, 10)]));
-  });
-}
-
-function renderMultiYear(id, years, totals) {
-  const c = getThemeColors();
-  const chart = ensureChart(id);
-  if (!chart) return;
-  chart.setOption(chartBase({
-    grid: { left: 60, right: 24, top: 16, bottom: 28 },
-    tooltip: { trigger: 'axis', valueFormatter: v => fmtRp(v, true) },
-    xAxis: { type: 'category', data: years, axisLine: { lineStyle: { color: c.grid } }, axisLabel: { color: c.text2 } },
-    yAxis: { type: 'value', axisLabel: { color: c.text3, formatter: v => fmtShort(v) }, splitLine: { lineStyle: { color: c.grid, type: 'dashed' } } },
-    series: [{
-      type: 'bar', data: years.map(y => totals[y]),
-      itemStyle: {
-        color: p => p.dataIndex === years.indexOf(2026) ? '#F37021' : '#00529C',
-        borderRadius: [6,6,0,0]
-      },
-      label: { show: true, position: 'top', formatter: p => fmtShort(p.value), color: c.text2, fontSize: 10 },
-      barMaxWidth: 60
-    }]
-  }));
-  window.addEventListener('resize', () => chart.resize());
-}
-
-function renderFutureProjects(id, yearRows, years) {
-  const c = getThemeColors();
-  const chart = ensureChart(id);
-  if (!chart) return;
-  const future = years.filter(y => y > 2026);
-  const merged = {};
-  future.forEach(y => (yearRows[y] || []).forEach(({p, amt}) => {
-    merged[p.name] = (merged[p.name] || 0) + amt;
-  }));
-  const top = Object.entries(merged).sort((a,b) => b[1]-a[1]).slice(0, 10);
-  if (!top.length) {
-    chart.setOption(chartBase({
-      title: { text: 'Belum ada estimasi tahun > 2026', left: 'center', top: 'middle',
-        textStyle: { color: c.text3, fontSize: 13, fontWeight: 400 } }
-    }));
-    return;
-  }
-  chart.setOption(chartBase({
-    grid: { left: 8, right: 24, top: 12, bottom: 24, containLabel: true },
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, valueFormatter: v => fmtRp(v, true) },
-    xAxis: { type: 'value', axisLabel: { color: c.text3, formatter: v => fmtShort(v) }, splitLine: { lineStyle: { color: c.grid, type: 'dashed' } } },
-    yAxis: {
-      type: 'category',
-      data: top.map(([n]) => n.length > 45 ? n.slice(0, 42) + '…' : n).reverse(),
-      axisLine: { lineStyle: { color: c.grid } }, axisLabel: { color: c.text2, fontSize: 10 }
-    },
-    series: [{
-      type: 'bar', data: top.map(t => t[1]).reverse(),
-      itemStyle: { color: '#13A888', borderRadius: [0,4,4,0] }, barMaxWidth: 14
-    }]
-  }));
-  window.addEventListener('resize', () => chart.resize());
-}
-
-/* ============================================================
-   DRAWER — project detail
-   ============================================================ */
-const drawer = document.getElementById('drawer');
-const drawerOverlay = document.getElementById('drawerOverlay');
-function openDrawer(p) {
-  if (!p) return;
-  document.getElementById('drawerTitle').textContent = p.name;
-  document.getElementById('drawerMeta').innerHTML = `
-    ${escapeHtml(p.idRka2026 || '-')} · ${escapeHtml(p.dept || '-')}/${escapeHtml(p.tim || '-')} · 
-    <span class="chip sm ${STATUS_COLORS[p.status] || 'neutral'}">${escapeHtml(p.status)}</span>
-  `;
-  const body = document.getElementById('drawerBody');
-
-  // Switching log items
-  let switchHtml = '';
-  if (p.switchingLog && p.switchingLog.length) {
-    switchHtml = '<div class="dfield"><div class="dfield-label">📋 Riwayat Switching</div>';
-    p.switchingLog.forEach(log => {
-      if (!log.desc) return;
-      const isIn = /bertambah/i.test(log.desc);
-      const isOut = /berkurang/i.test(log.desc);
-      const cls = isIn ? 'in' : isOut ? 'out' : '';
-      switchHtml += `
-        <div class="switch-row ${cls}">
-          <div class="desc">${escapeHtml(log.desc)}${log.ip ? `<br><a href="${extractUrl(log.ip)}" target="_blank" rel="noopener" style="font-size:10px;">${escapeHtml(log.ip)}</a>` : ''}</div>
-        </div>`;
-    });
-    switchHtml += '</div>';
-  }
-
-  body.innerHTML = `
-    <div class="dfield-grid">
-      <div class="dfield">
-        <div class="dfield-label">Total Project Cost (TPC)</div>
-        <div class="dfield-value num">${fmtRp(p.tpcRevisi || p.tpcAwal)}</div>
-        ${p.tpcAwal !== p.tpcRevisi && p.tpcAwal ? `<div style="font-size:10px;color:var(--text-3);margin-top:2px;">Awal: ${fmtRp(p.tpcAwal)}</div>` : ''}
-      </div>
-      <div class="dfield">
-        <div class="dfield-label">Alokasi Update 2026</div>
-        <div class="dfield-value num">${fmtRp(p.alokasiUpdate)}</div>
-        ${p.kebutuhan1Thn !== p.alokasiUpdate ? `<div style="font-size:10px;color:var(--text-3);margin-top:2px;">Awal: ${fmtRp(p.kebutuhan1Thn)}</div>` : ''}
-      </div>
-      <div class="dfield">
-        <div class="dfield-label">Realisasi YTD</div>
-        <div class="dfield-value num">${fmtRp(p.realisasi)}</div>
-        <div style="font-size:10px;color:var(--text-3);margin-top:2px;">
-          <span class="chip sm ${p.serapanPct >= 80 ? 'success' : p.serapanPct >= 40 ? 'warning' : 'danger'}">${fmtPct(p.serapanPct)} terserap</span>
-        </div>
-      </div>
-      <div class="dfield">
-        <div class="dfield-label">Prognosa 2026</div>
-        <div class="dfield-value num">${fmtRp(p.prognosaTotal)}</div>
-      </div>
-      <div class="dfield">
-        <div class="dfield-label">Nominal Switching</div>
-        <div class="dfield-value num" style="color:${p.nominalSwitching > 0 ? 'var(--success)' : p.nominalSwitching < 0 ? 'var(--danger)' : 'inherit'};">
-          ${p.nominalSwitching > 0 ? '+' : ''}${fmtRp(p.nominalSwitching)}
-        </div>
-      </div>
-      <div class="dfield">
-        <div class="dfield-label">Status / Update</div>
-        <div class="dfield-value">${escapeHtml(p.status)}<div style="font-size:10px;color:var(--text-3);margin-top:2px;">${escapeHtml(p.updateProgress)}</div></div>
-      </div>
-    </div>
-
-    <div class="dfield">
-      <div class="dfield-label">Klasifikasi</div>
-      <div class="dfield-value" style="display:flex;flex-wrap:wrap;gap:6px;">
-        ${p.kategori ? `<span class="chip primary">${escapeHtml(p.kategori)}</span>` : ''}
-        ${p.klasifikasi ? `<span class="chip info">${escapeHtml(p.klasifikasi)}</span>` : ''}
-        ${p.rutin ? `<span class="chip">${escapeHtml(p.rutin)}</span>` : ''}
-        ${p.baru ? `<span class="chip ${p.baru === 'Baru' ? 'accent' : ''}">${escapeHtml(p.baru)}</span>` : ''}
-        ${p.planned ? `<span class="chip ${p.planned === 'Unplanned' ? 'accent' : 'info'}">${escapeHtml(p.planned)}</span>` : ''}
-        ${p.parentChild ? `<span class="chip">${escapeHtml(p.parentChild)}</span>` : ''}
-        ${p.assetClass ? `<span class="chip">${escapeHtml(p.assetClass)}</span>` : ''}
-      </div>
-    </div>
-
-    ${p.notaDinas ? `
-      <div class="dfield">
-        <div class="dfield-label">Nomor Nota Dinas</div>
-        <div class="dfield-value tnum">${escapeHtml(p.notaDinas)}</div>
-      </div>` : ''}
-
-    ${p.namaAplikasi || p.grpAplikasi ? `
-      <div class="dfield">
-        <div class="dfield-label">Aplikasi / Service yang Didukung</div>
-        <div class="dfield-value">${escapeHtml(p.namaAplikasi || '-')} ${p.grpAplikasi ? `<span class="chip sm">${escapeHtml(p.grpAplikasi)}</span>` : ''}</div>
-      </div>` : ''}
-
-    ${p.programKerja ? `
-      <div class="dfield">
-        <div class="dfield-label">Program Kerja JPS</div>
-        <div class="dfield-value">${escapeHtml(p.programKerja)}</div>
-      </div>` : ''}
-
-    ${p.principle || p.bp ? `
-      <div class="dfield">
-        <div class="dfield-label">Vendor</div>
-        <div class="dfield-value">
-          ${p.principle ? `<div style="font-weight:600;">${escapeHtml(p.principle)}</div>` : ''}
-          ${p.bp ? `<div style="font-size:11px;color:var(--text-3);margin-top:2px;white-space:pre-line;">${escapeHtml(p.bp)}</div>` : ''}
-        </div>
-      </div>` : ''}
-
-    ${p.nomorSpk && p.nomorSpk !== '-' ? `
-      <div class="dfield">
-        <div class="dfield-label">SPK</div>
-        <div class="dfield-value">
-          <div class="tnum" style="font-weight:600;">${escapeHtml(p.nomorSpk)}</div>
-          ${p.nominalSpk ? `<div style="font-size:11px;color:var(--text-3);margin-top:2px;" class="tnum">Nominal: ${fmtRp(p.nominalSpk)}</div>` : ''}
-          ${p.spkMulai || p.spkSelesai ? `<div style="font-size:11px;color:var(--text-3);">Periode: ${escapeHtml(p.spkMulai)} → ${escapeHtml(p.spkSelesai)}</div>` : ''}
-        </div>
-      </div>` : ''}
-
-    <div class="dfield">
-      <div class="dfield-label">📊 Realisasi vs Prognosa Bulanan</div>
-      <div id="drawerChart" style="width:100%;height:220px;margin-top:8px;"></div>
-    </div>
-
-    ${switchHtml}
-
-    ${p.keteranganRevisi ? `<div class="dfield"><div class="dfield-label">📝 Keterangan Revisi</div><div class="info-block info">${escapeHtml(p.keteranganRevisi)}</div></div>` : ''}
-    ${p.catatan ? `<div class="dfield"><div class="dfield-label">💬 Catatan / Update Progress</div><div class="info-block">${escapeHtml(p.catatan)}</div></div>` : ''}
-  `;
-
-  drawer.classList.add('open');
-  drawerOverlay.classList.add('open');
-
-  // Render mini chart in drawer
-  setTimeout(() => {
-    const dom = document.getElementById('drawerChart');
-    if (!dom) return;
-    const c = getThemeColors();
-    const chart = echarts.init(dom);
-    chart.setOption(chartBase({
-      grid: { left: 50, right: 16, top: 30, bottom: 24 },
-      legend: { right: 0, top: 0, textStyle: { color: c.text2, fontSize: 10 } },
-      tooltip: { trigger: 'axis', valueFormatter: v => fmtRp(v, true) },
-      xAxis: { type: 'category', data: MONTH_LABELS, axisLine: { lineStyle: { color: c.grid } }, axisLabel: { color: c.text3, fontSize: 9 } },
-      yAxis: { type: 'value', axisLabel: { color: c.text3, fontSize: 9, formatter: v => fmtShort(v) }, splitLine: { lineStyle: { color: c.grid, type: 'dashed' } } },
-      series: [
-        { name: 'Realisasi', type: 'bar', data: p.real, itemStyle: { color: '#00529C', borderRadius: [3,3,0,0] }, barMaxWidth: 14 },
-        { name: 'Prognosa', type: 'line', smooth: true, data: p.prog, itemStyle: { color: '#F37021' }, lineStyle: { width: 2 }, symbol: 'circle', symbolSize: 5 }
-      ]
-    }));
-  }, 100);
-}
-function closeDrawer() {
-  drawer.classList.remove('open');
-  drawerOverlay.classList.remove('open');
-}
-document.getElementById('drawerClose').addEventListener('click', closeDrawer);
-drawerOverlay.addEventListener('click', closeDrawer);
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
-function extractUrl(s) {
-  const m = String(s).match(/https?:\/\/\S+/);
-  return m ? m[0] : '#';
-}
-
-/* ============================================================
-   EXPORT
-   ============================================================ */
-document.getElementById('btnExport').addEventListener('click', () => {
-  const choices = [
-    { label: 'CSV (data terfilter)', fn: exportFilteredCsv },
-    { label: 'Excel (semua data parsed)', fn: exportXlsx },
-    { label: 'PNG (screenshot view aktif)', fn: exportPng },
-    { label: 'PDF (print)', fn: () => window.print() }
-  ];
-  // Simple menu
-  const existing = document.getElementById('expMenu'); if (existing) existing.remove();
-  const menu = document.createElement('div');
-  menu.id = 'expMenu';
-  menu.style.cssText = `position:fixed;right:20px;top:62px;background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:var(--sh-3);z-index:300;padding:6px;min-width:240px;`;
-  choices.forEach(c => {
-    const b = document.createElement('button');
-    b.textContent = c.label;
-    b.style.cssText = `display:block;width:100%;text-align:left;padding:8px 12px;border-radius:6px;font-size:12px;color:var(--text-1);`;
-    b.onmouseover = () => b.style.background = 'var(--bg-alt)';
-    b.onmouseout = () => b.style.background = 'transparent';
-    b.onclick = () => { menu.remove(); c.fn(); };
-    menu.appendChild(b);
-  });
-  document.body.appendChild(menu);
-  setTimeout(() => document.addEventListener('click', function once(e){
-    if (!menu.contains(e.target)) { menu.remove(); document.removeEventListener('click', once); }
-  }), 0);
-});
-
-function exportFilteredCsv() {
-  const rows = state.view === 'pengadaan' ? filterRows() : state.rows;
-  const headers = ['ID RKA','Nama Proyek','DEPT','Tim','Status','Kategori','Klasifikasi','Planned','Parent/Child',
-                   'Asset Class','Alokasi Update','Realisasi','Prognosa','Switching','Selisih','% Serap',
-                   'Nomor SPK','Principle','BP','Mulai','Selesai','Update Progress','Catatan'];
-  const csv = [headers.join(',')];
-  rows.forEach(p => {
-    const row = [p.idRka2026, p.name, p.dept, p.tim, p.status, p.kategori, p.klasifikasi, p.planned, p.parentChild,
-      p.assetClass, p.alokasiUpdate, p.realisasi, p.prognosaTotal, p.nominalSwitching, p.selisihAlokasi, p.serapanPct.toFixed(2),
-      p.nomorSpk, p.principle, p.bp, p.mulai, p.selesai, p.updateProgress, p.catatan];
-    csv.push(row.map(c => '"' + String(c == null ? '' : c).replace(/"/g, '""').replace(/\n/g,' ') + '"').join(','));
-  });
-  downloadBlob(new Blob(['\uFEFF' + csv.join('\n')], { type: 'text/csv;charset=utf-8' }), `challenge-session-${Date.now()}.csv`);
-}
-
-function exportXlsx() {
-  const headers = ['ID RKA','Nama Proyek','DEPT','Tim','Status','Kategori','Klasifikasi','Planned','Asset Class',
-                   'Alokasi Update','Realisasi','Prognosa','Switching','% Serap','Nomor SPK','Principle','BP','Catatan'];
-  const data = [headers];
-  state.rows.forEach(p => {
-    data.push([p.idRka2026, p.name, p.dept, p.tim, p.status, p.kategori, p.klasifikasi, p.planned, p.assetClass,
-      p.alokasiUpdate, p.realisasi, p.prognosaTotal, p.nominalSwitching, p.serapanPct, p.nomorSpk, p.principle, p.bp, p.catatan]);
-  });
-  const ws = XLSX.utils.aoa_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Challenge Session');
-  XLSX.writeFile(wb, `challenge-session-${Date.now()}.xlsx`);
-}
-
-function exportPng() {
-  const target = document.querySelector('.view:not(.hidden)');
-  if (!target) return;
-  showLoading('Membuat PNG…');
-  html2canvas(target, {
-    backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg').trim(),
-    scale: 2, useCORS: true, logging: false
-  }).then(canvas => {
-    canvas.toBlob(blob => {
-      hideLoading();
-      downloadBlob(blob, `challenge-session-${state.view}-${Date.now()}.png`);
-    });
-  }).catch(err => { hideLoading(); console.error(err); alert('Gagal export PNG: ' + err.message); });
-}
-
-function downloadBlob(blob, name) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = name;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 200);
-}
-
-/* ============================================================
-   Resize handling
-   ============================================================ */
-let resizeT;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeT);
-  resizeT = setTimeout(() => {
-    Object.values(state.chartInstances).forEach(c => c && c.resize());
-  }, 150);
-});
-
-})(); // IIFE end
+})(); // end IIFE
 </script>
 </body>
 </html>
