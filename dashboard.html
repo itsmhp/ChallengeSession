@@ -721,8 +721,8 @@ function renderMain(){
         <th data-k="name">Nama Proyek</th>
         <th data-k="dept">DEPT</th>
         <th>Status</th>
-        <th data-k="alok" style="text-align:right">Alokasi Revisi</th>
-        <th data-k="rTot" style="text-align:right">Realisasi</th>
+        <th data-k="rTot" style="text-align:right">Alokasi Revisi</th>
+        <th data-k="alokUpdate" style="text-align:right">Alokasi Update ISG</th>
         <th data-k="sw" style="text-align:right">Switching</th>
         <th data-k="tpcDelta" style="text-align:right">Δ TPC</th>
         <th data-k="kebDelta" style="text-align:right">Δ Kebutuhan</th>
@@ -897,7 +897,7 @@ function renderPTable(){
 
   const totA=filtered.reduce((s,p)=>s+p.alok,0);
   const totR=filtered.reduce((s,p)=>s+p.rTot,0);
-  document.getElementById('pFoot').innerHTML=`<b>${filtered.length}</b> proyek · Alokasi <b class="tnum">${fmtRp(totA,true)}</b> · Realisasi <b class="tnum">${fmtRp(totR,true)}</b>`;
+  document.getElementById('pFoot').innerHTML=`<b>${filtered.length}</b> proyek · Alokasi Revisi <b class="tnum">${fmtRp(totA,true)}</b> · Alokasi ISG <b class="tnum">${fmtRp(filtered.reduce((s,p)=>s+p.alokUpdate,0),true)}</b>`;
 
   const tbody=document.getElementById('pTbody');
   if(!sorted.length){ tbody.innerHTML=`<tr><td colspan="10" class="empty">Tidak ada proyek yang cocok</td></tr>`; return; }
@@ -918,7 +918,7 @@ function renderPTable(){
       <td><b>${esc(p.dept||'-')}</b><div class="cell-sub">${esc(p.tim||'')}</div></td>
       <td><span class="chip ${STATUS_COLOR[p.status]||''}"><span class="chip-dot"></span>${esc(p.status)}</span></td>
       <td class="num">${fmtN(p.alok)}</td>
-      <td class="num">${fmtN(p.rTot)}</td>
+      <td class="num">${fmtN(p.alokUpdate)}</td>
       <td class="num"><span class="dbadge ${swCls}">${p.sw!==0?(sign(p.sw)+fmtRp(p.sw,true)):'-'}</span></td>
       <td class="num"><span class="dbadge ${tCls}">${p.tpcDelta!==0?(sign(p.tpcDelta)+fmtRp(p.tpcDelta,true)):'-'}</span></td>
       <td class="num"><span class="dbadge ${kCls}">${p.kebDelta!==0?(sign(p.kebDelta)+fmtRp(p.kebDelta,true)):'-'}</span></td>
