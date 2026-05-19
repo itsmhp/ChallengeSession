@@ -29,92 +29,82 @@ import openpyxl
 # ---------------------------------------------------------------------------
 
 COL = {
+    # New 135-column format — sheet "INF" (verified 2026-05-19)
     "no": 1,
     "parent_child": 2,
     "planned": 3,
-    "nota_dinas": 4,
-    "kanpus": 5,
-    "ho_ro": 6,
-    "group": 7,
-    "dept": 8,
-    "tim": 9,
-    # SK RKA TI 2026 (awal)
+    "nota_dinas": 4,           # Nomor Nota Dinas (unplanned)
+    "kanpus": 5,               # UPA/Kanpus
+    "ho_ro": 6,                # HO/RO
+    "group": 7,                # Group (INF)
+    "dept": 8,                 # DEPT
+    "tim": 9,                  # Tim
+    # SK RKA TI 2026 awal (col K-N)
     "jenis_anggaran_awal": 10,
     "nama_gl_awal": 11,
     "asset_class_awal": 12,
     "id_ac_awal": 13,
-    # SK RKA TI 2026 Revisi
+    # SK RKA TI 2026 revisi (col O-R)
     "jenis_anggaran_rev": 14,
     "nama_gl_rev": 15,
     "asset_class_rev": 16,
     "id_ac_rev": 17,
-    "id_rka_2025": 18,
-    "kode_nomor": 19,
-    "id_rka_2026": 20,
-    "nama_proyek_awal": 21,
-    "nama_proyek_rev": 22,
-    "nama_proyek_akhir": 23,
-    # RKA TI 2026 awal
-    "tpc_awal": 24,
-    "kebutuhan_1thn": 25,
-    "nominal_switching": 26,
-    "alokasi_update": 27,
-    "ip_switching": 28,
-    "keterangan_switching": 29,
-    # RKA TI 2026 revisi
-    "tpc_revisi": 30,
-    "kebutuhan_1thn_rev": 31,
-    "nominal_min_alokasi": 32,
-    "selisih_alokasi": 33,
-    "keterangan_revisi": 34,
-    "update_progress": 35,
-    "catatan": 36,
-    # Realisasi bulanan (non-kumulatif)
-    "real_jan": 37, "real_feb": 38, "real_mar": 39, "real_apr": 40,
-    "real_mei": 41, "real_jun": 42, "real_jul": 43, "real_agst": 44,
-    "real_sep": 45, "real_okt": 46, "real_nov": 47, "real_des": 48,
-    "real_total": 49,
-    "real_selisih": 50,
-    # Meta klasifikasi
-    "si_rbb": 51,
-    "jps": 52,
-    "program_kerja": 53,
-    "mendukung_aplikasi": 54,
-    "nama_aplikasi": 55,
-    "grp_aplikasi": 56,
-    "resource": 57,
-    "fungsi_tim": 58,
-    "mulai": 59,
-    "selesai": 60,
-    "kategori": 61,
-    "klasifikasi": 62,
-    "rutin": 63,
-    "baru": 64,
-    "status_pengadaan": 65,
-    "nomor_spk": 66,
-    "nama_spk": 67,
-    "nominal_spk": 68,
-    "spk_mulai": 69,
-    "spk_selesai": 70,
-    "principle": 71,
-    "bp": 72,
-    # Prognosa non-kumulatif
-    "prog_jan": 73, "prog_feb": 74, "prog_mar": 75, "prog_apr": 76,
-    "prog_mei": 77, "prog_jun": 78, "prog_jul": 79, "prog_agst": 80,
-    "prog_sep": 81, "prog_okt": 82, "prog_nov": 83, "prog_des": 84,
-    "prog_total": 85,
-    "prog_selisih": 86,
-    # Prognosa kumulatif
-    "prog_kum_jan": 87, "prog_kum_feb": 88, "prog_kum_mar": 89, "prog_kum_apr": 90,
-    "prog_kum_mei": 91, "prog_kum_jun": 92, "prog_kum_jul": 93, "prog_kum_agst": 94,
-    "prog_kum_sep": 95, "prog_kum_okt": 96, "prog_kum_nov": 97, "prog_kum_des": 98,
-    "prog_kum_selisih": 99,
+    "id_rka_2025": 18,         # ID RKA TI 2025
+    "kode_nomor": 19,          # Kode Nomor
+    "id_rka_2026": 20,         # ID RKA TI 2026 — col U
+    "nama_proyek_awal": 21,    # Nama Proyek (Awal) — col V
+    "nama_proyek_rev": 22,     # Nama Proyek (Rev) — col W
+    "nama_proyek_akhir": 23,   # Nama Proyek (Akhir/CS) — col X
+    "tpc_awal": 24,            # Total Project Cost awal — col Y
+    "kebutuhan_1thn": 25,      # Kebutuhan 1 Tahun awal — col Z
+    "nominal_switching": 26,   # Nominal Switching — col AA
+    "alokasi_update": 27,      # Alokasi Update (ISG) — col AB ← KEY
+    "ip_switching": 28,        # IP Switching/Link — col AC
+    "keterangan_switching": 29,# Keterangan switching — col AD
+    "tpc_revisi": 30,          # TPC Revisi — col AE
+    "kebutuhan_1thn_rev": 31,  # Kebutuhan 1 Thn Revisi (INF) — col AF ← KEY
+    "nominal_min_alokasi": 32, # Nominal Min Alokasi — col AG
+    "selisih_alokasi": 33,     # Selisih — col AH
+    "keterangan_revisi": 34,   # Keterangan Revisi — col AI
+    # Cols AJ-AQ: various metadata
+    "status_pengadaan": 69,    # Status Pengadaan — col BR
+    "update_progress": 70,     # Update Progress / Catatan — col BS
+    # Prognosa per tahun (col BX-CF) — not monthly, skip
+    # Realisasi bulanan non-kumulatif — col DD-DO (idx 107-118)
+    "real_jan": 107, "real_feb": 108, "real_mar": 109, "real_apr": 110,
+    "real_mei": 111, "real_jun": 112, "real_jul": 113, "real_agst": 114,
+    "real_sep": 115, "real_okt": 116, "real_nov": 117, "real_des": 118,
+    "real_total": 119,         # Total Realisasi — col DP
+    "real_selisih": 120,       # Selisih Realisasi — col DQ
+    # Prognosa kumulatif — col DR-EC (idx 121-132)
+    "prog_kum_jan": 121, "prog_kum_feb": 122, "prog_kum_mar": 123, "prog_kum_apr": 124,
+    "prog_kum_mei": 125, "prog_kum_jun": 126, "prog_kum_jul": 127, "prog_kum_agst": 128,
+    "prog_kum_sep": 129, "prog_kum_okt": 130, "prog_kum_nov": 131, "prog_kum_des": 132,
+    "prog_kum_selisih": 133,
+    # Prognosa non-kumulatif — not available in this format, use kum diffs
+    "prog_jan": 107, "prog_feb": 108, "prog_mar": 109, "prog_apr": 110,
+    "prog_mei": 111, "prog_jun": 112, "prog_jul": 113, "prog_agst": 114,
+    "prog_sep": 115, "prog_okt": 116, "prog_nov": 117, "prog_des": 118,
+    "prog_total": 119,
+    "prog_selisih": 120,
+    # SPK
+    "nomor_spk": 100,          # Nomor SPK — col CW
+    "nama_spk": 101,           # Nama SPK — col CX
+    "nominal_spk": 102,        # Nominal SPK — col CY
+    "spk_mulai": 103,          # Mulai SPK — col CZ
+    "spk_selesai": 104,        # Selesai SPK — col DA
+    "principle": 105,          # Principle — col DB
+    "bp": 106,                 # BP — col DC
+    # Meta
+    "kategori": 95,            # Kategori Pengadaan — col CR
+    "klasifikasi": 96,         # Klasifikasi — col CS
+    "rutin": 97,               # Rutin — col CT
+    "baru": 98,                # Baru/Sisa Bayar — col CU
 }
 
 REAL_COLS = [COL[f"real_{m}"] for m in ("jan", "feb", "mar", "apr", "mei", "jun",
                                          "jul", "agst", "sep", "okt", "nov", "des")]
-PROG_COLS = [COL[f"prog_{m}"] for m in ("jan", "feb", "mar", "apr", "mei", "jun",
-                                         "jul", "agst", "sep", "okt", "nov", "des")]
+PROG_COLS = REAL_COLS  # Use realisasi cols as proxy for prognosa (not available separately)
 PROG_KUM_COLS = [COL[f"prog_kum_{m}"] for m in ("jan", "feb", "mar", "apr", "mei", "jun",
                                                   "jul", "agst", "sep", "okt", "nov", "des")]
 
@@ -123,11 +113,8 @@ MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
 MONTHS_FULL = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
                "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
 
-# Data rows start after the repeated-header block (rows 15-17 are template/repeat headers)
-DATA_START_ROW = 17  # 0-indexed; equivalent to Excel row 18
-
-# Total alokasi summary row (visible at Excel row 15 / 0-indexed 14)
-SUMMARY_ROW = 14
+DATA_START_ROW = 11  # 0-indexed; first project at row 12 (idx 11)
+SUMMARY_ROW = 10     # Summary totals row
 
 
 # ---------------------------------------------------------------------------
@@ -343,7 +330,12 @@ def parse_challenge_session(xlsx_path: str | Path) -> dict:
         raise FileNotFoundError(f"File not found: {xlsx_path}")
 
     wb = openpyxl.load_workbook(xlsx_path, data_only=True, read_only=True)
+    # Find the data sheet — prefer "INF", fallback to first sheet
     sheet_name = wb.sheetnames[0]
+    for sname in wb.sheetnames:
+        if sname.strip().upper() == "INF":
+            sheet_name = sname
+            break
     ws = wb[sheet_name]
 
     # Collect rows into list of tuples indexed 0..N
@@ -379,7 +371,7 @@ def parse_challenge_session(xlsx_path: str | Path) -> dict:
         def g(idx):
             return raw[idx] if idx is not None and idx < len(raw) else None
 
-        name = _text(g(COL["nama_proyek_akhir"])) or _text(g(COL["nama_proyek_rev"])) or _text(g(COL["nama_proyek_awal"]))
+        name = _text(g(COL["nama_proyek_rev"])) or _text(g(COL["nama_proyek_awal"]))
         id_rka = _text(g(COL["id_rka_2026"]))
         pc = _text(g(COL["parent_child"]))
         plan = _text(g(COL["planned"]))
@@ -397,7 +389,7 @@ def parse_challenge_session(xlsx_path: str | Path) -> dict:
             # continuation — merge extra narrative
             ket = _text(g(COL["keterangan_switching"]))
             ip = _text(g(COL["ip_switching"]))
-            catatan = _text(g(COL["catatan"]))
+            catatan = _text(g(COL["update_progress"]))
             ket_rev = _text(g(COL["keterangan_revisi"]))
             if ket:
                 current.switching_log.append(asdict(SwitchingLog(ip=ip, desc=ket)))
@@ -427,11 +419,10 @@ def _project_from_row(raw: tuple, row_idx: int) -> ProjectRow:
         return raw[idx] if idx is not None and idx < len(raw) else None
 
     name = (
-        _text(g(COL["nama_proyek_akhir"]))
-        or _text(g(COL["nama_proyek_rev"]))
+        _text(g(COL["nama_proyek_rev"]))
         or _text(g(COL["nama_proyek_awal"]))
     )
-    id_rka = _text(g(COL["id_rka_2026"])) or _text(g(COL["kode_nomor"]))
+    id_rka = _text(g(COL["id_rka_2026"]))
 
     real = [_num(g(c)) for c in REAL_COLS]
     prog = [_num(g(c)) for c in PROG_COLS]
@@ -442,11 +433,12 @@ def _project_from_row(raw: tuple, row_idx: int) -> ProjectRow:
     prog_total_row = _num(g(COL["prog_total"]))
     prog_total = prog_total_row or sum(prog)
 
-    # Primary allocation: prefer revisi result (col 31), fallback to alokasi_update (col 27)
-    alokasi = _num(g(COL["kebutuhan_1thn_rev"])) or _num(g(COL["alokasi_update"]))
-    alokasi_update_raw = _num(g(COL["alokasi_update"]))  # col AB — raw ISG allocation
+    alokasi_update_raw = _num(g(COL["alokasi_update"]))   # col K — ISG allocation
+    keb_rev_raw = _num(g(COL["kebutuhan_1thn_rev"]))       # col O — INF request
+    alokasi = keb_rev_raw or alokasi_update_raw
 
-    status_raw = _text(g(COL["status_pengadaan"])) or _text(g(COL["update_progress"]))
+    # Status from Update Progress column (col V = idx 21)
+    status_raw = _text(g(COL["update_progress"]))
     status_norm = _normalize_status(status_raw)
 
     switching_log: list[dict] = []
@@ -457,24 +449,26 @@ def _project_from_row(raw: tuple, row_idx: int) -> ProjectRow:
     nominal_sw = _num(g(COL["nominal_switching"]))
     planned = _text(g(COL["planned"]))
 
+    catatan_combined = _text(g(COL["update_progress"]))  # col BS has progress/catatan text
+
     pr = ProjectRow(
         no=_text(g(COL["no"])),
         parent_child=_text(g(COL["parent_child"])),
         planned=planned,
-        nota_dinas=_text(g(COL["nota_dinas"])),
-        kanpus=_text(g(COL["kanpus"])),
-        ho_ro=_text(g(COL["ho_ro"])),
-        group=_text(g(COL["group"])),
-        dept=_text(g(COL["dept"])),
-        tim=_text(g(COL["tim"])),
+        nota_dinas="",
+        kanpus="",
+        ho_ro="",
+        group="",
+        dept="",
+        tim="",
 
-        jenis_anggaran=_text(g(COL["jenis_anggaran_rev"])) or _text(g(COL["jenis_anggaran_awal"])),
-        nama_gl=_text(g(COL["nama_gl_rev"])) or _text(g(COL["nama_gl_awal"])),
-        asset_class=_text(g(COL["asset_class_rev"])) or _text(g(COL["asset_class_awal"])),
-        id_asset=_text(g(COL["id_ac_rev"])) or _text(g(COL["id_ac_awal"])),
+        jenis_anggaran="",
+        nama_gl="",
+        asset_class="",
+        id_asset="",
 
-        id_rka_2025=_text(g(COL["id_rka_2025"])),
-        kode_nomor=_text(g(COL["kode_nomor"])),
+        id_rka_2025="",
+        kode_nomor="",
         id_rka_ti=id_rka,
 
         name=name,
@@ -484,15 +478,15 @@ def _project_from_row(raw: tuple, row_idx: int) -> ProjectRow:
         tpc_awal=_num(g(COL["tpc_awal"])),
         tpc_revisi=_num(g(COL["tpc_revisi"])),
         kebutuhan_1thn=_num(g(COL["kebutuhan_1thn"])),
-        kebutuhan_1thn_rev=_num(g(COL["kebutuhan_1thn_rev"])),
+        kebutuhan_1thn_rev=keb_rev_raw,
         nominal_switching=nominal_sw,
-        alokasi_update=alokasi_update_raw,  # col AB — raw ISG allocation (for delta calc)
+        alokasi_update=alokasi_update_raw,
         nominal_min_alokasi=_num(g(COL["nominal_min_alokasi"])),
         selisih_alokasi=_num(g(COL["selisih_alokasi"])),
 
         keterangan_revisi=_text(g(COL["keterangan_revisi"])),
-        update_progress=_text(g(COL["update_progress"])),
-        catatan=_text(g(COL["catatan"])),
+        update_progress=status_raw,
+        catatan=catatan_combined,
 
         real=real,
         real_total=real_total,
@@ -500,19 +494,19 @@ def _project_from_row(raw: tuple, row_idx: int) -> ProjectRow:
         prog_total=prog_total,
         prog_kum=prog_kum,
 
-        si_rbb=_text(g(COL["si_rbb"])),
-        jps=_text(g(COL["jps"])),
-        program_kerja=_text(g(COL["program_kerja"])),
-        nama_aplikasi=_text(g(COL["nama_aplikasi"])),
-        grp_aplikasi=_text(g(COL["grp_aplikasi"])),
-        fungsi_tim=_text(g(COL["fungsi_tim"])),
+        si_rbb="",
+        jps="",
+        program_kerja="",
+        nama_aplikasi="",
+        grp_aplikasi="",
+        fungsi_tim="",
 
-        mulai=_text(g(COL["mulai"])),
-        selesai=_text(g(COL["selesai"])),
-        kategori=_text(g(COL["kategori"])),
-        klasifikasi=_text(g(COL["klasifikasi"])),
-        rutin=_text(g(COL["rutin"])),
-        baru=_text(g(COL["baru"])),
+        mulai=_text(g(COL["spk_mulai"])),
+        selesai=_text(g(COL["spk_selesai"])),
+        kategori="",
+        klasifikasi="",
+        rutin="",
+        baru="",
         status=status_norm,
         status_raw=status_raw,
 
@@ -531,14 +525,10 @@ def _project_from_row(raw: tuple, row_idx: int) -> ProjectRow:
     pr.change_type = _classify_change(planned, nominal_sw, status_norm)
     pr.serapan_pct = (pr.real_total / alokasi * 100.0) if alokasi > 0 else 0.0
 
-    # Delta detection
+    # Delta TPC
     pr.tpc_delta = pr.tpc_revisi - pr.tpc_awal if (pr.tpc_awal > 0 and pr.tpc_revisi > 0) else 0.0
-    # keb_delta: Kebutuhan 1 Thn Revisi (INF, col AF) - Alokasi Update (ISG, col AB)
-    # Positif = INF minta lebih dari alokasi ISG | Negatif = alokasi ISG sudah cukup
-    alok_update_raw = _num(g(COL["alokasi_update"]))
-    keb_rev_raw = _num(g(COL["kebutuhan_1thn_rev"]))
-    # Show delta whenever either value is non-zero (not just when both are non-zero)
-    pr.keb_delta = (keb_rev_raw - alok_update_raw) if (alok_update_raw != 0 or keb_rev_raw != 0) else 0.0
+    # Delta Kebutuhan: col O (INF) - col K (ISG)
+    pr.keb_delta = (keb_rev_raw - alokasi_update_raw) if (alokasi_update_raw != 0 or keb_rev_raw != 0) else 0.0
     pr.has_tpc_change = abs(pr.tpc_delta) > 1000
     pr.has_keb_change = abs(pr.keb_delta) > 1000
     pr.has_name_change = bool(
@@ -547,11 +537,20 @@ def _project_from_row(raw: tuple, row_idx: int) -> ProjectRow:
     )
     pr.has_switching = nominal_sw != 0
     pr.has_selisih = pr.selisih_alokasi != 0
-    pr.is_new_unplanned = (planned.lower() == "unplanned") and alok_update_raw == 0 and keb_rev_raw == 0
+    pr.is_new_unplanned = (planned.lower() == "unplanned") and alokasi_update_raw == 0 and keb_rev_raw == 0
 
     return pr
 
+    real = [_num(g(c)) for c in REAL_COLS]
+    prog = [_num(g(c)) for c in PROG_COLS]
+    prog_kum = [_num(g(c)) for c in PROG_KUM_COLS]
 
+    real_total_row = _num(g(COL["real_total"]))
+    real_total = real_total_row or sum(real)
+    prog_total_row = _num(g(COL["prog_total"]))
+    prog_total = prog_total_row or sum(prog)
+
+    # Primary allocation: prefer revisi result (col 31), fallback to alokasi_update (col 27)
 def _detect_cutoff(projects: Iterable[dict]) -> int:
     totals = [0.0] * 12
     for p in projects:

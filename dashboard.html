@@ -358,30 +358,42 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 (function(){
 'use strict';
 
-/* ── COLUMN MAP (0-indexed) ── */
+/* ── COLUMN MAP (0-indexed) — 135-col format, sheet "INF" ── */
 const COL = {
-  no:1,pc:2,planned:3,nota:4,kanpus:5,ho:6,group:7,dept:8,tim:9,
+  no:1, pc:2, planned:3, nota:4,
+  kanpus:5, ho:6, group:7, dept:8, tim:9,
   ja1:10,gl1:11,ac1:12,id1:13,ja2:14,gl2:15,ac2:16,id2:17,
-  id25:18,kode:19,id26:20,
-  nm1:21,nm2:22,nm3:23,
-  tpc_awal:24,keb1:25,sw:26,alok:27,ip_sw:28,ket_sw:29,
-  tpc_rev:30,keb_rev:31,nom_min:32,selisih:33,ket_rev:34,
-  progress:35,catatan:36,
-  r0:37,r1:38,r2:39,r3:40,r4:41,r5:42,r6:43,r7:44,r8:45,r9:46,r10:47,r11:48,
-  r_tot:49,r_sel:50,
-  si_rbb:51,jps:52,prog_kerja:53,mendukung:54,aplikasi:55,grp_app:56,resource:57,fungsi:58,
-  mulai:59,selesai:60,kategori:61,klasifikasi:62,rutin:63,baru:64,status:65,
-  no_spk:66,nm_spk:67,nom_spk:68,spk_mul:69,spk_sel:70,principle:71,bp:72,
-  p0:73,p1:74,p2:75,p3:76,p4:77,p5:78,p6:79,p7:80,p8:81,p9:82,p10:83,p11:84,
-  p_tot:85,p_sel:86,
-  pk0:87,pk1:88,pk2:89,pk3:90,pk4:91,pk5:92,pk6:93,pk7:94,pk8:95,pk9:96,pk10:97,pk11:98,pk_sel:99
+  id25:18, kode:19,
+  id26:20,
+  nm1:21, nm2:22, nm3:23,
+  tpc_awal:24, keb1:25, sw:26,
+  alok:27,          // Alokasi Update (ISG) — col AB
+  ip_sw:28, ket_sw:29,
+  tpc_rev:30,
+  keb_rev:31,       // Kebutuhan 1 Thn Revisi (INF) — col AF
+  nom_min:32, selisih:33, ket_rev:34,
+  status:69,        // Status Pengadaan — col BR
+  progress:70,      // Update Progress / Catatan — col BS
+  kategori:95, klasifikasi:96, rutin:97, baru:98,
+  no_spk:100, nm_spk:101, nom_spk:102, spk_mul:103, spk_sel:104,
+  principle:105, bp:106,
+  // Realisasi bulanan non-kumulatif — col DD-DO (idx 107-118)
+  r0:107,r1:108,r2:109,r3:110,r4:111,r5:112,r6:113,r7:114,r8:115,r9:116,r10:117,r11:118,
+  r_tot:119,        // Total Realisasi — col DP
+  r_sel:120,
+  // Prognosa kumulatif — col DR-EC (idx 121-132)
+  pk0:121,pk1:122,pk2:123,pk3:124,pk4:125,pk5:126,pk6:127,pk7:128,pk8:129,pk9:130,pk10:131,pk11:132,
+  pk_sel:133,
+  // Prognosa non-kumulatif — same as realisasi (not available separately)
+  p0:107,p1:108,p2:109,p3:110,p4:111,p5:112,p6:113,p7:114,p8:115,p9:116,p10:117,p11:118,
+  p_tot:119, p_sel:120
 };
-const REAL_IDX = [37,38,39,40,41,42,43,44,45,46,47,48];
-const PROG_IDX = [73,74,75,76,77,78,79,80,81,82,83,84];
-const PROG_KUM = [87,88,89,90,91,92,93,94,95,96,97,98];
+const REAL_IDX = [107,108,109,110,111,112,113,114,115,116,117,118];
+const PROG_IDX = [107,108,109,110,111,112,113,114,115,116,117,118];
+const PROG_KUM = [121,122,123,124,125,126,127,128,129,130,131,132];
 const MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'];
 const MONTHS_FULL = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-const DATA_START = 17;
+const DATA_START = 11; // First project at row 12 (idx 11)
 
 /* ── UTILS ── */
 const num = v => {
@@ -500,7 +512,7 @@ function parseProjects(aoa) {
       cur = buildRow(r,i); out.push(cur);
     } else if(cur){
       const ks=txt(g(COL.ket_sw)), ip=txt(g(COL.ip_sw));
-      const cat=txt(g(COL.catatan)), kr=txt(g(COL.ket_rev));
+      const cat=txt(g(COL.progress)), kr=txt(g(COL.ket_rev));
       if(ks) cur.swLog.push({ip,desc:ks});
       if(cat&&!cur.catatan.includes(cat)) cur.catatan+=(cur.catatan?'\n':'')+cat;
       if(kr&&!cur.ketRev.includes(kr)) cur.ketRev+=(cur.ketRev?'\n':'')+kr;
@@ -517,15 +529,17 @@ function buildRow(r,ri){
   const progK= PROG_KUM.map(c=>num(g(c)));
   const rTot = num(g(COL.r_tot))||real.reduce((a,b)=>a+b,0);
   const pTot = num(g(COL.p_tot))||prog.reduce((a,b)=>a+b,0);
-  // alokasi_update = col AB (idx 27), kebutuhan_1thn_rev = col AF (idx 31)
-  const alokUpdate = num(g(COL.alok));       // col AB — Alokasi Update (ISG)
-  const kebRev     = num(g(COL.keb_rev));    // col AF — Kebutuhan 1 Thn Revisi (INF)
-  const alok = kebRev || alokUpdate;         // primary display value
+  // col AB (idx 27) = Alokasi Update (ISG)
+  // col AF (idx 31) = Kebutuhan 1 Thn Revisi (INF)
+  const alokUpdate = num(g(COL.alok));   // col AB — Alokasi Update (ISG)
+  const kebRev     = num(g(COL.keb_rev));// col AF — Kebutuhan 1 Thn Revisi (INF)
+  const alok = kebRev || alokUpdate;
   const tpcA = num(g(COL.tpc_awal)), tpcR = num(g(COL.tpc_rev));
   const sw   = num(g(COL.sw));
   const sel  = num(g(COL.selisih));
   const nomMin = num(g(COL.nom_min));
   const plan = txt(g(COL.planned));
+  // Status: col BR (idx 69) = Status Pengadaan, col BS (idx 70) = Update Progress
   const statusRaw = txt(g(COL.status))||txt(g(COL.progress));
   const status = normStatus(statusRaw);
   const nameA = txt(g(COL.nm1)), nameR = txt(g(COL.nm2));
@@ -534,9 +548,6 @@ function buildRow(r,ri){
   if(ks) swLog.push({ip:txt(g(COL.ip_sw)),desc:ks});
 
   const tpcDelta = (tpcA>0&&tpcR>0) ? tpcR-tpcA : 0;
-  // kebDelta: Kebutuhan 1 Thn Revisi (INF, col AF) - Alokasi Update (ISG, col AB)
-  // Positif = INF minta lebih dari alokasi ISG | Negatif = alokasi ISG sudah cukup
-  // Show delta whenever either value is non-zero (not just when both are non-zero)
   const kebDelta = (alokUpdate!==0||kebRev!==0) ? kebRev-alokUpdate : 0;
   const hasNameChange = !!(nameA&&name&&nameA!=='-'&&name!=='-'&&nameA!==name&&nameA.length>3);
 
@@ -551,16 +562,17 @@ function buildRow(r,ri){
     rutin:txt(g(COL.rutin)), baru:txt(g(COL.baru)),
     status, statusRaw,
     tpcA, tpcR, tpcDelta,
-    alokUpdate, kebRev, kebDelta,  // alokUpdate=col AB, kebRev=col AF
+    alokUpdate, kebRev, kebDelta,
     alok, sw, sel, nomMin,
     real, rTot, prog, pTot, progK,
-    ketRev:txt(g(COL.ket_rev)), catatan:txt(g(COL.catatan)),
+    ketRev:txt(g(COL.ket_rev)),
+    catatan:txt(g(COL.progress)),  // col BS has the progress/catatan text
     progress:txt(g(COL.progress)),
     noSpk:txt(g(COL.no_spk)), nmSpk:txt(g(COL.nm_spk)),
     nomSpk:num(g(COL.nom_spk)),
     principle:txt(g(COL.principle)), bp:txt(g(COL.bp)),
-    aplikasi:txt(g(COL.aplikasi)), grpApp:txt(g(COL.grp_app)),
-    mulai:txt(g(COL.mulai)), selesai:txt(g(COL.selesai)),
+    aplikasi:'', grpApp:'',
+    mulai:txt(g(COL.spk_mul)), selesai:txt(g(COL.spk_sel)),
     swLog,
     hasTpcChange: Math.abs(tpcDelta)>1000,
     hasKebChange: Math.abs(kebDelta)>1000,
